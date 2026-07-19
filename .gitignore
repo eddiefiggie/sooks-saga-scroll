@@ -1,0 +1,5 @@
+# macOS
+.DS_Store
+
+# Pruned builds kept locally for rollback, not published
+_to_delete/
