@@ -33,7 +33,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p _site
-          LIVE=$(grep -oE 'sooks-saga-scroll-[0-9]{8}-[0-9]+\.html' README.md | head -1)
+          LIVE=$(grep -m1 -oE 'sooks-saga-scroll-[0-9]{8}-[0-9]+\.html' README.md)
           if [ -z "$LIVE" ] || [ ! -f "$LIVE" ]; then
             echo "::error::Could not resolve the parked build from README.md (got '$LIVE')"
             exit 1
