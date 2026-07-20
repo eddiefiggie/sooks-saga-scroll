@@ -1194,7 +1194,7 @@
      the reclaimed right-side space spanning BOTH rows. The `auto` right column +
      its column-gap exist only here, so gap-free sagas never reserve dead space. */
   .saga-header.has-lfm {
-    grid-template-columns: minmax(0, 1fr) auto;
+    grid-template-columns: minmax(0, 1fr) 248px;   /* Build 07192026.4 — fixed right band -> all pills align vertically */
     grid-template-areas:
       "t1 t3"
       "t2 t3";
@@ -1224,21 +1224,27 @@
   .hdr-t3 {
     grid-area: t3;
     align-self: stretch;
-    justify-self: end;
-    display: flex;
-    align-items: center;
-  }
-  .hdr-t3 .lfm-skull-tag {
-    width: auto;
-    max-width: 280px;
-    height: 100%;
+    justify-self: stretch;
     display: flex;
     align-items: center;
     justify-content: center;
-    padding: 6px 18px;
-    font-size: 0.78rem;
+  }
+  .hdr-t3 .lfm-skull-tag {
+    width: 210px;
+    max-width: 210px;
+    min-height: 62px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 8px 12px;
     text-align: center;
   }
+  .hdr-t3 .lfm-r1 { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.3px; white-space: nowrap; }
+  .hdr-t3 .lfm-r2 { font-size: 0.88rem; font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hdr-t3 .lfm-r3 { font-size: 0.8rem;  font-style: italic; opacity: 0.85; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* Fixed pill width so the reaper + completion bars start at the same offset
      on every card (R10 column alignment). Bars are already equal 118px. */
   .hdr-t2 .reward-pill {
@@ -1280,9 +1286,8 @@
     .hdr-t3 .lfm-skull-tag {
       width: 100%;
       max-width: 100%;
-      height: auto;
-      display: block;
-      padding: 3px 16px;
+      min-height: 0;
+      padding: 6px 16px;
     }
   }
 
@@ -1575,6 +1580,11 @@
     border-color: #ff2f1f;
     box-shadow: 0 0 11px rgba(255,47,31,0.95);
   }
+  /* Build 07192026.4 — right-side reaper-tier tracker captions carry the SAME
+     low/mid/high colours as the LFM pills (colour key for the tier signal). */
+  th.gm-fold.low  { background: rgba(43,26,8,0.22); border-bottom: 2px solid var(--gold); }
+  th.gm-fold.mid  { background: #e07b1f; color: #fff3e0; border-bottom: 2px solid #ff8c1a; }
+  th.gm-fold.high { background: #cf261b; color: #ffe9e6; border-bottom: 2px solid #ff2f1f; }
   /* Build 07182026.9 — PERF: opacity-overlay pulse instead of animated
      box-shadow. The tag keeps its static 11px glow; a `::after` carrying the
      peak halo breathes via `opacity` (transparent fill, so the tag text is
@@ -2346,6 +2356,7 @@
        narrow : "tog name" / controls / LFM fully stacked (controls roll below)
      LFM always occupies its own row (its own tier). */
   .quest {
+    --q-check: 32px;   /* Build 07192026.4 — single source for the checkbox width; the LFM indent derives from it */
     /* container-type lives on .quest-block (the parent) — a container queries
        its descendants, not itself. */
     display: grid;
@@ -2361,8 +2372,10 @@
   .quest > .quest-toggle { grid-area: tog; }
   .quest > .q-t2 { grid-area: ctrl; }   /* controls left of the name at wide */
   .quest > .q-t1 { grid-area: name; min-width: 0; }
-  /* LFM auto-places onto a full-width implicit row only when present. */
-  .quest > .q-t3 { grid-column: 1 / -1; }
+  /* Build 07192026.4 — align the LFM line's left edge with the action PILLS
+     (past the master checkbox), so it reads as part of the same aligned column.
+     The indent matches the checkbox (32) + gaps + cluster padding. */
+  .quest > .q-t3 { grid-column: 2 / -1; margin-left: calc(var(--q-check) + 20px); }  /* Build 07192026.4 — checkbox width + cluster chrome; aligns the LFM under the pills */
   /* Narrow: name rises next to the toggle; controls roll below (B1). Build .5
      raised this 560 -> 640 so a full control cluster (~468px) rolls before it
      crushes the name into a sliver. Tunable. */
@@ -2373,6 +2386,13 @@
         "tog name"
         "ctrl ctrl";
     }
+    .quest > .q-t3 { grid-column: 1 / -1; }
+  }
+  /* Build 07192026.4 — the action pills hold a horizontal ROW while they fit
+     (including on their own collapsed line); they stack into an aligned
+     vertical column ONLY once a 3-pill row no longer fits (~490px). */
+  @container (max-width: 490px) {
+    .q-actions { flex-direction: column; align-items: flex-start; }
   }
   /* Build 07052026.10 — structured two-line row (replaces Build .9's
      free-wrapping chips, which read as patchwork). The controls cluster
@@ -2445,6 +2465,17 @@
        6px row-gap when wrapped). */
     flex-wrap: wrap;
   }
+  /* Build 07192026.4 — the three 140px action pills (Reaper / Saga / Skip) live
+     in their own grid so they wrap into ALIGNED 140px columns as the row
+     narrows (a single aligned column at the narrowest) instead of a ragged
+     free wrap. The master checkbox stays to their left. */
+  .q-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    /* Build 07192026.4 — a horizontal ROW at wide; it stacks into an aligned
+       vertical column ONLY at the narrow breakpoint below, as the row collapses. */
+  }
 
   .completion-controls:hover {
     border-color: rgba(111,90,50,0.6);
@@ -2463,8 +2494,8 @@
      26px checkmark — meant to dominate the row as the master state. */
   .quest input[type="checkbox"] {
     appearance: none;
-    width: 32px;
-    height: 32px;
+    width: var(--q-check);
+    height: var(--q-check);
     border: 2.5px solid var(--parchment-edge);
     border-radius: 50%;
     cursor: pointer;
@@ -2641,8 +2672,10 @@
     font-family: var(--font-body);
     font-size: 0.95rem;
     color: var(--ink-secondary);
-    white-space: nowrap;
-    flex-shrink: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    min-width: 0;
+    flex-shrink: 1;
   }
 
   .quest-giver a {
@@ -3463,12 +3496,20 @@
   /* Build 06222026.3 — each distinct card. The parchment box that used to wrap
      the whole cluster now wraps each panel individually, so the Characters card
      and the Guild card read as two separate things. */
+  /* Build 07192026.3 — shared, viewport-driven corner width. Holds 200px on
+     wide screens, then shrinks symmetrically toward a 150px floor as the
+     window narrows so both clusters stay edge-pinned as long as possible
+     (it never grows). The SAME property sizes the center gutter below, so
+     left/right stay equal by construction. Floor is reached at 100vw≈1040px. */
+  :root {
+    --corner-w: clamp(150px, calc((100vw - 688px) / 2 - 26px), 200px);
+  }
   .corner-panel {
     display: flex;
     flex-direction: column;
     align-items: stretch;
     min-height: 0;
-    width: 200px;                    /* both cards share one width so they align */
+    width: var(--corner-w);          /* shared width; equal on both sides */
     box-sizing: border-box;
     gap: 6px;
     padding: 6px 8px;
@@ -4004,7 +4045,10 @@
        Search(2×) · Expand-all, symmetric around the center); shrinks to
        one unit before the row wraps on narrow screens. */
     width: calc(var(--ctl-w) * 2 + 18px);
-    min-width: var(--ctl-w);
+    /* Build 07192026.4 — was min-width: var(--ctl-w), which beat max-width:100%
+       and made the field overflow its 2x2 sub-panel at the narrowest widths.
+       min-width:0 lets it shrink to fit the panel (max-width:100% still caps it). */
+    min-width: 0;
     text-align: left; cursor: text;
     padding-left: 28px; padding-right: 28px;
     -webkit-appearance: none; appearance: none;
@@ -4054,16 +4098,23 @@
      collides with the centered content when the effective viewport shrinks
      — small windows, phones, and BROWSER ZOOM (zoom shrinks the CSS
      viewport that media queries measure, so a zoomed desktop behaves like
-     a tablet). Three regimes:
-       ≥1621px  — plenty of room, fixed corners as always;
-       1180–1620 — corners stay fixed but the scroll cedes side gutters so
-                   cards never sit ON the parchment;
-       ≤1179px  — corners drop INTO the document flow as wrapping card rows
-                   above the scroll; nothing can overlap anything. */
-  @media (min-width: 1180px) and (max-width: 1620px) {
-    .scroll { max-width: calc(100vw - 452px); }
+     a tablet). Two regimes (Build 07192026.3 made the fixed regime a single
+     continuous band that shrinks the corners symmetrically instead of the old
+     ≥1621 / 1180–1620 split):
+       >1040px  — corners fixed and pinned to BOTH edges; they hold 200px then
+                  shrink together toward a 150px floor (via --corner-w) as the
+                  viewport narrows, while the scroll cedes matching side gutters
+                  so cards never sit ON the parchment. Nothing overlaps;
+       ≤1040px  — corners drop INTO the document flow, reparented into the
+                  #narrowStack single column above the scroll. */
+  /* Build 07192026.3 — continuous gutter across the whole fixed-corner
+     regime (was a single 1180-1620 band). The center yields symmetric side
+     gutters sized to the live --corner-w, so the shrinking corners never sit
+     on the parchment; min() keeps the reading column <=1150px on wide screens. */
+  @media (min-width: 1041px) {
+    .scroll { max-width: min(1150px, calc(100vw - 2 * var(--corner-w) - 52px)); }
   }
-  @media (max-width: 1179px) {
+  @media (max-width: 1040px) {
     .data-corner,
     .data-corner.left {
       position: static;
@@ -4080,9 +4131,9 @@
     }
     .data-corner.left { margin-bottom: 16px; }
     .corner-panel {
-      width: 320px;
-      max-width: 100%;
-      flex: 0 1 320px;
+      width: 100%;
+      max-width: 380px;
+      flex: 0 1 auto;
     }
     .char-panel { max-height: none; }
 
@@ -4345,7 +4396,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07192026.2</div>
+      <div class="build">Build 07192026.4</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -13034,6 +13085,7 @@ const DDO_REF_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
 let _areasMap = null;      // Map<number, {name, region}>
 let _questsMap = null;     // Map<number, name>
 let _questAreaMap = null;  // Build 07052026.1 — Map<area_id, quest name> (quest-by-location)
+let _questAreaIdMap = null; // Build 07192026.4 — Map<quest_id, area_id> (drives the LFM zone line)
 let _raidQuestIds = null;  // Build 07112026.1 — Set<quest_id> where group_size === "Raid"
 let _questPackMap = null;  // Build 07112026.5 — Map<quest_id, required_adventure_pack>
 const _refFetchInFlight = {};  // de-dupe concurrent fetches by table name
@@ -13486,6 +13538,7 @@ async function getAreasMap() {
 function _setQuestMaps(slim) {
   _questsMap = new Map(slim.map(q => [q.id, q.name]));
   _questAreaMap = new Map(slim.filter(q => q.area > 0).map(q => [q.area, q.name]));
+  _questAreaIdMap = new Map(slim.map(q => [q.id, q.area || 0]));  // Build 07192026.4 — quest_id -> area_id (zone)
   // Build 07112026.1 — which quest ids are raids (group_size "Raid"). Powers
   // the raids card: raid LFMs are split out of the quest badge path by id.
   _raidQuestIds = new Set(slim.filter(q => q.raid).map(q => q.id));
@@ -13526,6 +13579,7 @@ async function getQuestsMap() {
     } else {
       _questsMap = new Map();
       _questAreaMap = new Map();
+      _questAreaIdMap = new Map();
       _raidQuestIds = new Set();     // Build 07112026.1 — resolved-but-empty
       _questPackMap = new Map();     // Build 07112026.5 — resolved-but-empty
     }
@@ -13789,8 +13843,9 @@ async function refreshLfmIndex(server) {
   _lfmFetchKey = server;
   _lfmFetchTs = now;   // claim the window up-front so concurrent renders don't re-enter
   try {
-    const [qmap, j] = await Promise.all([
+    const [qmap, areas, j] = await Promise.all([
       getQuestsMap(),
+      getAreasMap(),                       // Build 07192026.4 — for the LFM zone (adventure area)
       _ddoGetJson(DDO_AUDIT.lfmUrls(server))
     ]);
     const lfms = j && j.data ? j.data : null;
@@ -13832,12 +13887,18 @@ async function refreshLfmIndex(server) {
       // can filter by tier: a heroic-level group must not light the
       // Legendary container for the same-named quest, and vice versa.
       // Aggregation moved to lfmForTier().
+      // Build 07192026.4 — the ZONE (adventure area) the quest takes place in,
+      // resolved from the quest's area_id via the areas table. Distinct from the
+      // quest name; "" when unresolvable so the pill simply omits its third row.
+      const areaId = _questAreaIdMap ? _questAreaIdMap.get(qid) : 0;
+      const areaRec = areaId ? areas.get(areaId) : null;
+      const zone = areaRec ? areaRec.name : "";
       const e = idx[key] || (idx[key] = { groups: [] });
       e.groups.push({
         minL: isFinite(minL) ? minL : null,
         maxL: isFinite(maxL) ? maxL : null,
         diff: diff ? String(diff) : "",
-        skulls, leader: leaderName, party
+        skulls, leader: leaderName, party, zone
       });
       // Build 07112026.1 — raids also feed the raids card (by quest id, via
       // the quests table's group_size). They stay in the quest index too —
@@ -13982,14 +14043,14 @@ function _lfmForTierCompute(questName, tier) {
     return hi >= band[0] && lo <= band[1];               // range overlaps the tier band
   });
   if (!groups.length) return null;
-  const agg = { count: groups.length, minLevel: null, maxLevel: null, difficulties: new Set(), skulls: 0, leader: "", party: 0 };
+  const agg = { count: groups.length, minLevel: null, maxLevel: null, difficulties: new Set(), skulls: 0, leader: "", party: 0, zone: "" };
   let ps = -1;
   groups.forEach(g => {
     if (g.minL != null && (agg.minLevel == null || g.minL < agg.minLevel)) agg.minLevel = g.minL;
     if (g.maxL != null && (agg.maxLevel == null || g.maxL > agg.maxLevel)) agg.maxLevel = g.maxL;
     if (g.diff) agg.difficulties.add(g.diff);
     if (g.skulls > agg.skulls) agg.skulls = g.skulls;
-    if (g.skulls > ps) { agg.leader = g.leader; agg.party = g.party; ps = g.skulls; }
+    if (g.skulls > ps) { agg.leader = g.leader; agg.party = g.party; agg.zone = g.zone || ""; ps = g.skulls; }
   });
   return agg;
 }
@@ -14616,11 +14677,13 @@ function renderSagaCard(saga) {
   // R4–R7, red (pulsing) for R8–R10. Build 07052026.8 — the tag also names
   // the group leader and the party fill as a fraction of the 6-player cap,
   // in plain readable text ("☠ R8 · Henk · 3/6").
-  const lfmLeadTxt = (lfmTopHit && lfmTopHit.leader)
-    ? `<span class="lfm-lead">${escapeHtml(lfmTopHit.leader)} · ${lfmTopHit.party}/6</span>` : "";
+  // Build 07192026.4 — fixed-size 3-row LFM pill: row 1 ☠ R<n> · <fill>/6,
+  // row 2 leader, row 3 the ZONE the leader is in.
+  const lfmLeader = (lfmTopHit && lfmTopHit.leader) ? lfmTopHit.leader : "Anonymous";
+  const lfmFill = lfmTopHit ? lfmTopHit.party : 1;
+  const lfmZone = (lfmTopHit && lfmTopHit.zone) ? lfmTopHit.zone : "";
   const lfmSkullTag = lfmMaxSkulls > 0
-    ? `<span class="lfm-skull-tag ${lfmMaxSkulls >= 8 ? "high" : (lfmMaxSkulls >= 4 ? "mid" : "low")}"
-         title="Live LFM: ${lfmTopHit && lfmTopHit.leader ? escapeHtml(lfmTopHit.leader) + "'s group (" + lfmTopHit.party + " of 6) · " : ""}declared Reaper ${lfmMaxSkulls} skull${lfmMaxSkulls === 1 ? "" : "s"}">☠ R${lfmMaxSkulls}${lfmLeadTxt}</span>`
+    ? `<span class="lfm-skull-tag ${lfmMaxSkulls >= 8 ? "high" : (lfmMaxSkulls >= 4 ? "mid" : "low")}" title="Live LFM: ${escapeHtml(lfmLeader)}'s group (${lfmFill} of 6) · declared Reaper ${lfmMaxSkulls} skull${lfmMaxSkulls === 1 ? "" : "s"}${lfmZone ? " · " + escapeHtml(lfmZone) : ""}"><span class="lfm-r1">☠ R${lfmMaxSkulls} · ${lfmFill}/6</span><span class="lfm-r2">${escapeHtml(lfmLeader)}</span>${lfmZone ? `<span class="lfm-r3">${escapeHtml(lfmZone)}</span>` : ""}</span>`
     : "";
   // Build 07192026.2 — `toggleLabel` (the in-body End Reward button's label)
   // was removed with that control; the header pill uses `rewardLabel`.
@@ -15411,9 +15474,7 @@ function renderQuestRow(sagaId, questName, qState) {
         <span class="completion-controls q-t2" title="LEFT checkbox = master Quest Completed (counts toward saga reward) · ☠ REAPER ☠ = first-time Reaper completion (preserved on saga reset) · Saga Reward = master toggle (same as LEFT) · ★ SKIP ★ = Astral Shard / VIP skip (saga-local, reset with saga)">
           <input type="checkbox" data-quest="${escapeHtml(questName)}" ${done ? "checked" : ""}
                  title="QUEST COMPLETED — master indicator. Auto-fills when you click Reaper, Skip, or Saga Reward. Click to toggle."/>
-          ${NO_REAPER.has(questName) ? "" : reaperBtnHtml}
-          ${sagaDoneBtnHtml}
-          ${astralBtnHtml}
+          <span class="q-actions">${NO_REAPER.has(questName) ? "" : reaperBtnHtml}${sagaDoneBtnHtml}${astralBtnHtml}</span>
         </span>
         <div class="quest-line1 q-t1">
           ${levelHtml}
@@ -16496,7 +16557,7 @@ function _ftrNeeded(questName, minL, maxL) {
 // ☠ R<n> / leader · fill vs the 6-player quest cap. Same fold + repaint
 // mechanics as the raids card; every card defaults collapsed. Never throws.
 const REAPER_CARDS = {
-  low:  { el: "lowCorner",  label: "Low Reaper",  lo: 1, hi: 3,  tint: "" },
+  low:  { el: "lowCorner",  label: "Low Reaper",  lo: 1, hi: 3,  tint: " low" },
   mid:  { el: "midCorner",  label: "Mid Reaper",  lo: 4, hi: 7,  tint: " mid" },
   high: { el: "highCorner", label: "High Reaper", lo: 8, hi: 10, tint: " high" }
 };
@@ -16556,7 +16617,7 @@ function renderReaperCorner(band) {
     const caret = folded ? "▸" : "▾";
     corner.innerHTML =
       `<table class="guild-table" title="${cfg.label} (☠ R${cfg.lo}–R${cfg.hi}) quest groups posted on ${escapeHtml(server)}${lvl != null ? ` that fit ${escapeHtml(active)} (lvl ${lvl})` : ""} — live from DDO Audit, refreshed every 15s. Raids are listed in the Raids card below.">` +
-        `<thead><tr><th class="gm-fold" role="button" tabindex="0" ` +
+        `<thead><tr><th class="gm-fold${cfg.tint}" role="button" tabindex="0" ` +
           `title="Click to ${folded ? "unfold" : "fold up"} the ${cfg.label.toLowerCase()} list">` +
           `<span class="gm-caret">${caret}</span> ☠ ${cfg.label} · ${relevant.length}</th></tr></thead>` +
         (folded ? "" : `<tbody>${body}</tbody>`) +
@@ -16798,9 +16859,11 @@ document.addEventListener("visibilitychange", () => {
 });
 
 /* ── Build 07182026.1 — NARROW-WINDOW PRIORITY STACK ──────────────────────
-   At ≤1179px the two fixed corner clusters are reparented into #narrowStack
+   At ≤1040px the two fixed corner clusters are reparented into #narrowStack
    (which sits right after the Filters panel) so the page reads as one
-   coherent column: Filters → Characters → LFM alerts → Server. Above 1179px
+   coherent column: Filters → Characters → LFM alerts → Server. Above 1040px
+   (Build 07192026.3 lowered this from 1179px; the value is duplicated in the
+   CSS @media queries and the matchMedia below and must be kept in sync)
    both clusters return to their exact original <body> positions and resume
    the fixed-corner layout, so the desktop view is byte-identical.
 
@@ -16814,7 +16877,7 @@ document.addEventListener("visibilitychange", () => {
   const right = document.querySelector(".data-corner:not(.left)");
   const left  = document.querySelector(".data-corner.left");
   if (!stack || !right || !left) return;
-  const mq = window.matchMedia("(max-width: 1179px)");
+  const mq = window.matchMedia("(max-width: 1040px)");
   // Pin each cluster's original DOM home so we can restore it precisely.
   const rightHome = document.createComment("data-corner home");
   const leftHome  = document.createComment("data-corner.left home");

@@ -2,36 +2,27 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07192026-2.html` — Build
-> `07192026.2` (2026-07-19). 2 most recent overall:
-> `sooks-saga-scroll-07192026-2.html` + `sooks-saga-scroll-07192026-1.html`.
+> **Currently parked:** `sooks-saga-scroll-07192026-5.html` — Build
+> `07192026.5` (2026-07-19). 2 most recent overall:
+> `sooks-saga-scroll-07192026-5.html` + `sooks-saga-scroll-07192026-4.html`.
 > Cross-day rollback anchor (most recent previous-day build) =
 > `sooks-saga-scroll-07182026-9.html` (a distinct 3rd slot), so the retain set
-> is **3 files**. Nothing pruned this park (only 3 builds exist). **Batch
-> (7 UI units), each prototyped + validated in-browser during planning:**
-> (U1) the saga/non-saga header stacks — level pill + title on row 1, reward
-> pill + progress bars on row 2 — and the LFM notification fills the reclaimed
-> right-side space spanning both rows, snapping to a full-width bottom row when
-> narrow; the reward pill now bottom-aligns with the bars. (U2) IM Fell retired
-> as a reading font: `--font-flavor` → the EB Garamond stack (sweeps ~9 spots),
-> and the tale-so-far + completed-count are forced upright EB Garamond (Cinzel
-> headings + Uncial hero title untouched). (U3) the redundant in-body "End
-> Reward" control was removed (markup + handler + CSS); the header reward pill
-> is the sole toggle. (U4) quest-row pills wrap cleanly inside the card on narrow
-> widths. (U5) pronounced themed zebra striping separates quest rows in the
-> active list and the completed stash. (U6) filters redesign — bounded, centered
-> subcontainer panels; Group by / Search / Audio / Autocomplete as a uniform 2×2
-> grid with options wrapping inside; full-width Tier panel; the fold still
-> collapses the whole container; the **Expand all** button was removed and its
-> legacy fully cleaned out (`state.expandAll` + the `collapsed` set deleted).
-> (U7) the collapsed COMPLETED rollup is a **completion progress bar** — green→
-> gold fill to the saga's completed fraction (done/total, like the header
-> Complete bar), empty track, crisp leading edge, gold trim, bold black text.
-> **Verified (by Claude):** `node --check` SYNTAX_OK; clean boot + render (no
-> console errors); **in-browser visual pass** (localhost + Claude-in-Chrome) on a
-> crafted test character confirmed all seven at wide and narrow widths, including
-> the fold collapsing the whole filter container and the completed-stash zebra.
-> Update this line on every park.
+> is **3 files**. Pruned this park: `sooks-saga-scroll-07192026-3.html` →
+> `_to_delete/`. **Multi-LFM pill + filter alignment (CSS + JS; no schema change,
+> still v14):** the header LFM pill now **scales with how many live groups** a
+> saga has, in the same fixed 210×72 footprint — **1 group** = the 3-row pill
+> (☠R·fill / leader / zone); **2–3 groups** = stacked **tier-striped mini-rows**
+> (☠R + leader); **4+ groups** = a **fractional colour bar** (one segment per
+> group, tinted by tier) + a count + the top group. `lfmForTier` now exposes the
+> full sorted group list and the header collects every group across the saga's
+> quests. Also: in the **Audio Alerts** and **Quest Autocomplete** filter
+> sub-panels, the checkboxes/radios now sit in a **left-aligned column** so every
+> checkmark lines up (they were centre-justified and staggered). Prototyped +
+> validated in-browser (localhost + Claude-in-Chrome): 1/2/3/5-group variants all
+> render, **0 empty pills** (fixed a `length<=3` boundary that rendered an empty
+> pill for LFM-less sagas), filter checkmarks share one x per panel, no search
+> overflow or page h-scroll at 380px, header pill stays within its band, no
+> console errors. Update this line on every park.
 
 > **Publishing (GitHub Pages) — paused 2026-07-19 on a GitHub Actions incident.**
 > Repo `eddiefiggie/sooks-saga-scroll` is live and Pages is configured in
@@ -54,12 +45,108 @@ details tucked behind each quest. Companion to the source spreadsheet
 "Sook's Saga Database" (Google Sheets).
 
 ## Files
-- `sooks-saga-scroll-07192026-2.html` — the live build. Open in any
+- `sooks-saga-scroll-07192026-5.html` — the live build. Open in any
   browser; no server or build step. Progress auto-saves to browser
   storage (key `sooksSagaScroll`, **schema v14** as of Build
   07142026.1 — see notes below). See **Data Schema & Import/Export
   Contract** below for the durable shape and the rules every future
   build must follow.
+
+  **Build 07192026.5 — multi-LFM pill + filter checkbox alignment (CSS + JS; no
+  schema change, still v14).** **(1) Header LFM pill scales with group count.**
+  `lfmForTier`'s aggregate now exposes `groups` — the full tier-filtered list
+  sorted by skulls — and `renderSagaCard` collects every group across the saga's
+  quests into `lfmGroups`. The fixed 210×72 pill then branches: **1** → the
+  3-row pill (unchanged); **2–3** → stacked `.lfm-mini` rows (a tier-colored left
+  stripe + `☠ R<n>` + leader, focused on level + who); **4+** → `.lfm-frac`, a
+  segmented color bar (one `.lfm-seg` per group, tinted low-gold / mid-orange /
+  high-red) with an `N groups` count and the top group. A `length >= 2 && <= 3`
+  guard keeps a zero-group saga from rendering an empty pill (the first pass used
+  `<= 3`, which caught 0). A **code-review pass** then caught a second boundary
+  miss: the collected list included 0-skull (non-reaper) groups, so a
+  normal-difficulty LFM rendered a misleading `☠ R0` pill — fixed by filtering the
+  collected groups to `skulls > 0`, restoring build .3's declared-reaper-only gate. **(2) Filter checkbox/radio alignment.** `.audio-checks`
+  (shared by Audio Alerts and Quest Autocomplete) changed from a centered
+  `flex-wrap` row to a `flex-direction: column; align-items: flex-start`, so every
+  checkbox/radio left-aligns in a vertical column; the `.autoc-divider` became a
+  horizontal rule to suit the column. **Verification: in-browser** (localhost +
+  Claude-in-Chrome) — injected 1/2/3/5-group sagas render the four variants
+  correctly; **0 empty pills**; Audio checkmarks all share one x and Autocomplete
+  checkmarks all share one x (aligned columns); at 380px no search overflow, no
+  page horizontal scroll, header pill stays within its band; no console errors.
+  Live file: `sooks-saga-scroll-07192026-5.html`. Park retention: kept
+  `sooks-saga-scroll-07192026-5.html` + `sooks-saga-scroll-07192026-4.html`
+  (2 most recent) + cross-day anchor `sooks-saga-scroll-07182026-9.html`
+  (3 files); pruned `sooks-saga-scroll-07192026-3.html` → `_to_delete/`.
+
+  **Build 07192026.4 — LFM pill redesign + quest-row layout batch (CSS + JS; no
+  schema change, still v14).** Six changes, each prototyped and validated from a
+  live in-browser draft. **(1) Header LFM pill → fixed-size 3-row.** The
+  saga/non-saga header LFM `.lfm-skull-tag` is now a fixed 210×72 three-row pill:
+  row 1 `☠ R<n> · <fill>/6`, row 2 the leader, row 3 the zone — same footprint on
+  every card (`.hdr-t3 .lfm-r1/.lfm-r2/.lfm-r3`). **(2) Pills vertically aligned.**
+  `.saga-header.has-lfm` reserves a fixed right band (`minmax(0,1fr) 248px`) and
+  centers the pill in it, so every header pill shares one x. **(3) Row 3 = zone.**
+  A new `_questAreaIdMap` (quest_id → area_id, built in `_setQuestMaps`) plus the
+  areas table resolves each LFM's quest to its **adventure area**; `refreshLfmIndex`
+  stores `zone` on the group record and `lfmForTier`'s aggregate carries it.
+  Reliable (always resolves) and distinct from the quest name (*The Haunting of
+  Saltmarsh* → *The Haunted House*). Wired to the quest's area rather than the LFM
+  leader's live location — no live LFMs were up to confirm the leader exposes a
+  location field, and an unverifiable source would silently render an empty row.
+  **(4) Reaper-tier trackers color-matched.** The right-side Low/Mid/High Reaper
+  corner captions (`th.gm-fold.low/.mid/.high`, tint from `REAPER_CARDS`) now carry
+  the same neutral-gold / orange / red as the LFM pill tiers. **(5) "Given by"
+  wraps.** `.quest-giver` changed from `white-space:nowrap; flex-shrink:0` to
+  `normal` + `overflow-wrap:anywhere` + `min-width:0`, so a long quest-giver rolls
+  under instead of spilling past the card edge. **(6) Quest-row pills + LFM align.**
+  The Reaper/Saga/Skip pills are wrapped in `.q-actions` (a horizontal row that
+  stacks into an aligned vertical column only below ~490px container width — a
+  plain flex row, *not* an `auto-fit` grid, which collapsed at every width), and
+  the LFM `.quest-live` left edge aligns to the pills via
+  `margin-left: calc(var(--q-check) + 20px)` (derived from the checkbox width, not
+  a magic number). **Also folded in:** the filters **Search field** overflow —
+  `#questSearch` had `min-width: var(--ctl-w)` which beat `max-width:100%` and
+  spilled the input out of its 2×2 sub-panel at the narrowest widths; now
+  `min-width:0`. **Verification: in-browser** (localhost + Claude-in-Chrome) —
+  header pills uniform 210×72 and left-aligned with real resolved zones; quest
+  pills row-at-wide / aligned-column-at-narrow with the LFM tracking their left
+  edge; no Search overflow and no page horizontal scroll at 380px; zone wiring
+  confirmed end-to-end against the live areas table (655 quests); no console
+  errors. Live file: `sooks-saga-scroll-07192026-4.html`. Park retention: kept
+  `sooks-saga-scroll-07192026-4.html` + `sooks-saga-scroll-07192026-3.html`
+  (2 most recent) + cross-day anchor `sooks-saga-scroll-07182026-9.html`
+  (3 files); pruned `sooks-saga-scroll-07192026-2.html` → `_to_delete/`.
+
+  **Build 07192026.3 — header corner-widget symmetry (CSS + 1-line JS; no
+  schema change, still v14).** Fixes the reported bug where, as the window
+  narrows, the upper-left (Server/Guild) and upper-right (Characters/LFM)
+  fixed clusters *grew* and slid over the center. Root cause: the `≤1179px`
+  media block bumped `.corner-panel` from 200px to **320px** (growth-on-narrow)
+  and the reflow fired at a hard `1179px` breakpoint rather than at real
+  collision. Fix, planned in
+  `docs/plans/2026-07-19-003-fix-header-corner-symmetry-plan.md`: a single
+  `:root { --corner-w: clamp(150px, calc((100vw - 688px)/2 - 26px), 200px) }`
+  drives both the corner width (`.corner-panel { width: var(--corner-w) }`, so
+  left == right by construction) and the center gutter (`.scroll { max-width:
+  min(1150px, calc(100vw - 2*var(--corner-w) - 52px)) }`), collapsing the old
+  `1180–1620` special band into one continuous fixed regime. Panels hold 200px,
+  then **shrink symmetrically toward the 150px floor**, staying pinned to both
+  edges until ~1040px, where they reflow into the existing `#narrowStack` single
+  column (the `320px` growth rule is deleted). The reflow breakpoint moved
+  `1179 → 1040` in the `@media` query **and** the `initNarrowStack` `matchMedia`
+  (kept in sync; the value is duplicated by design, noted in-code). **Verified:**
+  in-browser (localhost + Claude-in-Chrome) — at 1680/1269px both clusters
+  measure 200px, equal, pinned to both edges (center parchment centered at
+  1150px); width is monotonically non-increasing as the window narrows (no
+  growth); at narrow widths the clusters form a clean centered single column.
+  (Known pre-existing, not from this change: on classic-scrollbar systems the
+  right cluster sits ~15px further from the edge — the vertical scrollbar's
+  width; a `scrollbar-gutter` compensation is a possible follow-up.) Live file:
+  `sooks-saga-scroll-07192026-3.html`. Park retention: kept
+  `sooks-saga-scroll-07192026-3.html` + `sooks-saga-scroll-07192026-2.html`
+  (2 most recent) + cross-day anchor `sooks-saga-scroll-07182026-9.html`
+  (3 files); pruned `sooks-saga-scroll-07192026-1.html` → `_to_delete/`.
 
   **Build 07192026.2 — header/LFM layout + font sweep + filters redesign +
   zebra + completed progress bar (CSS + JS markup; no schema change, still

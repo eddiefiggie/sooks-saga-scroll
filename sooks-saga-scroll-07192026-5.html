@@ -32,7 +32,11 @@
   :root {
     --font-display: 'Cinzel', serif;
     --font-body: 'EB Garamond', 'IM Fell English', Georgia, serif;
-    --font-flavor: 'IM Fell English', serif;
+    /* Build 07192026.2 — retired IM Fell as a reading font (hard to read,
+       especially italic at small sizes). --font-flavor now points at the same
+       readable EB Garamond stack as --font-body, sweeping every var(--font-flavor)
+       consumer at once. IM Fell stays only as a fallback in the stack. */
+    --font-flavor: 'EB Garamond', 'IM Fell English', Georgia, serif;
     --radius-card: 10px;
     --radius-ctl: 8px;
     --radius-tag: 6px;
@@ -596,6 +600,41 @@
     margin-left: 2px;
   }
 
+  /* Build 07192026.2 — FILTER REDESIGN. Each filter section is now a bounded,
+     centered panel (parchment card + thin border) with its header label capped
+     by a divider, so the options no longer float loosely. The four small groups
+     (Group by / Search / Audio Alerts / Quest Autocomplete) share the top row as
+     a UNIFORM 2×2 grid; options wrap within each fixed panel (.audio-checks
+     already flex-wraps). Tier is a full-width panel below. No !important on the
+     grid display, so the fold rule (.controls.folded .ctl-row { display:none },
+     higher specificity) still collapses the whole container. */
+  .control-group {
+    align-items: center;
+    text-align: center;
+    background: rgba(168,131,46,0.09);
+    border: 1px solid rgba(111,90,50,0.32);
+    border-radius: var(--radius-card);
+    padding: 10px 16px 14px;
+    box-sizing: border-box;
+  }
+  .control-group > label:first-child {
+    align-self: stretch;
+    text-align: center;
+    border-bottom: 1px solid rgba(111,90,50,0.24);
+    padding-bottom: 6px;
+    margin-bottom: 4px;
+    margin-left: 0;
+  }
+  .ctl-row-top {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 14px;
+    align-items: stretch;
+  }
+  .ctl-row-top .control-group { min-height: 118px; justify-content: flex-start; }
+  /* Tier buttons center under their (now centered) label. */
+  .ctl-row-tiers .tier-segment.bar { justify-content: center; }
+
   /* Shared baseline — one width + height standard for every control. */
   .ctl-input {
     font-family: var(--font-display);
@@ -821,9 +860,10 @@
   .audio-group { align-items: center; width: 100%; }
   .audio-checks {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;          /* Build 07192026.5 — one per line so every checkbox/radio left-aligns in a column */
+    align-items: flex-start;
     justify-content: center;
-    gap: 8px 22px;
+    gap: 8px;
     width: 100%;
   }
   .audio-check {
@@ -855,10 +895,11 @@
      saved mode stays visible. */
   .autoc-group { align-items: center; width: 100%; }
   .autoc-divider {
-    width: 1px;
+    width: 100%;
+    height: 1px;
     align-self: stretch;
     background: var(--frame-line);
-    margin: 0 2px;
+    margin: 3px 0;
   }
   .audio-check input[type="radio"] {
     width: 14px;
@@ -1142,8 +1183,23 @@
     row-gap: 6px;
     padding: 12px 16px;
     cursor: pointer;
-    grid-template-columns: minmax(0, 1fr) auto;
-    grid-template-areas: "t1 t2";
+    /* Build 07192026.2 — the level pill + title (t1) get their own row and the
+       reward pill + progress bars (t2) drop to a second row. Default (no live
+       LFM) is a single column so no right-side gap is reserved. */
+    grid-template-columns: 1fr;
+    grid-template-areas:
+      "t1"
+      "t2";
+  }
+  /* Build 07192026.2 — only when a live LFM renders (.has-lfm, set in
+     renderSagaCard) does the header become 2 columns, with the LFM (t3) filling
+     the reclaimed right-side space spanning BOTH rows. The `auto` right column +
+     its column-gap exist only here, so gap-free sagas never reserve dead space. */
+  .saga-header.has-lfm {
+    grid-template-columns: minmax(0, 1fr) 248px;   /* Build 07192026.4 — fixed right band -> all pills align vertically */
+    grid-template-areas:
+      "t1 t3"
+      "t2 t3";
   }
   .saga-header > * { min-width: 0; }
   .saga-header:hover {
@@ -1160,21 +1216,60 @@
   /* Build 07182026.7 — bottom-align the actions row so the reward pill lines up
      with the BARS (not the taller caption+bar column, which floated the pill
      above the bars). Pill height matches a bar below. */
-  .hdr-t2 { grid-area: t2; justify-self: end; align-items: flex-end; }   /* actions right-aligned; fixed width → columns align across cards */
-  /* LFM auto-places onto a full-width implicit row that exists ONLY when the
-     LFM element is present (no empty row / gap on cards without one), and is
-     always right-justified. */
-  /* Build 07182026.6 — LFM is now a full-width, centered BAR on its own row
-     (was a small right-justified chip): it stretches across the header with
-     left/right padding and its content centered. */
-  .hdr-t3 { grid-column: 1 / -1; justify-self: stretch; }
+  /* Build 07192026.2 — t2 sits on its own row now, left-aligned under the title;
+     align-items:flex-end keeps the reward pill level with the BARS (not the
+     taller caption+bar column). */
+  .hdr-t2 { grid-area: t2; justify-self: start; align-items: flex-end; }
+  /* Build 07192026.2 — the LFM fills the reclaimed right-side space, spanning
+     both header rows as a right-hand panel (was a full-width bar on its own
+     row). The narrow @container below snaps it back to a full-width bottom row. */
+  .hdr-t3 {
+    grid-area: t3;
+    align-self: stretch;
+    justify-self: stretch;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+  }
   .hdr-t3 .lfm-skull-tag {
-    width: 100%;
-    max-width: 100%;
-    padding: 3px 16px;
-    font-size: 0.78rem;
+    width: 210px;
+    max-width: 210px;
+    min-height: 62px;
+    box-sizing: border-box;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    gap: 2px;
+    padding: 8px 12px;
     text-align: center;
   }
+  .hdr-t3 .lfm-r1 { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.3px; white-space: nowrap; }
+  .hdr-t3 .lfm-r2 { font-size: 0.88rem; font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hdr-t3 .lfm-r3 { font-size: 0.8rem;  font-style: italic; opacity: 0.85; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* Build 07192026.5 — multi-LFM pill variants (same fixed 210x72 footprint). */
+  .hdr-t3 .lfm-skull-tag.multi {
+    color: var(--ink); background: rgba(43,26,8,0.16); border-color: var(--gold);
+    box-shadow: 0 0 6px rgba(200,147,42,0.35); gap: 4px; padding: 6px 8px; justify-content: center;
+  }
+  .hdr-t3 .lfm-mini {
+    display: flex; align-items: center; gap: 6px; width: 100%; min-width: 0;
+    padding: 2px 6px; border-radius: 5px; box-sizing: border-box;
+    border-left: 4px solid var(--gold); background: rgba(255,255,255,0.4);
+  }
+  .hdr-t3 .lfm-mini.mid  { border-left-color: #ff8c1a; background: rgba(224,123,31,0.20); }
+  .hdr-t3 .lfm-mini.high { border-left-color: #ff2f1f; background: rgba(207,38,27,0.20); }
+  .hdr-t3 .lfm-mini-r    { font-family: var(--font-display); font-weight: 700; font-size: 0.82rem; white-space: nowrap; }
+  .hdr-t3 .lfm-mini-lead { font-family: var(--font-body); font-weight: 600; font-size: 0.82rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hdr-t3 .lfm-many-count { font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; }
+  .hdr-t3 .lfm-frac {
+    display: flex; width: 100%; height: 14px; gap: 1px; border-radius: 4px;
+    overflow: hidden; border: 1px solid var(--frame-line); background: var(--frame-line);
+  }
+  .hdr-t3 .lfm-seg { flex: 1 1 0; min-width: 3px; background: #b8942a; }
+  .hdr-t3 .lfm-seg.mid  { background: #e07b1f; }
+  .hdr-t3 .lfm-seg.high { background: #cf261b; }
+  .hdr-t3 .lfm-many-top { font-family: var(--font-body); font-style: italic; font-size: 0.78rem; opacity: 0.85; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* Fixed pill width so the reaper + completion bars start at the same offset
      on every card (R10 column alignment). Bars are already equal 118px. */
   .hdr-t2 .reward-pill {
@@ -1194,17 +1289,31 @@
     box-sizing: border-box;
   }
 
-  /* Narrow: the actions group (T2) rolls below the name; everything stacked.
-     Rolls at the header's own width, so all same-width cards roll together.
-     Threshold is a tunable knob — adjust after a visual pass. */
-  @container (max-width: 470px) {
-    .saga-header {
+  /* Narrow: an LFM header stacks — title (t1), actions (t2), then the LFM (t3)
+     snaps to a full-width bottom row. No-LFM headers are already single-column,
+     so only .has-lfm needs the restack. Rolls at the header's own width, so all
+     same-width cards roll together. Threshold is a tunable knob — adjust after
+     a visual pass. */
+  @container (max-width: 620px) {
+    .saga-header.has-lfm {
       grid-template-columns: 1fr;
       grid-template-areas:
         "t1"
-        "t2";
+        "t2"
+        "t3";
     }
     .hdr-t2 { justify-self: start; }   /* actions left-aligned once stacked */
+    .hdr-t3 {
+      justify-self: stretch;
+      align-self: auto;
+      display: block;
+    }
+    .hdr-t3 .lfm-skull-tag {
+      width: 100%;
+      max-width: 100%;
+      min-height: 0;
+      padding: 6px 16px;
+    }
   }
 
   .saga-expand {
@@ -1471,19 +1580,9 @@
     border-color: var(--gold);
     box-shadow: 0 0 6px rgba(200,147,42,0.35);
   }
-  /* Build 07052026.8 — leader + party fraction inside the tag. Plain,
-     readable EB Garamond (no small-caps letterspacing), slightly larger
-     than the Cinzel skull part; inherits the chip's color for contrast. */
-  .lfm-skull-tag .lfm-lead {
-    font-family: var(--font-body);
-    font-weight: 600;
-    font-size: 0.8rem;
-    letter-spacing: 0;
-    text-transform: none;
-    margin-left: 7px;
-    white-space: normal;             /* Build 07052026.9 — wrap, don't overflow */
-    overflow-wrap: anywhere;
-  }
+  /* Build 07192026.5 — the old `.lfm-skull-tag .lfm-lead` rule was dead code
+     (the pill render stopped emitting `.lfm-lead` in Build 07192026.4) and was
+     removed. */
   .lfm-skull-tag.mid {
     color: #fff3e0;
     background: #e07b1f;
@@ -1496,6 +1595,11 @@
     border-color: #ff2f1f;
     box-shadow: 0 0 11px rgba(255,47,31,0.95);
   }
+  /* Build 07192026.4 — right-side reaper-tier tracker captions carry the SAME
+     low/mid/high colours as the LFM pills (colour key for the tier signal). */
+  th.gm-fold.low  { background: rgba(43,26,8,0.22); border-bottom: 2px solid var(--gold); }
+  th.gm-fold.mid  { background: #e07b1f; color: #fff3e0; border-bottom: 2px solid #ff8c1a; }
+  th.gm-fold.high { background: #cf261b; color: #ffe9e6; border-bottom: 2px solid #ff2f1f; }
   /* Build 07182026.9 — PERF: opacity-overlay pulse instead of animated
      box-shadow. The tag keeps its static 11px glow; a `::after` carrying the
      peak halo breathes via `opacity` (transparent fill, so the tag text is
@@ -2084,41 +2188,83 @@
      by the in-memory `rollupOpen` Set (mirrors the saga-card `expanded`
      pattern) — intentionally NOT a persisted state field, so no schema
      bump and the list always opens tidy. */
+  /* Build 07192026.2 — the outer wrapper no longer frames the bar (the header IS
+     the bar now); keep only the margin. */
   .completed-rollup {
     margin: 12px 0 2px;
-    border: 1px dashed var(--parchment-edge);
-    border-radius: var(--radius-card);
-    background: rgba(74,107,58,0.07);
   }
+  /* Build 07192026.2 — the collapsed COMPLETED bar is a completion PROGRESS BAR:
+     green→gold fill to the saga's completed fraction (--fill, set inline), an
+     empty parchment track for the remainder, a crisp dark leading edge, gold
+     trim + glow — mirroring the saga header's Complete bar. Text is bold black
+     for legibility over both the fill and the track. */
   .completed-rollup-header {
+    position: relative;
+    overflow: hidden;
     display: flex;
     align-items: center;
     gap: 10px;
-    padding: 7px 12px;
+    padding: 8px 16px;
     cursor: pointer;
     font-family: var(--font-display);
     font-size: 0.72rem;
     letter-spacing: 1.5px;
     text-transform: uppercase;
-    color: var(--ink-secondary);
     user-select: none;
+    --fill: 0%;
+    background:
+      linear-gradient(90deg,
+        rgba(133,168,74,1) 0%,
+        rgba(200,163,66,1) calc(var(--fill) - 12%),
+        rgba(226,192,96,1) var(--fill),
+        rgba(101,84,44,0.20) var(--fill),
+        rgba(101,84,44,0.13) 100%);
+    border: 1px solid var(--gold);
+    border-radius: 6px;
+    box-shadow: inset 0 0 4px rgba(120,95,30,0.30), 0 0 6px rgba(200,147,42,0.35);
   }
-  .completed-rollup-header:hover { color: var(--wax-red-dark); }
+  /* crisp leading edge at the fill boundary */
+  .completed-rollup-header::before {
+    content: "";
+    position: absolute;
+    top: 2px; bottom: 2px;
+    left: var(--fill);
+    width: 2px;
+    background: rgba(78,62,28,0.6);
+    z-index: 1;
+  }
+  /* bold black text over the fill/track; the ✓ stays a dark completion-green */
+  .completed-rollup-header,
+  .completed-rollup-count {
+    color: #000;
+    font-weight: 800;
+    position: relative;
+    z-index: 2;
+  }
   .completed-rollup-caret {
     font-size: 0.72rem;
-    color: var(--emerald);
+    color: #000;
     transition: transform 0.15s ease;
     display: inline-block;
+    position: relative;
+    z-index: 2;
   }
   .completed-rollup.open .completed-rollup-caret { transform: rotate(90deg); }
-  .completed-rollup-check { color: var(--emerald); font-weight: 700; }
+  .completed-rollup-check {
+    color: #2e5a1e;
+    font-weight: 800;
+    position: relative;
+    z-index: 2;
+  }
   .completed-rollup-count {
     margin-left: auto;
-    font-family: var(--font-flavor);
-    font-style: italic;
+    /* Build 07192026.2 — upright EB Garamond (was IM Fell italic), bold black
+       over the bar with a faint light halo so it reads on fill and track. */
+    font-family: var(--font-body);
+    font-style: normal;
     text-transform: none;
     letter-spacing: 0.5px;
-    color: var(--ink-faded);
+    text-shadow: 0 1px 0 rgba(255,250,225,0.5);
   }
   .completed-rollup-body {
     display: none;
@@ -2225,6 +2371,7 @@
        narrow : "tog name" / controls / LFM fully stacked (controls roll below)
      LFM always occupies its own row (its own tier). */
   .quest {
+    --q-check: 32px;   /* Build 07192026.4 — single source for the checkbox width; the LFM indent derives from it */
     /* container-type lives on .quest-block (the parent) — a container queries
        its descendants, not itself. */
     display: grid;
@@ -2240,8 +2387,10 @@
   .quest > .quest-toggle { grid-area: tog; }
   .quest > .q-t2 { grid-area: ctrl; }   /* controls left of the name at wide */
   .quest > .q-t1 { grid-area: name; min-width: 0; }
-  /* LFM auto-places onto a full-width implicit row only when present. */
-  .quest > .q-t3 { grid-column: 1 / -1; }
+  /* Build 07192026.4 — align the LFM line's left edge with the action PILLS
+     (past the master checkbox), so it reads as part of the same aligned column.
+     The indent matches the checkbox (32) + gaps + cluster padding. */
+  .quest > .q-t3 { grid-column: 2 / -1; margin-left: calc(var(--q-check) + 20px); }  /* Build 07192026.4 — checkbox width + cluster chrome; aligns the LFM under the pills */
   /* Narrow: name rises next to the toggle; controls roll below (B1). Build .5
      raised this 560 -> 640 so a full control cluster (~468px) rolls before it
      crushes the name into a sliver. Tunable. */
@@ -2252,6 +2401,13 @@
         "tog name"
         "ctrl ctrl";
     }
+    .quest > .q-t3 { grid-column: 1 / -1; }
+  }
+  /* Build 07192026.4 — the action pills hold a horizontal ROW while they fit
+     (including on their own collapsed line); they stack into an aligned
+     vertical column ONLY once a 3-pill row no longer fits (~490px). */
+  @container (max-width: 490px) {
+    .q-actions { flex-direction: column; align-items: flex-start; }
   }
   /* Build 07052026.10 — structured two-line row (replaces Build .9's
      free-wrapping chips, which read as patchwork). The controls cluster
@@ -2319,6 +2475,21 @@
     border-radius: var(--radius-pill);
     background: rgba(244,232,200,0.35);
     flex-shrink: 0;
+    /* Build 07192026.2 — on narrow widths the pills wrap to a second line inside
+       the card instead of spilling past the right edge (gap already supplies the
+       6px row-gap when wrapped). */
+    flex-wrap: wrap;
+  }
+  /* Build 07192026.4 — the three 140px action pills (Reaper / Saga / Skip) live
+     in their own grid so they wrap into ALIGNED 140px columns as the row
+     narrows (a single aligned column at the narrowest) instead of a ragged
+     free wrap. The master checkbox stays to their left. */
+  .q-actions {
+    display: flex;
+    gap: 6px;
+    align-items: center;
+    /* Build 07192026.4 — a horizontal ROW at wide; it stacks into an aligned
+       vertical column ONLY at the narrow breakpoint below, as the row collapses. */
   }
 
   .completion-controls:hover {
@@ -2338,8 +2509,8 @@
      26px checkmark — meant to dominate the row as the master state. */
   .quest input[type="checkbox"] {
     appearance: none;
-    width: 32px;
-    height: 32px;
+    width: var(--q-check);
+    height: var(--q-check);
     border: 2.5px solid var(--parchment-edge);
     border-radius: 50%;
     cursor: pointer;
@@ -2516,8 +2687,10 @@
     font-family: var(--font-body);
     font-size: 0.95rem;
     color: var(--ink-secondary);
-    white-space: nowrap;
-    flex-shrink: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+    min-width: 0;
+    flex-shrink: 1;
   }
 
   .quest-giver a {
@@ -2536,50 +2709,9 @@
     opacity: 0.55;
   }
 
-  /* Reward controls */
-  .reward-controls {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 6px;
-    margin: 12px 0;
-    align-items: center;
-  }
-
-  .reward-controls .lbl {
-    font-family: var(--font-display);
-    font-size: 0.72rem;
-    text-transform: uppercase;
-    letter-spacing: 1.5px;
-    color: var(--ink-faded);
-    margin-right: 6px;
-  }
-
-  /* Single ON/OFF toggle button for Banked */
-  .reward-btn {
-    font-family: var(--font-display);
-    font-size: 0.8rem;
-    letter-spacing: 1.5px;
-    text-transform: uppercase;
-    padding: 7px 18px;
-    background: var(--parchment-mid);
-    border: 1px solid var(--parchment-edge);
-    color: var(--ink-faded);
-    border-radius: var(--radius-tag);
-    cursor: pointer;
-    min-width: 130px;
-    text-align: center;
-    transition: background 120ms, color 120ms, border-color 120ms;
-  }
-
-  .reward-btn:hover {
-    border-color: var(--ink-faded);
-  }
-
-  .reward-btn.banked {
-    background: linear-gradient(180deg, #6e8a5a, var(--emerald));
-    color: #f4e8c8;
-    border-color: #2f4523;
-  }
+  /* Build 07192026.2 — the in-body End Reward control (.reward-controls / .lbl /
+     .reward-btn) was removed; its CSS is deleted with it. The header .reward-pill
+     is the surviving banked/incomplete toggle and keeps its own styling. */
 
   /* Notes */
   .notes-wrap {
@@ -2898,8 +3030,10 @@
   }
 
   .saga-story-body {
-    font-family: 'IM Fell DW Pica', 'IM Fell English', serif;
-    font-style: italic;
+    /* Build 07192026.2 — was IM Fell DW Pica italic (hard to read). Now the
+       readable EB Garamond stack, upright — the italic was part of the problem. */
+    font-family: var(--font-body);
+    font-style: normal;
     font-size: 1rem;
     line-height: 1.55;
     color: var(--ink-primary);
@@ -2927,6 +3061,15 @@
      .quest `@container` rules resolve against this block's width (a container
      queries its descendants, not itself). */
   .quest-block { container-type: inline-size; }
+  /* Build 07192026.2 — themed zebra striping so quest rows read as clearly
+     separated. Alternates every other .quest-block within its container (the
+     .arc-header offsets the count consistently, so each arc alternates the same
+     way). Covers active arcs, side quests, AND the completed-stash body (those
+     rows are .quest-block too). Warm parchment tints — on-theme in both color
+     schemes. */
+  .quest-block:nth-of-type(odd)  { background: rgba(255,247,220,0.16); border-radius: 8px; }
+  .quest-block:nth-of-type(even) { background: rgba(101,78,40,0.26);  border-radius: 8px;
+                                    box-shadow: inset 0 0 0 1px rgba(101,78,40,0.16); }
   .quest-toggle {
     background: rgba(255,245,210,0.6);
     border: 1px solid rgba(111,90,50,0.35);
@@ -3368,12 +3511,20 @@
   /* Build 06222026.3 — each distinct card. The parchment box that used to wrap
      the whole cluster now wraps each panel individually, so the Characters card
      and the Guild card read as two separate things. */
+  /* Build 07192026.3 — shared, viewport-driven corner width. Holds 200px on
+     wide screens, then shrinks symmetrically toward a 150px floor as the
+     window narrows so both clusters stay edge-pinned as long as possible
+     (it never grows). The SAME property sizes the center gutter below, so
+     left/right stay equal by construction. Floor is reached at 100vw≈1040px. */
+  :root {
+    --corner-w: clamp(150px, calc((100vw - 688px) / 2 - 26px), 200px);
+  }
   .corner-panel {
     display: flex;
     flex-direction: column;
     align-items: stretch;
     min-height: 0;
-    width: 200px;                    /* both cards share one width so they align */
+    width: var(--corner-w);          /* shared width; equal on both sides */
     box-sizing: border-box;
     gap: 6px;
     padding: 6px 8px;
@@ -3909,7 +4060,10 @@
        Search(2×) · Expand-all, symmetric around the center); shrinks to
        one unit before the row wraps on narrow screens. */
     width: calc(var(--ctl-w) * 2 + 18px);
-    min-width: var(--ctl-w);
+    /* Build 07192026.4 — was min-width: var(--ctl-w), which beat max-width:100%
+       and made the field overflow its 2x2 sub-panel at the narrowest widths.
+       min-width:0 lets it shrink to fit the panel (max-width:100% still caps it). */
+    min-width: 0;
     text-align: left; cursor: text;
     padding-left: 28px; padding-right: 28px;
     -webkit-appearance: none; appearance: none;
@@ -3959,16 +4113,23 @@
      collides with the centered content when the effective viewport shrinks
      — small windows, phones, and BROWSER ZOOM (zoom shrinks the CSS
      viewport that media queries measure, so a zoomed desktop behaves like
-     a tablet). Three regimes:
-       ≥1621px  — plenty of room, fixed corners as always;
-       1180–1620 — corners stay fixed but the scroll cedes side gutters so
-                   cards never sit ON the parchment;
-       ≤1179px  — corners drop INTO the document flow as wrapping card rows
-                   above the scroll; nothing can overlap anything. */
-  @media (min-width: 1180px) and (max-width: 1620px) {
-    .scroll { max-width: calc(100vw - 452px); }
+     a tablet). Two regimes (Build 07192026.3 made the fixed regime a single
+     continuous band that shrinks the corners symmetrically instead of the old
+     ≥1621 / 1180–1620 split):
+       >1040px  — corners fixed and pinned to BOTH edges; they hold 200px then
+                  shrink together toward a 150px floor (via --corner-w) as the
+                  viewport narrows, while the scroll cedes matching side gutters
+                  so cards never sit ON the parchment. Nothing overlaps;
+       ≤1040px  — corners drop INTO the document flow, reparented into the
+                  #narrowStack single column above the scroll. */
+  /* Build 07192026.3 — continuous gutter across the whole fixed-corner
+     regime (was a single 1180-1620 band). The center yields symmetric side
+     gutters sized to the live --corner-w, so the shrinking corners never sit
+     on the parchment; min() keeps the reading column <=1150px on wide screens. */
+  @media (min-width: 1041px) {
+    .scroll { max-width: min(1150px, calc(100vw - 2 * var(--corner-w) - 52px)); }
   }
-  @media (max-width: 1179px) {
+  @media (max-width: 1040px) {
     .data-corner,
     .data-corner.left {
       position: static;
@@ -3985,9 +4146,9 @@
     }
     .data-corner.left { margin-bottom: 16px; }
     .corner-panel {
-      width: 320px;
-      max-width: 100%;
-      flex: 0 1 320px;
+      width: 100%;
+      max-width: 380px;
+      flex: 0 1 auto;
     }
     .char-panel { max-height: none; }
 
@@ -4143,7 +4304,8 @@
          label ("Non-Saga Legendary" sets the standard via --ctl-w). The grid
          WRAPS on narrow screens — buttons collapse to more rows, the page
          never widens. All hooks (#groupBy, #tierFilter, #questSearch,
-         #searchClear, #searchCount, #expandAll) are unchanged. -->
+         #searchClear, #searchCount) are unchanged. (#expandAll was removed in
+         Build 07192026.2.) -->
     <div class="controls" id="controlsPanel">
       <!-- Build 07142026.1 — roll-up bar: folds the whole filter/alert panel
            into a slim closed drawer. State persists in the META key
@@ -4153,6 +4315,11 @@
         <span class="ctl-caret" id="ctlCaret">▾</span> Filters &amp; Alerts
         <span class="ctl-fold-count" id="ctlFoldHint">— click to fold</span>
       </div>
+      <!-- Build 07192026.2 — the four small filter groups (Group by, Search,
+           Audio Alerts, Quest Autocomplete) share one row as a uniform 2×2 grid
+           of bounded panels; options wrap within each panel. The "Expand all"
+           button was removed (feature retired). Tier stays a full-width panel
+           below. Everything is a .ctl-row so the fold still collapses it all. -->
       <div class="ctl-row ctl-row-top">
         <div class="control-group">
           <label>Group by</label>
@@ -4172,8 +4339,23 @@
           </div>
           <div class="search-count" id="searchCount"></div>
         </div>
-        <div class="control-group">
-          <button class="ctl-input toggle-btn" id="expandAll" type="button">Expand all</button>
+        <div class="control-group audio-group">
+          <label>Audio Alerts</label>
+          <div class="audio-checks" id="audioChecks" role="group" aria-label="Audio alert toggles">
+            <label class="audio-check" title="Play the knell when a new level-relevant ☠ R1–R3 quest group appears"><input type="checkbox" id="audioLow"> Low Reaper</label>
+            <label class="audio-check" title="Play the knell when a new level-relevant ☠ R4–R7 quest group appears"><input type="checkbox" id="audioMid"> Mid Reaper</label>
+            <label class="audio-check" title="Play the knell when a new level-relevant ☠ R8–R10 quest group appears"><input type="checkbox" id="audioHigh"> High Reaper</label>
+            <label class="audio-check" title="Play the horn when a new level-relevant raid group appears"><input type="checkbox" id="audioRaid"> Raids</label>
+          </div>
+        </div>
+        <div class="control-group autoc-group">
+          <label>Quest Autocomplete</label>
+          <div class="audio-checks" id="autocChecks" role="group" aria-label="Quest autocomplete settings">
+            <label class="audio-check" title="When ON, entering a quest in-game automatically marks it complete on this scroll (active character only; needs a server set for live lookup)"><input type="checkbox" id="acEnabled"> Enabled</label>
+            <span class="autoc-divider" aria-hidden="true"></span>
+            <label class="audio-check autoc-mode" title="Autocomplete marks the green Quest Completed seal only — First-Time Reaper is left untouched"><input type="radio" name="acMode" id="acModeNormal" value="normal"> ✓ Non-Reaper</label>
+            <label class="audio-check autoc-mode" title="Autocomplete ALSO seals First-Time Reaper for the quest (same as clicking the ☠ REAPER ☠ button) — use when you run everything on Reaper"><input type="radio" name="acMode" id="acModeReaper" value="reaper"> ☠ Reaper</label>
+          </div>
         </div>
       </div>
       <div class="ctl-row ctl-row-tiers">
@@ -4191,43 +4373,9 @@
           </div>
         </div>
       </div>
-      <!-- Build 07112026.6 — audio-alert toggles. Each checkbox gates the
-           audio cue for its LFM list (knell for the reaper tiers, horn for
-           raids). Build 07122026.1 — choices are PER CHARACTER
-           (state.characterAudio, schema v13); a character without a saved
-           choice inherits the legacy global META value (audioCues), then
-           the defaults: High Reaper + Raids ON, Low + Mid OFF. -->
-      <div class="ctl-row ctl-row-audio">
-        <div class="control-group audio-group">
-          <label>Audio Alerts</label>
-          <div class="audio-checks" id="audioChecks" role="group" aria-label="Audio alert toggles">
-            <label class="audio-check" title="Play the knell when a new level-relevant ☠ R1–R3 quest group appears"><input type="checkbox" id="audioLow"> Low Reaper</label>
-            <label class="audio-check" title="Play the knell when a new level-relevant ☠ R4–R7 quest group appears"><input type="checkbox" id="audioMid"> Mid Reaper</label>
-            <label class="audio-check" title="Play the knell when a new level-relevant ☠ R8–R10 quest group appears"><input type="checkbox" id="audioHigh"> High Reaper</label>
-            <label class="audio-check" title="Play the horn when a new level-relevant raid group appears"><input type="checkbox" id="audioRaid"> Raids</label>
-          </div>
-        </div>
-      </div>
-      <!-- Build 07142026.1 — QUEST AUTOCOMPLETE. When the active character's
-           live DDO Audit location resolves to a quest instance (the same
-           lookup that powers the guild roster's "quest they're running"
-           line), the scroll can mark that quest complete automatically.
-           Per-character setting (state.characterAutoComplete, schema v14):
-           an on/off gate plus a mode choice — Non-Reaper marks the green
-           "Quest Completed" seal only; Reaper additionally seals First-Time
-           Reaper (exactly like the ☠ REAPER ☠ button, NO_REAPER quests
-           fall back to the green seal). Default OFF, mode Non-Reaper. -->
-      <div class="ctl-row ctl-row-autoc">
-        <div class="control-group autoc-group">
-          <label>Quest Autocomplete</label>
-          <div class="audio-checks" id="autocChecks" role="group" aria-label="Quest autocomplete settings">
-            <label class="audio-check" title="When ON, entering a quest in-game automatically marks it complete on this scroll (active character only; needs a server set for live lookup)"><input type="checkbox" id="acEnabled"> Enabled</label>
-            <span class="autoc-divider" aria-hidden="true"></span>
-            <label class="audio-check autoc-mode" title="Autocomplete marks the green Quest Completed seal only — First-Time Reaper is left untouched"><input type="radio" name="acMode" id="acModeNormal" value="normal"> ✓ Non-Reaper</label>
-            <label class="audio-check autoc-mode" title="Autocomplete ALSO seals First-Time Reaper for the quest (same as clicking the ☠ REAPER ☠ button) — use when you run everything on Reaper"><input type="radio" name="acMode" id="acModeReaper" value="reaper"> ☠ Reaper</label>
-          </div>
-        </div>
-      </div>
+      <!-- Build 07192026.2 — Audio Alerts and Quest Autocomplete moved up into
+           the .ctl-row-top 2×2 grid (above). Their standalone .ctl-row-audio /
+           .ctl-row-autoc rows were removed. -->
     </div>
   </header>
 
@@ -4263,7 +4411,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07192026.1</div>
+      <div class="build">Build 07192026.5</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -4274,7 +4422,48 @@
 <script>
 /* ==========================================================================
    Sook's Saga Scroll — local-storage saga tracker
-   Build 07192026.1
+   Build 07192026.2
+   Build 07192026.2: header/LFM layout + font sweep + filters redesign + zebra +
+   completed progress bar (CSS + JS markup; no schema change, still v14). Seven
+   user-directed UI changes, each prototyped and validated in-browser during
+   planning. (U1) The saga/non-saga header now stacks — level pill + title on row
+   1, reward pill + progress bars on row 2 — and the LFM notification fills the
+   reclaimed right-side space spanning both rows (2-col grid "t1 t3"/"t2 t3");
+   below the @container breakpoint it snaps to a full-width 3rd row. The reward
+   pill bottom-aligns with the bars (align-items:flex-end). (U2) Retired IM Fell
+   as a reading font (hard to read, especially italic): --font-flavor now points
+   at the EB Garamond stack (sweeps all ~9 consumers), and .saga-story-body (tale
+   so far) + .completed-rollup-count are forced upright EB Garamond. Cinzel
+   headings + the Uncial hero title are untouched. (U3) Removed the redundant
+   in-body "End Reward" control (.reward-controls markup + .reward-btn handler +
+   its CSS); the header reward pill is the single banked/incomplete toggle. (U4)
+   Quest-row pills (.completion-controls) flex-wrap so they wrap cleanly inside
+   the card on narrow widths instead of spilling out. (U5) Pronounced themed
+   zebra striping on .quest-block (alternating warm parchment tints) separates
+   quest rows in the active list AND the completed stash. (U6) Filters redesign:
+   each section is a bounded, centered panel; Group by / Search / Audio Alerts /
+   Quest Autocomplete are a uniform 2×2 grid (.ctl-row-top) with options wrapping
+   inside; Tier is a full-width panel; the fold still collapses the whole
+   container (grid uses no !important so .controls.folded wins); the "Expand all"
+   button was REMOVED and its legacy cleaned out (button, handler, state.expandAll
+   + the `collapsed` set all deleted). (U7) The collapsed COMPLETED rollup is now
+   a completion PROGRESS BAR — green→gold fill to the saga's completed fraction
+   (done/total from sagaStatus, like the header Complete bar), empty track for the
+   remainder, crisp leading edge, gold trim, bold black text. Verification:
+   node --check SYNTAX_OK; clean boot + render (no console errors); in-browser
+   pass by Claude confirmed all seven (header stack/LFM panel/narrow snap/pill
+   alignment, readable fonts, End Reward gone, pill wrapping, zebra active +
+   stash, filters uniform + working fold + no Expand All, completed progress bar).
+   Plan: docs/plans/2026-07-19-002-feat-header-stack-font-sweep-end-reward-plan.md.
+   Live file: sooks-saga-scroll-07192026-2.html. Park retention: kept
+   07192026-2 + 07192026-1 (2 most recent) + cross-day anchor 07182026-9 (3 files);
+   nothing pruned (only 3 builds exist). Post-build code review (2 finder agents,
+   no functional regressions) drove two refinements folded into this build: (i)
+   the 2-column header grid is scoped to a .has-lfm class (set in renderSagaCard
+   only when a live LFM renders) so gap-free sagas no longer reserve a 14px
+   right-side column-gap; (ii) three stale #expandAll references in comments were
+   cleaned up. Both re-verified (node --check + in-browser: .has-lfm → 2 cols +
+   panel; no-LFM → single full-width column).
    Build 07192026.1: autocomplete reaper fix + DS&A CPU pass + progress-bar
    visuals (CSS + JS; no schema change, still v14). (A) BUG: reaper-mode Quest
    Autocomplete on a quest whose First-Time Reaper was already banked but whose
@@ -4523,10 +4712,10 @@
    plate. FRAMES — one hairline (--frame-line) and a 3-step shadow scale
    (--shadow-card/-ctl/-lift) replace the ad-hoc borders/shadows on the
    structural surfaces (glow/pulse shadows are signals, untouched).
-   FONTS — three roles: --font-display (Cinzel: titles/headers/labels/
-   buttons), --font-body (EB Garamond stack: reading text), --font-flavor
-   (IM Fell: italic flavor); 'Uncial Antiqua' title + 'IM Fell DW Pica'
-   stay as intentional accents. Sizes snapped to the scale 0.64 / 0.72 /
+   FONTS — Build 07192026.2 retired IM Fell as a reading font (hard to read).
+   Two roles now: --font-display (Cinzel: titles/headers/labels/buttons) and
+   --font-body / --font-flavor (both the EB Garamond stack: all reading text).
+   'Uncial Antiqua' stays only on the hero h1 title. Sizes snapped to the scale 0.64 / 0.72 /
    0.8 / 0.85 / 0.9 / 0.95 / 1+ rem (30 sizes → 7 below 1rem).
    Build 07112026.15: BONUS DAYS banner, GIST edition (markup + CSS + JS;
    no schema change, still v12). The .14 verdict stands for DDO's own
@@ -4744,8 +4933,8 @@
    scroll strip; seg-all margin removed for symmetry). Buttons modernized:
    9px radii, hairline borders, hover lift + gold border, focus-visible
    rings, active wax-red fill with soft glow. All control hooks (#groupBy,
-   #tierFilter, #questSearch, #searchClear, #searchCount, #expandAll)
-   unchanged.
+   #tierFilter, #questSearch, #searchClear, #searchCount) unchanged
+   (#expandAll removed in Build 07192026.2).
    Build 07112026.2: left-justified card title bars + audio cues (CSS + JS;
    no schema change, still v12). (1) .guild-table thead th text-align
    center → left (padding 5px 8px) — the guild AND raids title bars now
@@ -12033,7 +12222,6 @@ function defaultState() {
     groupBy: "tier",
     tierFilter: "suggested",   // Build 07112026.17 — Suggested is the fresh-install default
     ftrOnly: false,
-    expandAll: false,
     questExpanded: {},         // saga.id -> { questName: true }
     progress: {},
     questOverrides: {}         // v6: questName -> { path?, traps?, survival? }
@@ -12097,11 +12285,13 @@ function migrate(raw) {
   }
 
   // v1 (or unversioned legacy):
-  //   { activeChar, groupBy, ftrOnly, expandAll, "<CharA>": {...}, "<CharB>": {...} }
+  //   { activeChar, groupBy, ftrOnly, "<CharA>": {...}, "<CharB>": {...} }
+  //   (older payloads may still carry an `expandAll` boolean — harmless; the
+  //    feature was removed in Build 07192026.2 and the key is ignored on load.)
   // Anything at top-level that is NOT a known meta key is treated as a
   // character. If no character data is detected, we land at an empty
   // list — the user can add characters via the Add Character button.
-  const META_KEYS = new Set(["activeChar","groupBy","tierFilter","ftrOnly","expandAll","schemaVersion","characters","progress","questExpanded","puzzleOverrides","puzzleEditing","characterThemes","characterServers","characterLevels","characterAudio","characterAutoComplete","questOverrides","questOverrideEditing"]);
+  const META_KEYS = new Set(["activeChar","groupBy","tierFilter","ftrOnly","schemaVersion","characters","progress","questExpanded","puzzleOverrides","puzzleEditing","characterThemes","characterServers","characterLevels","characterAudio","characterAutoComplete","questOverrides","questOverrideEditing"]);
   const inferredChars = Object.keys(raw).filter(k => !META_KEYS.has(k) && typeof raw[k] === "object" && raw[k] !== null);
   const characters = inferredChars;
   const progress = {};
@@ -12115,7 +12305,6 @@ function migrate(raw) {
     groupBy: raw.groupBy || "tier",
     tierFilter: raw.tierFilter || "suggested",   // Build 07112026.17 — Suggested is the default
     ftrOnly: !!raw.ftrOnly,
-    expandAll: !!raw.expandAll,
     questExpanded: raw.questExpanded || {},
     questOverrides: (raw.questOverrides && typeof raw.questOverrides === "object") ? raw.questOverrides : {},
     progress,
@@ -12363,9 +12552,8 @@ function applyTheme(themeId) {
 let state = loadState();
 const expanded = new Set();   // saga ids currently expanded (UI only)
 const rollupOpen = new Set(); // saga ids whose Completed-quest rollup is open
-const collapsed = new Set(); // saga ids explicitly collapsed while Expand-all is on (UI only)
-                              // (UI only, in-memory; collapsed by default each
-                              // load so the list always opens tidy — no schema field)
+// Build 07192026.2 — the `collapsed` set (Expand-all override) was removed with
+// the Expand All feature; per-saga expand state lives entirely in `expanded`.
 let charManageMode = false;   // toggled by the Manage Characters button
 // reaperPopQueue — quest names that should render with the `.reaper-pop`
 // animation class on the next render. Populated by the Reaper button
@@ -12912,6 +13100,7 @@ const DDO_REF_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
 let _areasMap = null;      // Map<number, {name, region}>
 let _questsMap = null;     // Map<number, name>
 let _questAreaMap = null;  // Build 07052026.1 — Map<area_id, quest name> (quest-by-location)
+let _questAreaIdMap = null; // Build 07192026.4 — Map<quest_id, area_id> (drives the LFM zone line)
 let _raidQuestIds = null;  // Build 07112026.1 — Set<quest_id> where group_size === "Raid"
 let _questPackMap = null;  // Build 07112026.5 — Map<quest_id, required_adventure_pack>
 const _refFetchInFlight = {};  // de-dupe concurrent fetches by table name
@@ -13364,6 +13553,7 @@ async function getAreasMap() {
 function _setQuestMaps(slim) {
   _questsMap = new Map(slim.map(q => [q.id, q.name]));
   _questAreaMap = new Map(slim.filter(q => q.area > 0).map(q => [q.area, q.name]));
+  _questAreaIdMap = new Map(slim.map(q => [q.id, q.area || 0]));  // Build 07192026.4 — quest_id -> area_id (zone)
   // Build 07112026.1 — which quest ids are raids (group_size "Raid"). Powers
   // the raids card: raid LFMs are split out of the quest badge path by id.
   _raidQuestIds = new Set(slim.filter(q => q.raid).map(q => q.id));
@@ -13404,6 +13594,7 @@ async function getQuestsMap() {
     } else {
       _questsMap = new Map();
       _questAreaMap = new Map();
+      _questAreaIdMap = new Map();
       _raidQuestIds = new Set();     // Build 07112026.1 — resolved-but-empty
       _questPackMap = new Map();     // Build 07112026.5 — resolved-but-empty
     }
@@ -13667,8 +13858,9 @@ async function refreshLfmIndex(server) {
   _lfmFetchKey = server;
   _lfmFetchTs = now;   // claim the window up-front so concurrent renders don't re-enter
   try {
-    const [qmap, j] = await Promise.all([
+    const [qmap, areas, j] = await Promise.all([
       getQuestsMap(),
+      getAreasMap(),                       // Build 07192026.4 — for the LFM zone (adventure area)
       _ddoGetJson(DDO_AUDIT.lfmUrls(server))
     ]);
     const lfms = j && j.data ? j.data : null;
@@ -13710,12 +13902,18 @@ async function refreshLfmIndex(server) {
       // can filter by tier: a heroic-level group must not light the
       // Legendary container for the same-named quest, and vice versa.
       // Aggregation moved to lfmForTier().
+      // Build 07192026.4 — the ZONE (adventure area) the quest takes place in,
+      // resolved from the quest's area_id via the areas table. Distinct from the
+      // quest name; "" when unresolvable so the pill simply omits its third row.
+      const areaId = _questAreaIdMap ? _questAreaIdMap.get(qid) : 0;
+      const areaRec = areaId ? areas.get(areaId) : null;
+      const zone = areaRec ? areaRec.name : "";
       const e = idx[key] || (idx[key] = { groups: [] });
       e.groups.push({
         minL: isFinite(minL) ? minL : null,
         maxL: isFinite(maxL) ? maxL : null,
         diff: diff ? String(diff) : "",
-        skulls, leader: leaderName, party
+        skulls, leader: leaderName, party, zone
       });
       // Build 07112026.1 — raids also feed the raids card (by quest id, via
       // the quests table's group_size). They stay in the quest index too —
@@ -13860,15 +14058,20 @@ function _lfmForTierCompute(questName, tier) {
     return hi >= band[0] && lo <= band[1];               // range overlaps the tier band
   });
   if (!groups.length) return null;
-  const agg = { count: groups.length, minLevel: null, maxLevel: null, difficulties: new Set(), skulls: 0, leader: "", party: 0 };
+  const agg = { count: groups.length, minLevel: null, maxLevel: null, difficulties: new Set(), skulls: 0, leader: "", party: 0, zone: "" };
   let ps = -1;
   groups.forEach(g => {
     if (g.minL != null && (agg.minLevel == null || g.minL < agg.minLevel)) agg.minLevel = g.minL;
     if (g.maxL != null && (agg.maxLevel == null || g.maxL > agg.maxLevel)) agg.maxLevel = g.maxL;
     if (g.diff) agg.difficulties.add(g.diff);
     if (g.skulls > agg.skulls) agg.skulls = g.skulls;
-    if (g.skulls > ps) { agg.leader = g.leader; agg.party = g.party; ps = g.skulls; }
+    if (g.skulls > ps) { agg.leader = g.leader; agg.party = g.party; agg.zone = g.zone || ""; ps = g.skulls; }
   });
+  // Build 07192026.5 — expose the full filtered group list (sorted by skulls)
+  // so the header pill can render more than the single top group.
+  agg.groups = groups.slice()
+    .sort((a, b) => (b.skulls - a.skulls) || (b.party - a.party))
+    .map(g => ({ skulls: g.skulls, leader: g.leader || "Anonymous", party: g.party, zone: g.zone || "" }));
   return agg;
 }
 
@@ -14434,7 +14637,7 @@ function renderSagaList() {
 function renderSagaCard(saga) {
   const char = state.activeChar;
   const st = sagaStatus(char, saga);
-  const isExpanded = state.expandAll ? !collapsed.has(saga.id) : expanded.has(saga.id);
+  const isExpanded = expanded.has(saga.id);   // Build 07192026.2 — Expand-all removed
 
   const card = document.createElement("div");
   let cls = "saga";
@@ -14478,36 +14681,47 @@ function renderSagaCard(saga) {
   // progress bar by the HIGHEST declared tier: R4–R7 = brilliant orange
   // (lfm-mid), R8–R10 = brilliant red (lfm-high). R1–R3 / undeclared = no
   // tint. Rides the same _lfmIndex the 🔥 badges use, so it refreshes with it.
-  let lfmMaxSkulls = 0;
-  let lfmTopHit = null;   // Build 07052026.8 — the hit behind the tag, for leader/party
+  // Build 07192026.5 — collect EVERY live group relevant to this saga (across
+  // its quests), sorted by skulls, so the header pill can show more than one.
+  let lfmGroups = [];
   saga.quests.forEach(q => {
-    // Build 07052026.12 — tier-aware: only groups whose posted level range
-    // overlaps THIS container's tier band count here.
-    const hit = lfmForTier(q, saga.tier);
-    if (hit && hit.skulls > lfmMaxSkulls) { lfmMaxSkulls = hit.skulls; lfmTopHit = hit; }
+    const hit = lfmForTier(q, saga.tier);   // tier-aware; NO_REAPER already handled
+    // Build 07192026.5 — only DECLARED-reaper groups (skulls>0) light the header
+    // pill; a normal-difficulty LFM (skulls 0) must not render a misleading "☠ R0"
+    // (regression caught in code review — build .3 gated the pill on skulls>0).
+    if (hit && hit.groups) lfmGroups.push(...hit.groups.filter(g => g.skulls > 0));
   });
-  const lfmSkullClass = lfmMaxSkulls >= 8 ? " lfm-high" : (lfmMaxSkulls >= 4 ? " lfm-mid" : "");
-  const lfmSkullTip = lfmSkullClass
+  lfmGroups.sort((a, b) => (b.skulls - a.skulls) || (b.party - a.party));
+  const lfmMaxSkulls = lfmGroups.length ? lfmGroups[0].skulls : 0;
+  // Build 07192026.5 — the progress-bar tip shows only for a declared mid/high
+  // tier (R4+); the old `lfmSkullClass` string was only ever read for truthiness.
+  const lfmSkullTip = lfmMaxSkulls >= 4
     ? ` · 🔥 live LFM here declares R${lfmMaxSkulls}` : "";
-  // Build 07052026.7 — small header tag naming the declared tier. Shown for
-  // ANY declared skull count (R1+): neutral parchment for R1–R3, orange for
-  // R4–R7, red (pulsing) for R8–R10. Build 07052026.8 — the tag also names
-  // the group leader and the party fill as a fraction of the 6-player cap,
-  // in plain readable text ("☠ R8 · Henk · 3/6").
-  const lfmLeadTxt = (lfmTopHit && lfmTopHit.leader)
-    ? `<span class="lfm-lead">${escapeHtml(lfmTopHit.leader)} · ${lfmTopHit.party}/6</span>` : "";
-  const lfmSkullTag = lfmMaxSkulls > 0
-    ? `<span class="lfm-skull-tag ${lfmMaxSkulls >= 8 ? "high" : (lfmMaxSkulls >= 4 ? "mid" : "low")}"
-         title="Live LFM: ${lfmTopHit && lfmTopHit.leader ? escapeHtml(lfmTopHit.leader) + "'s group (" + lfmTopHit.party + " of 6) · " : ""}declared Reaper ${lfmMaxSkulls} skull${lfmMaxSkulls === 1 ? "" : "s"}">☠ R${lfmMaxSkulls}${lfmLeadTxt}</span>`
-    : "";
-  const toggleLabel = st.reward === "banked"
-    ? (isNotSagaContainer ? "Completed ✓" : "Banked ✓")
-    : "Incomplete";
+  // Build 07192026.5 — the header LFM pill scales with how many groups exist:
+  //   1 group  → the fixed 3-row pill (☠R·fill / leader / zone);
+  //   2-3      → stacked tier-striped mini-rows (☠R · leader);
+  //   4+       → a fractional colour bar (one segment per group, tinted by tier)
+  //              + a count + the top group.
+  const _lfmTier = sk => sk >= 8 ? "high" : (sk >= 4 ? "mid" : "low");
+  let lfmSkullTag = "";
+  if (lfmGroups.length === 1) {
+    const g = lfmGroups[0];
+    lfmSkullTag = `<span class="lfm-skull-tag ${_lfmTier(g.skulls)}" title="Live LFM: ${escapeHtml(g.leader)}'s group (${g.party} of 6) · ☠ R${g.skulls}${g.zone ? " · " + escapeHtml(g.zone) : ""}"><span class="lfm-r1">☠ R${g.skulls} · ${g.party}/6</span><span class="lfm-r2">${escapeHtml(g.leader)}</span>${g.zone ? `<span class="lfm-r3">${escapeHtml(g.zone)}</span>` : ""}</span>`;
+  } else if (lfmGroups.length >= 2 && lfmGroups.length <= 3) {
+    const rows = lfmGroups.map(g => `<span class="lfm-mini ${_lfmTier(g.skulls)}"><span class="lfm-mini-r">☠ R${g.skulls}</span><span class="lfm-mini-lead">${escapeHtml(g.leader)}</span></span>`).join("");
+    lfmSkullTag = `<span class="lfm-skull-tag multi" title="${lfmGroups.length} live LFM groups in this saga">${rows}</span>`;
+  } else if (lfmGroups.length >= 4) {
+    const top = lfmGroups[0];
+    const segs = lfmGroups.slice(0, 12).map(g => `<span class="lfm-seg ${_lfmTier(g.skulls)}" title="☠ R${g.skulls} · ${escapeHtml(g.leader)}"></span>`).join("");
+    lfmSkullTag = `<span class="lfm-skull-tag multi many" title="${lfmGroups.length} live LFM groups in this saga"><span class="lfm-many-count">${lfmGroups.length} groups</span><span class="lfm-frac">${segs}</span><span class="lfm-many-top">top ☠ R${top.skulls} · ${escapeHtml(top.leader)}</span></span>`;
+  }
+  // Build 07192026.2 — `toggleLabel` (the in-body End Reward button's label)
+  // was removed with that control; the header pill uses `rewardLabel`.
   const toggleNext = st.reward === "banked" ? "incomplete" : "banked";
   const rewardOnLabel = isNotSagaContainer ? "Completed" : "Banked";
 
   card.innerHTML = `
-    <div class="saga-header" data-saga="${saga.id}">
+    <div class="saga-header${lfmSkullTag ? " has-lfm" : ""}" data-saga="${saga.id}">
       <div class="hdr-tier hdr-t1">
         <div class="saga-expand">▶</div>
         <div class="saga-level">Lvl ${saga.levels}</div>
@@ -14546,12 +14760,9 @@ function renderSagaCard(saga) {
         <div class="row"><span class="key">Patron</span><span class="val">${escapeHtml(saga.patron || "")}</span></div>
       </div>
 
-      <div class="reward-controls">
-        <span class="lbl">${isNotSagaContainer ? "Tracking" : "End Reward"}</span>
-        <button class="reward-btn ${rewardCls}" data-reward="${toggleNext}" type="button"
-                title="Click to toggle ${toggleNext === 'banked' ? 'ON (' + rewardOnLabel + ')' : 'OFF (Incomplete)'}">${toggleLabel}</button>
-      </div>
-
+      <!-- Build 07192026.2 — the in-body "End Reward" control (.reward-controls
+           label + .reward-btn pill) was removed; the header reward pill is the
+           single banked/incomplete toggle now. -->
       <div class="quest-list-wrap">
         <div class="quest-list-title">
           <span>Quests</span>
@@ -14574,14 +14785,8 @@ function renderSagaCard(saga) {
 function wireCard(card, saga, char) {
   // wire up interactions
   card.querySelector(".saga-header").addEventListener("click", (e) => {
-    // Build 06082026.4: clicking a header always toggles THIS card, even when
-    // Expand-all is on (so a card can be tucked away). Expand-all uses a
-    // 'collapsed' override set; the off state uses the 'expanded' set.
-    if (state.expandAll) {
-      if (collapsed.has(saga.id)) collapsed.delete(saga.id); else collapsed.add(saga.id);
-    } else {
-      if (expanded.has(saga.id)) expanded.delete(saga.id); else expanded.add(saga.id);
-    }
+    // Clicking a header toggles THIS card's expand state (per-saga, in `expanded`).
+    if (expanded.has(saga.id)) expanded.delete(saga.id); else expanded.add(saga.id);
     renderSagaList();
   });
 
@@ -14814,8 +15019,8 @@ function wireCard(card, saga, char) {
     });
   });
 
-  // Reward toggle. Two click targets, one handler:
-  //   • .reward-btn (saga body) — original location
+  // Reward toggle. Build 07192026.2 — the in-body .reward-btn was removed;
+  // the header .reward-pill is the single click target now:
   //   • .reward-pill (saga header) — clickable as of v8 so a banked
   //     saga can be flipped back to Incomplete without expanding it.
   //
@@ -14831,7 +15036,7 @@ function wireCard(card, saga, char) {
   //
   // Confirms before wiping so an accidental click doesn't erase a
   // session of work.
-  card.querySelectorAll(".reward-btn, .reward-pill").forEach(btn => {
+  card.querySelectorAll(".reward-pill").forEach(btn => {
     btn.addEventListener("click", (e) => {
       e.stopPropagation();
       const v = btn.dataset.reward;
@@ -14985,9 +15190,14 @@ function renderCompletedRollup(saga, char, completedQuests) {
     .map(q => renderQuestRow(saga.id, q, ss.quests[q] || false))
     .join("");
   const n = completedQuests.length;
+  // Build 07192026.2 — the collapsed bar is a completion PROGRESS BAR filled to
+  // the saga's completed fraction, from the same sagaStatus() the header Complete
+  // bar uses. --fill drives the CSS gradient stop.
+  const st = sagaStatus(char, saga);
+  const pct = st.total > 0 ? Math.round((st.done / st.total) * 100) : 0;
   return `
     <div class="completed-rollup${isOpen ? " open" : ""}" data-rollup="${saga.id}">
-      <div class="completed-rollup-header" data-rollup-toggle="${saga.id}">
+      <div class="completed-rollup-header" data-rollup-toggle="${saga.id}" style="--fill: ${pct}%">
         <span class="completed-rollup-caret">▶</span>
         <span class="completed-rollup-check">✓</span>
         <span>Completed</span>
@@ -15294,9 +15504,7 @@ function renderQuestRow(sagaId, questName, qState) {
         <span class="completion-controls q-t2" title="LEFT checkbox = master Quest Completed (counts toward saga reward) · ☠ REAPER ☠ = first-time Reaper completion (preserved on saga reset) · Saga Reward = master toggle (same as LEFT) · ★ SKIP ★ = Astral Shard / VIP skip (saga-local, reset with saga)">
           <input type="checkbox" data-quest="${escapeHtml(questName)}" ${done ? "checked" : ""}
                  title="QUEST COMPLETED — master indicator. Auto-fills when you click Reaper, Skip, or Saga Reward. Click to toggle."/>
-          ${NO_REAPER.has(questName) ? "" : reaperBtnHtml}
-          ${sagaDoneBtnHtml}
-          ${astralBtnHtml}
+          <span class="q-actions">${NO_REAPER.has(questName) ? "" : reaperBtnHtml}${sagaDoneBtnHtml}${astralBtnHtml}</span>
         </span>
         <div class="quest-line1 q-t1">
           ${levelHtml}
@@ -15792,15 +16000,9 @@ function bindControls() {
     });
   }
 
-  const exBtn = document.getElementById("expandAll");
-  exBtn.classList.toggle("active", !!state.expandAll);
-  exBtn.addEventListener("click", () => {
-    state.expandAll = !state.expandAll;
-    exBtn.classList.toggle("active", state.expandAll);
-    expanded.clear(); collapsed.clear();
-    saveState();
-    renderSagaList();
-  });
+  // Build 07192026.2 — the "Expand all" button and its handler were removed
+  // (feature retired at user request). Per-saga expand/collapse via the header
+  // click (the `expanded` set) is the only expand control now.
 
   // Build 06022026.7: quest/saga search box (in-memory; not persisted).
   const searchInput = document.getElementById("questSearch");
@@ -16385,7 +16587,7 @@ function _ftrNeeded(questName, minL, maxL) {
 // ☠ R<n> / leader · fill vs the 6-player quest cap. Same fold + repaint
 // mechanics as the raids card; every card defaults collapsed. Never throws.
 const REAPER_CARDS = {
-  low:  { el: "lowCorner",  label: "Low Reaper",  lo: 1, hi: 3,  tint: "" },
+  low:  { el: "lowCorner",  label: "Low Reaper",  lo: 1, hi: 3,  tint: " low" },
   mid:  { el: "midCorner",  label: "Mid Reaper",  lo: 4, hi: 7,  tint: " mid" },
   high: { el: "highCorner", label: "High Reaper", lo: 8, hi: 10, tint: " high" }
 };
@@ -16445,7 +16647,7 @@ function renderReaperCorner(band) {
     const caret = folded ? "▸" : "▾";
     corner.innerHTML =
       `<table class="guild-table" title="${cfg.label} (☠ R${cfg.lo}–R${cfg.hi}) quest groups posted on ${escapeHtml(server)}${lvl != null ? ` that fit ${escapeHtml(active)} (lvl ${lvl})` : ""} — live from DDO Audit, refreshed every 15s. Raids are listed in the Raids card below.">` +
-        `<thead><tr><th class="gm-fold" role="button" tabindex="0" ` +
+        `<thead><tr><th class="gm-fold${cfg.tint}" role="button" tabindex="0" ` +
           `title="Click to ${folded ? "unfold" : "fold up"} the ${cfg.label.toLowerCase()} list">` +
           `<span class="gm-caret">${caret}</span> ☠ ${cfg.label} · ${relevant.length}</th></tr></thead>` +
         (folded ? "" : `<tbody>${body}</tbody>`) +
@@ -16687,9 +16889,11 @@ document.addEventListener("visibilitychange", () => {
 });
 
 /* ── Build 07182026.1 — NARROW-WINDOW PRIORITY STACK ──────────────────────
-   At ≤1179px the two fixed corner clusters are reparented into #narrowStack
+   At ≤1040px the two fixed corner clusters are reparented into #narrowStack
    (which sits right after the Filters panel) so the page reads as one
-   coherent column: Filters → Characters → LFM alerts → Server. Above 1179px
+   coherent column: Filters → Characters → LFM alerts → Server. Above 1040px
+   (Build 07192026.3 lowered this from 1179px; the value is duplicated in the
+   CSS @media queries and the matchMedia below and must be kept in sync)
    both clusters return to their exact original <body> positions and resume
    the fixed-corner layout, so the desktop view is byte-identical.
 
@@ -16703,7 +16907,7 @@ document.addEventListener("visibilitychange", () => {
   const right = document.querySelector(".data-corner:not(.left)");
   const left  = document.querySelector(".data-corner.left");
   if (!stack || !right || !left) return;
-  const mq = window.matchMedia("(max-width: 1179px)");
+  const mq = window.matchMedia("(max-width: 1040px)");
   // Pin each cluster's original DOM home so we can restore it precisely.
   const rightHome = document.createComment("data-corner home");
   const leftHome  = document.createComment("data-corner.left home");
