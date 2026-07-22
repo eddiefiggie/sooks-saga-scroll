@@ -10,6 +10,11 @@ A grouping of DDO quests that belong to a named saga chain, tracked as one unit 
 ### Non-Saga container
 A container that groups standalone quests which are *not* part of any saga chain, kept only for leveling and First-Time Reaper tracking. Non-Saga containers are excluded from the "sagas complete" and "rewards banked" tallies and from the tier breakdown — they are a convenience grouping, not a saga.
 
+### Tier
+The top-level classification of a container that determines both the section it displays under and its level band — one of six ordered values: Heroic, Non-Saga Heroic, Non-Saga Epic, Epic, Legendary, Non-Saga Legendary. Not to be confused with a [Roll-over tier](#roll-over-tier), which is a responsive-layout row group.
+
+Containers render grouped by tier in that fixed section sequence; within a tier they are ordered by character level (ascending by the low end of each container's level range). That within-tier level ordering is maintained by hand in the container list — nothing re-sorts it at display time — so a new container has to be placed at its level-correct spot rather than appended to its tier.
+
 ### First-Time Reaper (FTR)
 The state of having completed a quest on Reaper difficulty for the first time. Tracked per quest and rolled up per container as the count of reaper-eligible quests still unreaped; a container is "sealed" when none remain. FTR is independent of ordinary quest completion — completing a quest on non-Reaper difficulty never advances it.
 
@@ -24,4 +29,8 @@ A quest that can count toward a container's First-Time Reaper progress. Some que
 A cluster of live-status cards anchored to a screen corner: one cluster holds the character roster and the Reaper LFM alert cards; the other holds the server-population bar and the online-guild roster. Fixed to the viewport at desktop width; at narrow widths the clusters leave their fixed corners and reflow into the document.
 
 ### Roll-over tier
-One of the three priority groups a saga container header or quest row is composed of for responsive stacking: Tier 1 (name + level), Tier 2 (the actions group — reward pill + progress bars on a container header, or the completion controls on a quest row), and Tier 3 (LFM info). As a row loses width the tiers roll to new lines lowest-priority first (LFM, then the actions group), and each tier rolls as one atomic unit — a tier never fragments so a lone bar or button never strands on its own line.
+One of the three priority groups a saga container header or quest row is composed of for responsive stacking: Tier 1 (name + level), Tier 2 (the actions group — reward pill + progress bars on a container header, or the completion controls on a quest row), and Tier 3 (LFM info). As a row loses width the tiers roll to new lines lowest-priority first (LFM, then the actions group), and each tier rolls as one atomic unit — a tier never fragments so a lone bar or button never strands on its own line. Distinct from a container's [Tier](#tier) (Heroic/Epic/Legendary classification) — this "tier" is a within-row layout band, not a saga grouping.
+
+## Flagged ambiguities
+
+- **"Tier"** is used for two unrelated things: a container's [Tier](#tier) (its Heroic/Epic/Legendary/Non-Saga classification and level band) and a [Roll-over tier](#roll-over-tier) (one of the three responsive-layout priority bands a row stacks into). When unqualified, "tier" means the container classification; the layout sense is always "roll-over tier".
