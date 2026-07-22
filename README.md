@@ -28,18 +28,17 @@
 > Stealing from Sorcere), 2 placeholder locations, the Grin Ousttyl/Ousstyl giver
 > spelling, and full trash-mob monster enumeration. Update this line on every park.
 
-> **Publishing (GitHub Pages) — paused 2026-07-19 on a GitHub Actions incident.**
-> Repo `eddiefiggie/sooks-saga-scroll` is live and Pages is configured in
-> **branch-deploy** mode (`main` `/`), serving `index.html` (a copy of the parked
-> build) at **https://eddiefiggie.github.io/sooks-saga-scroll/**. The first build
-> was blocked because GitHub Actions was `degraded_performance` (runners wouldn't
-> provision — both the Actions workflow and the branch-deploy build stalled). This
-> is a transient GitHub outage, not a config problem. **To finish once Actions is
-> green (check githubstatus.com):** `gh api -X POST repos/eddiefiggie/sooks-saga-scroll/pages/builds`
-> (or push any commit), then the site goes live. `.github/workflows/deploy.yml`
-> (auto-derives `index.html` from the "Currently parked" line above) is committed
-> for later — to use it instead of manual copies, switch the Pages source back to
-> GitHub Actions (`gh api -X PUT .../pages -f build_type=workflow`).
+> **Publishing (GitHub Pages) — LIVE.** The 2026-07-19 GitHub Actions incident
+> has cleared; Build `07222026.1` published successfully on 2026-07-22 (run
+> 29943280823, green) and the site serves at
+> **https://eddiefiggie.github.io/sooks-saga-scroll/**. Pages is in **workflow**
+> mode (`build_type=workflow`, source `main` `/`): `.github/workflows/deploy.yml`
+> runs on every push and auto-derives `index.html` from the "Currently parked"
+> line above, so a normal `git push origin main` publishes. `index.html` is also
+> kept as a committed copy of the parked build for local consistency. **To
+> republish:** push any commit to `main` (or `gh api -X POST
+> repos/eddiefiggie/sooks-saga-scroll/pages/builds`); check githubstatus.com if a
+> run stalls.
 
 A single-file, offline-capable HTML compendium for tracking Dungeons & Dragons
 Online (DDO) saga progress across multiple characters. Parchment-and-wax-seal
