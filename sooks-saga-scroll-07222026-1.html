@@ -860,9 +860,10 @@
   .audio-group { align-items: center; width: 100%; }
   .audio-checks {
     display: flex;
-    flex-wrap: wrap;
+    flex-direction: column;          /* Build 07192026.5 — one per line so every checkbox/radio left-aligns in a column */
+    align-items: flex-start;
     justify-content: center;
-    gap: 8px 22px;
+    gap: 8px;
     width: 100%;
   }
   .audio-check {
@@ -894,10 +895,11 @@
      saved mode stays visible. */
   .autoc-group { align-items: center; width: 100%; }
   .autoc-divider {
-    width: 1px;
+    width: 100%;
+    height: 1px;
     align-self: stretch;
     background: var(--frame-line);
-    margin: 0 2px;
+    margin: 3px 0;
   }
   .audio-check input[type="radio"] {
     width: 14px;
@@ -1245,6 +1247,29 @@
   .hdr-t3 .lfm-r1 { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.3px; white-space: nowrap; }
   .hdr-t3 .lfm-r2 { font-size: 0.88rem; font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   .hdr-t3 .lfm-r3 { font-size: 0.8rem;  font-style: italic; opacity: 0.85; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* Build 07192026.5 — multi-LFM pill variants (same fixed 210x72 footprint). */
+  .hdr-t3 .lfm-skull-tag.multi {
+    color: var(--ink); background: rgba(43,26,8,0.16); border-color: var(--gold);
+    box-shadow: 0 0 6px rgba(200,147,42,0.35); gap: 4px; padding: 6px 8px; justify-content: center;
+  }
+  .hdr-t3 .lfm-mini {
+    display: flex; align-items: center; gap: 6px; width: 100%; min-width: 0;
+    padding: 2px 6px; border-radius: 5px; box-sizing: border-box;
+    border-left: 4px solid var(--gold); background: rgba(255,255,255,0.4);
+  }
+  .hdr-t3 .lfm-mini.mid  { border-left-color: #ff8c1a; background: rgba(224,123,31,0.20); }
+  .hdr-t3 .lfm-mini.high { border-left-color: #ff2f1f; background: rgba(207,38,27,0.20); }
+  .hdr-t3 .lfm-mini-r    { font-family: var(--font-display); font-weight: 700; font-size: 0.82rem; white-space: nowrap; }
+  .hdr-t3 .lfm-mini-lead { font-family: var(--font-body); font-weight: 600; font-size: 0.82rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hdr-t3 .lfm-many-count { font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; }
+  .hdr-t3 .lfm-frac {
+    display: flex; width: 100%; height: 14px; gap: 1px; border-radius: 4px;
+    overflow: hidden; border: 1px solid var(--frame-line); background: var(--frame-line);
+  }
+  .hdr-t3 .lfm-seg { flex: 1 1 0; min-width: 3px; background: #b8942a; }
+  .hdr-t3 .lfm-seg.mid  { background: #e07b1f; }
+  .hdr-t3 .lfm-seg.high { background: #cf261b; }
+  .hdr-t3 .lfm-many-top { font-family: var(--font-body); font-style: italic; font-size: 0.78rem; opacity: 0.85; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
   /* Fixed pill width so the reaper + completion bars start at the same offset
      on every card (R10 column alignment). Bars are already equal 118px. */
   .hdr-t2 .reward-pill {
@@ -1555,19 +1580,9 @@
     border-color: var(--gold);
     box-shadow: 0 0 6px rgba(200,147,42,0.35);
   }
-  /* Build 07052026.8 — leader + party fraction inside the tag. Plain,
-     readable EB Garamond (no small-caps letterspacing), slightly larger
-     than the Cinzel skull part; inherits the chip's color for contrast. */
-  .lfm-skull-tag .lfm-lead {
-    font-family: var(--font-body);
-    font-weight: 600;
-    font-size: 0.8rem;
-    letter-spacing: 0;
-    text-transform: none;
-    margin-left: 7px;
-    white-space: normal;             /* Build 07052026.9 — wrap, don't overflow */
-    overflow-wrap: anywhere;
-  }
+  /* Build 07192026.5 — the old `.lfm-skull-tag .lfm-lead` rule was dead code
+     (the pill render stopped emitting `.lfm-lead` in Build 07192026.4) and was
+     removed. */
   .lfm-skull-tag.mid {
     color: #fff3e0;
     background: #e07b1f;
@@ -4396,7 +4411,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07192026.4</div>
+      <div class="build">Build 07222026.1</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -4407,7 +4422,20 @@
 <script>
 /* ==========================================================================
    Sook's Saga Scroll — local-storage saga tracker
-   Build 07192026.2
+   Build 07222026.1
+   Build 07222026.1 (still v14; data-only): DDO Update 81 "Terror of Demogorgon"
+   (Underdark expansion, released 2026-07-22) added as two containers —
+   h-demogorgon (Heroic L11) and l-demogorgon (Legendary L37) — each 12 quests in
+   3 arcs (Part One x5 / Part Two x5 / Side x2). Level-ordered: h-demogorgon
+   between h-mist (L10-12) and h-myth-drannor (L13); l-demogorgon at the bottom of
+   the Legendary group after l-chill (L36). New SAGAS / SAGA_STORIES /
+   QUEST_GIVERS entries + a single QUEST_DETAILS["h-demogorgon"] block (12 quests
+   with sourced named-monster arrays); l-demogorgon resolves details via the
+   cross-tier lookupQuestDetails() fallback. Data self-check (runtime-derived)
+   goes 58->60 containers / 517->541 quests, 100% detailed. All content sourced
+   from ddowiki.com (U81 dossier); 4 preview placeholder synopses + 2 locations +
+   the Grin Ousttyl/Ousstyl giver spelling are flagged TODO(u81-resource) for the
+   live re-source pass. No schema change; STORAGE_KEY untouched.
    Build 07192026.2: header/LFM layout + font sweep + filters redesign + zebra +
    completed progress bar (CSS + JS markup; no schema change, still v14). Seven
    user-directed UI changes, each prototyped and validated in-browser during
@@ -5324,6 +5352,8 @@ const SAGA_STORIES = {
   "l-mists": { "synopsis": "Immerse yourself in one of the most infamous D&D adventure settings — save the people of Barovia, slay Strahd, and restore balance to the land. The stakes have never been higher.", "source": "https://ddowiki.com/page/Mists_of_Ravenloft" },
   "h-vecna": { "synopsis": "Bestowed by Aster the Trail-blazer in Morgrave University - Upper Commons, the Vecna Unleashed saga collects all 13 quests of the expansion — guarding the Codex of the Infinite Planes, rallying unlikely allies (the Lord of Blades, the Blood of Vol, the Dark Six, and warring Archons and Devils), and ultimately denying Vecna's bid to rule Eberron from the Astral Plane.", "source": "https://ddowiki.com/page/Vecna_Unleashed_(Heroic)" },
   "l-vecna": { "synopsis": "Bestowed by Orm the Trail-blazer in Morgrave University - Upper Commons, the Legendary Vecna Unleashed saga runs all 13 quests at legendary level 34 — same arc, higher stakes — culminating in the Astral Plane confrontation with the Whispered One. The Fire Over Morgrave raid is excluded.", "source": "https://ddowiki.com/page/Vecna_Unleashed_(Legendary)" },
+  "h-demogorgon": { "synopsis": "Bestowed by Haruhak Deepgift in Gravenhollow, the Terror of Demogorgon saga collects all 12 heroic (L11) quests of DDO's tenth expansion — driving deep into the Underdark to gather the components of Vizeran DeVir's Dark Heart ritual and banish the warring Demon Lords back to the Abyss, culminating in the confrontation with Demogorgon beneath the evacuated Duergar forge. The raid 'Raiding the Raiders' is excluded.", "source": "https://ddowiki.com/page/Terror_of_Demogorgon" },
+  "l-demogorgon": { "synopsis": "Bestowed by Eramura Orefinder in Gravenhollow, the Legendary Terror of Demogorgon saga runs the same 12 quests at legendary level 37 — the same Underdark arc at higher stakes — assembling Vizeran's Dark Heart ritual to hurl the Demon Lords back to the Abyss. The raid is excluded.", "source": "https://ddowiki.com/page/Terror_of_Demogorgon" },
   "l-masterminds": { "synopsis": "The artifact that protected Stormreach has been stolen and you've followed the trail to the vast metropolis of Sharn — recover the Stormreach Beacon without becoming a casualty of the conflicts between the Aurum, the City Council, the Boromar Clan and Daask.", "source": "https://ddowiki.com/page/Masterminds_of_Sharn" },
   "l-feywild": { "synopsis": "Journey to the land of myth and fable, a place of wonder and death. Meet the Archfey, mighty beings who may help or hinder you, and encounter majestic Unicorns, mischievous Pixies, deadly Displacer Beasts, and fierce Fomorians.", "source": "https://ddowiki.com/page/Fables_of_the_Feywild" },
   "l-saltmarsh": { "synopsis": "An evil Alchemist's mansion stands alone on a cliff and mysterious lights and hauntings have kept people away despite rumors of great treasure.", "source": "https://ddowiki.com/page/Sinister_Secret_of_Saltmarsh" },
@@ -5382,6 +5412,136 @@ const SAGA_STORIES = {
 };
 
 const QUEST_DETAILS = {
+  // ===== Update 81 — Terror of Demogorgon (2026-07-22). Defined once on the
+  // Heroic key; l-demogorgon resolves all 12 via lookupQuestDetails() cross-tier
+  // fallback (names are byte-identical across tiers). Monster arrays are the
+  // wiki-sourced NAMED/boss subset from the U81 dossier — never fabricated;
+  // full trash-mob enumeration + the 4 placeholder stories close in the U6
+  // live re-source pass (see TODO(u81-resource) markers). =====
+  "h-demogorgon": {
+    "Demon in the Rough": {
+      "levels": {"heroic": 11, "legendary": 37},
+      "story": "Mantol-Derith has endured for centuries as a neutral outpost where Drow, Duergar, Deep Gnomes, and the Zhentarim can meet and trade. Yet in recent days tensions there have risen to the boiling point. Someone - or something - is turning the trading post's factions against each other.",
+      "monsters": [
+        {"name": "Madfang (Fraz-Urb'luu)", "url": "https://ddowiki.com/page/Madfang"}
+      ],
+      "trapsNone": true,
+      "wikiUrl": "https://ddowiki.com/page/Demon_in_the_Rough"
+    },
+    "Tower of Vengeance": {
+      "levels": {"heroic": 11, "legendary": 37},
+      "story": "Vizeran was exiled from Menzoberranzan. Now the Drow Archmage lives in a tower deep in the Underdark - a tower that's under siege by the invading Demons.",
+      "monsters": [
+        {"name": "Tzorgorth the Deluder", "url": "https://ddowiki.com/page/Tzorgorth_the_Deluder"},
+        {"name": "Cormoran Stoneboots", "url": "https://ddowiki.com/page/Cormoran_Stoneboots"},
+        {"name": "Wronx", "url": "https://ddowiki.com/page/Wronx"}
+      ],
+      "trapsNone": true,
+      "wikiUrl": "https://ddowiki.com/page/Tower_of_Vengeance"
+    },
+    "A Blood Pact": {
+      "levels": {"heroic": 11, "legendary": 37},
+      "story": "Graz'zt, your sometimes ally, has told you that he knows where you can source a drop of Demon Lord blood. He invites you to his makeshift 'residence' in the Underdark to learn more.",
+      "monsters": [
+        {"name": "Baphomet", "url": "https://ddowiki.com/page/Baphomet"}
+      ],
+      "trapsNone": true,
+      "wikiUrl": "https://ddowiki.com/page/A_Blood_Pact"
+    },
+    "Hideous to Behold": {
+      "levels": {"heroic": 11, "legendary": 37},
+      "story": "Collect the beholder Karazikar's central eye for Vizeran's ritual. TODO(u81-resource): https://ddowiki.com/page/Hideous_to_Behold — the wiki synopsis is a placeholder ('DNT - TBD PLACEHOLDER LORE STRING'); replace with the live in-game story text.",
+      "monsters": [
+        {"name": "Karazikar", "url": "https://ddowiki.com/page/Karazikar"},
+        {"name": "Shedrak of the Eyes", "url": "https://ddowiki.com/page/Shedrak_of_the_Eyes"}
+      ],
+      "trapsNone": true,
+      "wikiUrl": "https://ddowiki.com/page/Hideous_to_Behold"
+    },
+    "The Price of an Egg": {
+      "levels": {"heroic": 11, "legendary": 37},
+      "story": "Bromnur, a capable merchant, may be able to help you find and gather a Purple Worm Egg from within the Wormwrithings.",
+      "monsters": [
+        {"name": "Purple Worm", "url": "https://ddowiki.com/page/Purple_Worm"},
+        {"name": "Battle Scarred Bullette", "url": "https://ddowiki.com/page/Battle_Scarred_Bullette"},
+        {"name": "Gruorg", "url": "https://ddowiki.com/page/Gruorg"}
+      ],
+      "trapsNone": true,
+      "wikiUrl": "https://ddowiki.com/page/The_Price_of_an_Egg"
+    },
+    "For Want of a Heart": {
+      "levels": {"heroic": 11, "legendary": 37},
+      "story": "Retrieve a fresh Goristro's heart for the Dark Heart ritual. TODO(u81-resource): https://ddowiki.com/page/For_Want_of_a_Heart — the wiki synopsis is a placeholder ('DNT - TBD PLACEHOLDER LORE STRING'); replace with the live in-game story text.",
+      "monsters": [
+        {"name": "Hulking Goristro", "url": "https://ddowiki.com/page/Hulking_Goristro"},
+        {"name": "Yeenoghu", "url": "https://ddowiki.com/page/Yeenoghu"},
+        {"name": "Baphomet", "url": "https://ddowiki.com/page/Baphomet"}
+      ],
+      "trapsNone": true,
+      "wikiUrl": "https://ddowiki.com/page/For_Want_of_a_Heart"
+    },
+    "Flocked Together": {
+      "levels": {"heroic": 11, "legendary": 37},
+      "story": "Within one of the numerous chambers of the Underdark lies the Gallery of Angels, former servants of the gods turned to stone as punishment for some long-forgotten crime. Their petrified feathers are an important component to Vizeran's ritual that you'll need to procure.",
+      "monsters": [
+        {"name": "The Decomposer", "url": "https://ddowiki.com/page/The_Decomposer"},
+        {"name": "Vrock Abjuror", "url": "https://ddowiki.com/page/Vrock_Abjuror"}
+      ],
+      "trapsNone": true,
+      "wikiUrl": "https://ddowiki.com/page/Flocked_Together"
+    },
+    "The Fetid Wedding": {
+      "levels": {"heroic": 11, "legendary": 37},
+      "story": "Obtain the Dream Shaper Mushroom from Zuggtmoy's lair for the Araumycos 'wedding'. TODO(u81-resource): https://ddowiki.com/page/The_Fetid_Wedding — the wiki synopsis is a placeholder ('DNT - TBD PLACEHOLDER LORE STRING'); replace with the live in-game story text.",
+      "monsters": [
+        {"name": "Zuggtmoy", "url": "https://ddowiki.com/page/Zuggtmoy"}
+      ],
+      "trapsNone": true,
+      "wikiUrl": "https://ddowiki.com/page/The_Fetid_Wedding"
+    },
+    "Stealing from Sorcere": {
+      "levels": {"heroic": 11, "legendary": 37},
+      "story": "Steal Gromph Baenre's ritual grimoire from Sorcere in Menzoberranzan. TODO(u81-resource): https://ddowiki.com/page/Stealing_from_Sorcere — the wiki synopsis is a copy-paste of Tower of Vengeance's text; replace with the live in-game story.",
+      "monsters": [
+        {"name": "Y'lara", "url": "https://ddowiki.com/page/Y%27lara"},
+        {"name": "Nauzhror Baenre", "url": "https://ddowiki.com/page/Nauzhror_Baenre"}
+      ],
+      "trapsNone": true,
+      "wikiUrl": "https://ddowiki.com/page/Stealing_from_Sorcere"
+    },
+    "Back to the Abyss": {
+      "levels": {"heroic": 11, "legendary": 37},
+      "story": "The Duergar evacuated this sprawling forge complex when the Demons attacked. Now Vizeran is going to use the location as part of his plan to banish the Demon Lords back the Abyss.",
+      "monsters": [
+        {"name": "Demogorgon", "url": "https://ddowiki.com/page/Demogorgon"},
+        {"name": "Yeenoghu", "url": "https://ddowiki.com/page/Yeenoghu"},
+        {"name": "Zuggtmoy", "url": "https://ddowiki.com/page/Zuggtmoy"},
+        {"name": "Forgefeeder", "url": "https://ddowiki.com/page/Forgefeeder"}
+      ],
+      "trapsNone": true,
+      "wikiUrl": "https://ddowiki.com/page/Back_to_the_Abyss"
+    },
+    "A Long Way to Mushrooms": {
+      "levels": {"heroic": 11, "legendary": 37},
+      "story": "Several caverns scattered throughout the underdark have been overtaken by Myconids and their fungi. Some of this fungi is said to have magical properties to be of some use.",
+      "monsters": [
+        {"name": "Gryblbe", "url": "https://ddowiki.com/page/Gryblbe"},
+        {"name": "Gldibe", "url": "https://ddowiki.com/page/Gldibe"}
+      ],
+      "trapsNone": true,
+      "wikiUrl": "https://ddowiki.com/page/A_Long_Way_to_Mushrooms"
+    },
+    "If It Wasn't For Bad Luck": {
+      "levels": {"heroic": 11, "legendary": 37},
+      "story": "A kindly Flumph has asked you to help his friends. They've been taken captive and brought to an abandoned Dwarven temple to be sacrificed to the Demon Lord Juiblex.",
+      "monsters": [
+        {"name": "Ghugell Quartzpacker", "url": "https://ddowiki.com/page/Ghugell_Quartzpacker"},
+        {"name": "Gelatinous Cube", "url": "https://ddowiki.com/page/Gelatinous_Cube"}
+      ],
+      "trapsNone": true,
+      "wikiUrl": "https://ddowiki.com/page/If_It_Wasn't_For_Bad_Luck"
+    }
+  },
   "h-saltmarsh": {
     "The Haunting of Saltmarsh": {
       "levels": {"heroic": 3, "legendary": 32},
@@ -11301,6 +11461,8 @@ const QUEST_GIVERS = {
   "l-saltmarsh": {"The Haunting of Saltmarsh":"Krag","Under the Cover of Darkness":"Anders Solmor","Danger at Dunwater":"Eliander Fireborn","The Final Enemy":"Gellan Primewater","Swim at Your Own Risk":"Sauriv","Down You Go":"Walk-up (no NPC)","Back to Basics":"Eyrk Hollums","What Sleeps Below":"Bostwick Guern","The Hijacked Haul":"Verna Prow","Rest for the Night":"Walk-up (no NPC)"},
   "l-isle-dread": {"Captive of the Hidden God":"Wulth Sulfork","The Curse and the Captive Crustacean":"Quamak","Bullywugs and Booby Traps":"Rimta","Plundering Pirates' Point":"Akakan","Fall of the Forbidden Temple":"Marikan","All Hail the King":"Huta of Dawa","The Stone Crypt Chronicle":"Petra of Tanaroa","Trials of the Triceratops":"Kaya of Mantru","Wild Thing":"Anaka of Tanaroa","Spiders and Flies":"Aster","The Trouble with Tar Pits":"Tihasi of Dawa","Whispers of Return":"Anahu of the Turtle"},
   "l-vecna": {"The Bark and the Blade":"Kion","Enemy of My Enemy":"Elise Dunber","The Evil We Know":"High Priestess Valeria","Law and Order":"Jer'Can","Taken in Hand":"Burnorh Galmok","Vecna Denied":"Vigilance","Turn the Page":"Creighton Ebinor","Grand Theft Aureon":"Malfresia Galarya","Paper Trail":"Halman Best","Party 101":"Holtz","The Devils to Pay":"Calliope Feldren","What Dreams May Come":"Erryn Riston","Vecna Unleashed":"Zarnoth the Vigilant"},
+  "h-demogorgon": {"Demon in the Rough":"Dreline the Trader","Tower of Vengeance":"Grin Ousttyl","A Blood Pact":"Graz'zt the Dark Prince","Hideous to Behold":"Vizril Geemor","The Price of an Egg":"Jurdor the Provisioner","For Want of a Heart":"Brumo Zivthin","Flocked Together":"Regmur the Learned","The Fetid Wedding":"Mobopho","Stealing from Sorcere":"Altnil T'orgh","Back to the Abyss":"Kleve","A Long Way to Mushrooms":"Dirnun the Healer","If It Wasn't For Bad Luck":"Ervo the Curious"},
+  "l-demogorgon": {"Demon in the Rough":"Dreline the Trader","Tower of Vengeance":"Grin Ousttyl","A Blood Pact":"Graz'zt the Dark Prince","Hideous to Behold":"Vizril Geemor","The Price of an Egg":"Jurdor the Provisioner","For Want of a Heart":"Brumo Zivthin","Flocked Together":"Regmur the Learned","The Fetid Wedding":"Mobopho","Stealing from Sorcere":"Altnil T'orgh","Back to the Abyss":"Kleve","A Long Way to Mushrooms":"Dirnun the Healer","If It Wasn't For Bad Luck":"Ervo the Curious"},
   "l-myth-drannor": {"The Safehold":"Chessae Baenrahel","Death Hosts This Banquet":"Durfryn Alearn","Oghma's Song":"Greyarra Auvryath","The Key to the Mythal":"Izzinid Claddafin","Secrets of the Red Wizards":"Maloran Herthana","Times Long Past":"Neremyn Proris","The Zulkir's Plan":"Verzan Nuovis","Voices of the Dead":"Elred Maglan","The House of Gems":"Sharora Leonala","Ettercap Incursion":"Thiralan Farstep","Seeds of Decay":"Portal to the Temple of Moander","Portal to Below":"Erlon Argentdawn","Book Burning":"Jurin'ildren"},
   "l-chill": {"The Body Snatchers":"Bernd Hersteller","Special Delivery":"Annika von Dolchberg","The Proper Authorities":"Petra Meldung","The Wish":"Wilhelm Finster","Beneath the City Streets":"Erhard Gildemeister","A Miner Sacrifice":"Meinolf Draxsinger","Ends and Means":"Sepp Ohlhausen","Cold Snap":"Katrin Waljager","Locked Away (Part One)":"Renate Follmer","Locked Away (Part Two)":"Wenzel Brickner","Snowfall and Sunlight":"Hellmuth Neff","Zoo Creeper":"Frida Kauss","A Light in the Attic":"Othmar Aderhold"},
 
@@ -11442,6 +11604,21 @@ const SAGAS = [
       { name: "In the Shadow of the Castle", giver: "Ireena Kolyana", giverLocation: "Blood on the Vine Tavern", quests: ["Death House","Fresh-baked Dreams","An Invitation to Dinner"] },
       { name: "The Vampire Hunters", giver: "Rudolph van Richten", giverLocation: "Blue Water Inn", quests: ["Oath of Vengeance","A Raven at the Door","A Mad Tea Party","Sealed in Amber"] },
       { name: "The Light of the Land", giver: "Ezmerelda d'Avenir", giverLocation: "van Richten's Tower", quests: ["Ravens' Bane","The Final Vintage","Wrath of the Earth","Sunrise"] }
+    ]
+  },
+  {
+    // Update 81 — Terror of Demogorgon (Underdark expansion, released 2026-07-22).
+    // Level-ordered between h-mist (L10-12) and h-myth-drannor (L13).
+    id: "h-demogorgon", tier: "Heroic", name: "Terror of Demogorgon",
+    levels: "11", npc: "Haruhak Deepgift", npcLocation: "Gravenhollow",
+    region: "The Underdark", pack: "Terror of Demogorgon",
+    patron: "Battlehammer Expedition",
+    wiki: "https://ddowiki.com/page/Terror_of_Demogorgon_(Heroic)",
+    quests: ["Demon in the Rough","Tower of Vengeance","A Blood Pact","Hideous to Behold","The Price of an Egg","For Want of a Heart","Flocked Together","The Fetid Wedding","Stealing from Sorcere","Back to the Abyss","A Long Way to Mushrooms","If It Wasn't For Bad Luck"],
+    storyArcs: [
+      { name: "Terror of Demogorgon Part One", giver: null, quests: ["Demon in the Rough","Tower of Vengeance","A Blood Pact","Hideous to Behold","The Price of an Egg"] },
+      { name: "Terror of Demogorgon Part Two", giver: null, quests: ["For Want of a Heart","Flocked Together","The Fetid Wedding","Stealing from Sorcere","Back to the Abyss"] },
+      { name: "Side Quests", giver: null, quests: ["A Long Way to Mushrooms","If It Wasn't For Bad Luck"] }
     ]
   },
   {
@@ -11745,6 +11922,21 @@ const SAGAS = [
       { name: "The Chill of Ravenloft Part One", giver: "Mayor Vogelhertz", giverLocation: "Ludendorf City Hall (south of the city hall entrance)", quests: ["The Body Snatchers","Special Delivery","The Proper Authorities","The Wish","Beneath the City Streets"] },
       { name: "The Chill of Ravenloft Part Two", giver: "Ilona Rabus", giverLocation: "Ludendorf City Hall (south of the city hall entrance)", quests: ["A Miner Sacrifice","Ends and Means","Cold Snap","Locked Away (Part One)","Locked Away (Part Two)","Snowfall and Sunlight"] },
       { name: "Side Quests", giver: null, quests: ["Zoo Creeper","A Light in the Attic"] }
+    ]
+  },
+  {
+    // Update 81 — Terror of Demogorgon (Legendary). Level-ordered at the bottom
+    // of the Legendary group, after l-chill (L36); L37 is the new group max.
+    id: "l-demogorgon", tier: "Legendary", name: "Terror of Demogorgon",
+    levels: "37", npc: "Eramura Orefinder", npcLocation: "Gravenhollow",
+    region: "The Underdark", pack: "Terror of Demogorgon",
+    patron: "Battlehammer Expedition",
+    wiki: "https://ddowiki.com/page/Terror_of_Demogorgon_(Legendary)",
+    quests: ["Demon in the Rough","Tower of Vengeance","A Blood Pact","Hideous to Behold","The Price of an Egg","For Want of a Heart","Flocked Together","The Fetid Wedding","Stealing from Sorcere","Back to the Abyss","A Long Way to Mushrooms","If It Wasn't For Bad Luck"],
+    storyArcs: [
+      { name: "Terror of Demogorgon Part One", giver: null, quests: ["Demon in the Rough","Tower of Vengeance","A Blood Pact","Hideous to Behold","The Price of an Egg"] },
+      { name: "Terror of Demogorgon Part Two", giver: null, quests: ["For Want of a Heart","Flocked Together","The Fetid Wedding","Stealing from Sorcere","Back to the Abyss"] },
+      { name: "Side Quests", giver: null, quests: ["A Long Way to Mushrooms","If It Wasn't For Bad Luck"] }
     ]
   },
 
@@ -14052,6 +14244,11 @@ function _lfmForTierCompute(questName, tier) {
     if (g.skulls > agg.skulls) agg.skulls = g.skulls;
     if (g.skulls > ps) { agg.leader = g.leader; agg.party = g.party; agg.zone = g.zone || ""; ps = g.skulls; }
   });
+  // Build 07192026.5 — expose the full filtered group list (sorted by skulls)
+  // so the header pill can render more than the single top group.
+  agg.groups = groups.slice()
+    .sort((a, b) => (b.skulls - a.skulls) || (b.party - a.party))
+    .map(g => ({ skulls: g.skulls, leader: g.leader || "Anonymous", party: g.party, zone: g.zone || "" }));
   return agg;
 }
 
@@ -14661,30 +14858,40 @@ function renderSagaCard(saga) {
   // progress bar by the HIGHEST declared tier: R4–R7 = brilliant orange
   // (lfm-mid), R8–R10 = brilliant red (lfm-high). R1–R3 / undeclared = no
   // tint. Rides the same _lfmIndex the 🔥 badges use, so it refreshes with it.
-  let lfmMaxSkulls = 0;
-  let lfmTopHit = null;   // Build 07052026.8 — the hit behind the tag, for leader/party
+  // Build 07192026.5 — collect EVERY live group relevant to this saga (across
+  // its quests), sorted by skulls, so the header pill can show more than one.
+  let lfmGroups = [];
   saga.quests.forEach(q => {
-    // Build 07052026.12 — tier-aware: only groups whose posted level range
-    // overlaps THIS container's tier band count here.
-    const hit = lfmForTier(q, saga.tier);
-    if (hit && hit.skulls > lfmMaxSkulls) { lfmMaxSkulls = hit.skulls; lfmTopHit = hit; }
+    const hit = lfmForTier(q, saga.tier);   // tier-aware; NO_REAPER already handled
+    // Build 07192026.5 — only DECLARED-reaper groups (skulls>0) light the header
+    // pill; a normal-difficulty LFM (skulls 0) must not render a misleading "☠ R0"
+    // (regression caught in code review — build .3 gated the pill on skulls>0).
+    if (hit && hit.groups) lfmGroups.push(...hit.groups.filter(g => g.skulls > 0));
   });
-  const lfmSkullClass = lfmMaxSkulls >= 8 ? " lfm-high" : (lfmMaxSkulls >= 4 ? " lfm-mid" : "");
-  const lfmSkullTip = lfmSkullClass
+  lfmGroups.sort((a, b) => (b.skulls - a.skulls) || (b.party - a.party));
+  const lfmMaxSkulls = lfmGroups.length ? lfmGroups[0].skulls : 0;
+  // Build 07192026.5 — the progress-bar tip shows only for a declared mid/high
+  // tier (R4+); the old `lfmSkullClass` string was only ever read for truthiness.
+  const lfmSkullTip = lfmMaxSkulls >= 4
     ? ` · 🔥 live LFM here declares R${lfmMaxSkulls}` : "";
-  // Build 07052026.7 — small header tag naming the declared tier. Shown for
-  // ANY declared skull count (R1+): neutral parchment for R1–R3, orange for
-  // R4–R7, red (pulsing) for R8–R10. Build 07052026.8 — the tag also names
-  // the group leader and the party fill as a fraction of the 6-player cap,
-  // in plain readable text ("☠ R8 · Henk · 3/6").
-  // Build 07192026.4 — fixed-size 3-row LFM pill: row 1 ☠ R<n> · <fill>/6,
-  // row 2 leader, row 3 the ZONE the leader is in.
-  const lfmLeader = (lfmTopHit && lfmTopHit.leader) ? lfmTopHit.leader : "Anonymous";
-  const lfmFill = lfmTopHit ? lfmTopHit.party : 1;
-  const lfmZone = (lfmTopHit && lfmTopHit.zone) ? lfmTopHit.zone : "";
-  const lfmSkullTag = lfmMaxSkulls > 0
-    ? `<span class="lfm-skull-tag ${lfmMaxSkulls >= 8 ? "high" : (lfmMaxSkulls >= 4 ? "mid" : "low")}" title="Live LFM: ${escapeHtml(lfmLeader)}'s group (${lfmFill} of 6) · declared Reaper ${lfmMaxSkulls} skull${lfmMaxSkulls === 1 ? "" : "s"}${lfmZone ? " · " + escapeHtml(lfmZone) : ""}"><span class="lfm-r1">☠ R${lfmMaxSkulls} · ${lfmFill}/6</span><span class="lfm-r2">${escapeHtml(lfmLeader)}</span>${lfmZone ? `<span class="lfm-r3">${escapeHtml(lfmZone)}</span>` : ""}</span>`
-    : "";
+  // Build 07192026.5 — the header LFM pill scales with how many groups exist:
+  //   1 group  → the fixed 3-row pill (☠R·fill / leader / zone);
+  //   2-3      → stacked tier-striped mini-rows (☠R · leader);
+  //   4+       → a fractional colour bar (one segment per group, tinted by tier)
+  //              + a count + the top group.
+  const _lfmTier = sk => sk >= 8 ? "high" : (sk >= 4 ? "mid" : "low");
+  let lfmSkullTag = "";
+  if (lfmGroups.length === 1) {
+    const g = lfmGroups[0];
+    lfmSkullTag = `<span class="lfm-skull-tag ${_lfmTier(g.skulls)}" title="Live LFM: ${escapeHtml(g.leader)}'s group (${g.party} of 6) · ☠ R${g.skulls}${g.zone ? " · " + escapeHtml(g.zone) : ""}"><span class="lfm-r1">☠ R${g.skulls} · ${g.party}/6</span><span class="lfm-r2">${escapeHtml(g.leader)}</span>${g.zone ? `<span class="lfm-r3">${escapeHtml(g.zone)}</span>` : ""}</span>`;
+  } else if (lfmGroups.length >= 2 && lfmGroups.length <= 3) {
+    const rows = lfmGroups.map(g => `<span class="lfm-mini ${_lfmTier(g.skulls)}"><span class="lfm-mini-r">☠ R${g.skulls}</span><span class="lfm-mini-lead">${escapeHtml(g.leader)}</span></span>`).join("");
+    lfmSkullTag = `<span class="lfm-skull-tag multi" title="${lfmGroups.length} live LFM groups in this saga">${rows}</span>`;
+  } else if (lfmGroups.length >= 4) {
+    const top = lfmGroups[0];
+    const segs = lfmGroups.slice(0, 12).map(g => `<span class="lfm-seg ${_lfmTier(g.skulls)}" title="☠ R${g.skulls} · ${escapeHtml(g.leader)}"></span>`).join("");
+    lfmSkullTag = `<span class="lfm-skull-tag multi many" title="${lfmGroups.length} live LFM groups in this saga"><span class="lfm-many-count">${lfmGroups.length} groups</span><span class="lfm-frac">${segs}</span><span class="lfm-many-top">top ☠ R${top.skulls} · ${escapeHtml(top.leader)}</span></span>`;
+  }
   // Build 07192026.2 — `toggleLabel` (the in-body End Reward button's label)
   // was removed with that control; the header pill uses `rewardLabel`.
   const toggleNext = st.reward === "banked" ? "incomplete" : "banked";

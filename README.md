@@ -2,27 +2,31 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07192026-5.html` — Build
-> `07192026.5` (2026-07-19). 2 most recent overall:
-> `sooks-saga-scroll-07192026-5.html` + `sooks-saga-scroll-07192026-4.html`.
-> Cross-day rollback anchor (most recent previous-day build) =
-> `sooks-saga-scroll-07182026-9.html` (a distinct 3rd slot), so the retain set
-> is **3 files**. Pruned this park: `sooks-saga-scroll-07192026-3.html` →
-> `_to_delete/`. **Multi-LFM pill + filter alignment (CSS + JS; no schema change,
-> still v14):** the header LFM pill now **scales with how many live groups** a
-> saga has, in the same fixed 210×72 footprint — **1 group** = the 3-row pill
-> (☠R·fill / leader / zone); **2–3 groups** = stacked **tier-striped mini-rows**
-> (☠R + leader); **4+ groups** = a **fractional colour bar** (one segment per
-> group, tinted by tier) + a count + the top group. `lfmForTier` now exposes the
-> full sorted group list and the header collects every group across the saga's
-> quests. Also: in the **Audio Alerts** and **Quest Autocomplete** filter
-> sub-panels, the checkboxes/radios now sit in a **left-aligned column** so every
-> checkmark lines up (they were centre-justified and staggered). Prototyped +
-> validated in-browser (localhost + Claude-in-Chrome): 1/2/3/5-group variants all
-> render, **0 empty pills** (fixed a `length<=3` boundary that rendered an empty
-> pill for LFM-less sagas), filter checkmarks share one x per panel, no search
-> overflow or page h-scroll at 380px, header pill stays within its band, no
-> console errors. Update this line on every park.
+> **Currently parked:** `sooks-saga-scroll-07222026-1.html` — Build
+> `07222026.1` (2026-07-22). 2 most recent overall:
+> `sooks-saga-scroll-07222026-1.html` + `sooks-saga-scroll-07192026-5.html`.
+> The 2nd-most-recent (`-07192026-5`, 07-19) is itself the most-recent
+> previous-day build, so it doubles as the cross-day rollback anchor — no
+> distinct 3rd slot needed; retain set is **2 files**. Pruned this park:
+> `sooks-saga-scroll-07192026-4.html` + `sooks-saga-scroll-07182026-9.html`
+> → `_to_delete/`. **Update 81 — Terror of Demogorgon (data-only; no schema
+> change, still v14):** added DDO's 10th expansion (Underdark, released
+> 2026-07-22) as **two containers** — `h-demogorgon` (Heroic **L11**) and
+> `l-demogorgon` (Legendary **L37**) — each holding the same **12 quests** in 3
+> arcs (Part One ×5 / Part Two ×5 / Side ×2). **Level-ordered placement**
+> (verified): `h-demogorgon` sits **between `h-mist` (L10-12) and `h-myth-drannor`
+> (L13)**; `l-demogorgon` sits **at the bottom of the Legendary group after
+> `l-chill` (L36)** (intra-group order is array order — no render-time level
+> sort). New `SAGAS` / `SAGA_STORIES` / `QUEST_GIVERS` entries + a single
+> `QUEST_DETAILS["h-demogorgon"]` block (12 quests, sourced named-monster arrays);
+> `l-demogorgon` resolves all 12 details via the cross-tier `lookupQuestDetails()`
+> fallback. Verified in-browser (localhost + Claude-in-Chrome): data self-check
+> **0 errors**, **64 containers / 541 quests / 100% detailed**, legendary fallback
+> **12/12**, both groups ascending by level, no console errors. **Preview-data
+> gaps flagged for U6 live re-source** (`TODO(u81-resource)` markers): 4
+> placeholder synopses (Hideous to Behold, For Want of a Heart, The Fetid Wedding,
+> Stealing from Sorcere), 2 placeholder locations, the Grin Ousttyl/Ousstyl giver
+> spelling, and full trash-mob monster enumeration. Update this line on every park.
 
 > **Publishing (GitHub Pages) — paused 2026-07-19 on a GitHub Actions incident.**
 > Repo `eddiefiggie/sooks-saga-scroll` is live and Pages is configured in
@@ -45,12 +49,27 @@ details tucked behind each quest. Companion to the source spreadsheet
 "Sook's Saga Database" (Google Sheets).
 
 ## Files
-- `sooks-saga-scroll-07192026-5.html` — the live build. Open in any
+- `sooks-saga-scroll-07222026-1.html` — the live build. Open in any
   browser; no server or build step. Progress auto-saves to browser
   storage (key `sooksSagaScroll`, **schema v14** as of Build
   07142026.1 — see notes below). See **Data Schema & Import/Export
   Contract** below for the durable shape and the rules every future
   build must follow.
+
+  **Build 07222026.1 — Update 81 "Terror of Demogorgon" (data-only; no schema
+  change, still v14).** Added DDO's 10th expansion (Underdark, released
+  2026-07-22) as two containers: `h-demogorgon` (Heroic L11, giver Haruhak
+  Deepgift) and `l-demogorgon` (Legendary L37, giver Eramura Orefinder), each 12
+  quests in 3 arcs (Part One ×5 / Part Two ×5 / Side ×2). Level-ordered:
+  `h-demogorgon` between `h-mist` (L10-12) and `h-myth-drannor` (L13);
+  `l-demogorgon` last in the Legendary group after `l-chill` (L36). New `SAGAS` /
+  `SAGA_STORIES` / `QUEST_GIVERS` + a single `QUEST_DETAILS["h-demogorgon"]` block
+  (12 quests, sourced named-monster arrays); `l-demogorgon` resolves details via
+  the cross-tier `lookupQuestDetails()` fallback (12/12, verified). Self-check
+  62 → 64 containers / 517 → 541 quests, 100% detailed, 0 errors. All content
+  ddowiki-sourced (U81 dossier in `data/`); 4 preview placeholder synopses +
+  2 locations + the Grin Ousttyl/Ousstyl spelling + full monster enumeration are
+  flagged `TODO(u81-resource)` for the U6 live re-source pass (not yet run).
 
   **Build 07192026.5 — multi-LFM pill + filter checkbox alignment (CSS + JS; no
   schema change, still v14).** **(1) Header LFM pill scales with group count.**
@@ -3858,7 +3877,9 @@ Adding a new piece of user data (e.g. a per-saga colored flag)?
 > (21 standalone Legendary containers, 86 quests, for First Time
 > Reaper). Group order: Heroic → Non-Saga Heroic → Non-Saga Epic → Epic →
 > Legendary → Non-Saga Legendary. Per the data self-check the build now has
-> **58 containers / 517 quest slots** (all wiki-detailed). Multi-character
+> **64 containers / 541 quest slots** (all wiki-detailed) — includes Update 81
+> "Terror of Demogorgon" (Heroic `h-demogorgon` L11 + Legendary `l-demogorgon`
+> L37, 12 quests each) as of Build 07222026.1. Multi-character
 > with
 > add/rename/delete and per-character themes (Scholar / Soldier / Ranger /
 > Barbarian / Rogue / Divine / Arcane / Necrotic / Knight). Progress saves
@@ -3880,7 +3901,17 @@ Adding a new piece of user data (e.g. a per-saga colored flag)?
 > `SAGA_STORIES`, `QUEST_DETAILS`, `QUEST_GIVERS`; never fabricate — use
 > Chrome MCP against `ddowiki.com` (direct `web_fetch` is blocked by the
 > proxy). Footer uses `Build ` prefix with `mmddyyyy.x` format,
-> currently `Build 07182026.9`. **Build 07182026.9 (still v14): CPU/animation
+> currently `Build 07222026.1`. **Build 07222026.1 (still v14; data-only): DDO
+> Update 81 "Terror of Demogorgon" added as two containers — `h-demogorgon`
+> (Heroic L11) between `h-mist`/`h-myth-drannor`, `l-demogorgon` (Legendary L37)
+> at the bottom of Legendary — 12 quests each in 3 arcs; single
+> `QUEST_DETAILS["h-demogorgon"]` block, legendary resolves via fallback (12/12).
+> Verified in-browser: 0 self-check errors, 64 containers / 541 quests / 100%
+> detailed. Preview-data gaps (4 synopses, 2 locations, giver spelling, full
+> monster lists) flagged `TODO(u81-resource)` for the U6 live re-source (dossier:
+> `data/update-81-terror-of-demogorgon-research.md`; plan:
+> `docs/plans/2026-07-22-001-feat-update-81-terror-of-demogorgon-plan.md`).**
+> **Build 07182026.9 (still v14): CPU/animation
 > performance pass — the continuous progress-bar sheen (~121 `background-position`
 > animations at once) now runs only on COMPLETE bars (`.all-done` / reaper
 > `.sealed`) via a GPU `transform`; partial bars get a static gold shine. The
