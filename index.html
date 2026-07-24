@@ -4411,7 +4411,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07222026.1</div>
+      <div class="build">Build 07242026.1</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -4422,7 +4422,20 @@
 <script>
 /* ==========================================================================
    Sook's Saga Scroll — local-storage saga tracker
-   Build 07222026.1
+   Build 07242026.1
+   Build 07242026.1 (still v14; live-data fix, no schema change): the DDO Audit
+   reference tables (areas + quests) are cached 7 days; when U81 dropped
+   (2026-07-22) existing caches predated it, so every U81 quest_id/area_id was
+   missing and THREE features silently failed for the new content — the guild
+   roster's location line rendered blank, U81 LFM badges never appeared (the LFM
+   index drops any quest_id it can't resolve to a name), and quest Autocomplete
+   never fired (location_id -> getQuestAreaMap returned nothing). The row schema
+   was unchanged, so the existing shape guards never forced a refetch. Fix: a
+   reference-cache EPOCH (DDO_REF_EPOCH) stamped on every write and checked on
+   read — any cache written under an older epoch refetches once, so U81 IDs land
+   immediately instead of after the TTL lapses. Bump the epoch on each future
+   content drop. (Noted for the U81 re-source: DDO Audit lists a 13th pack quest,
+   "The Darklake", the container omits — likely a wilderness zone; verify on wiki.)
    Build 07222026.1 (still v14; data-only): DDO Update 81 "Terror of Demogorgon"
    (Underdark expansion, released 2026-07-22) added as two containers —
    h-demogorgon (Heroic L11) and l-demogorgon (Legendary L37) — each 12 quests in
@@ -13272,6 +13285,18 @@ const DDO_CACHE_TTL = 60000;     // 1 min — avoid hammering the API on re-rend
 
 const DDO_REF_KEY = "sooksSagaScrollRef";   // separate key — keeps `state` schema untouched
 const DDO_REF_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
+// Build 07242026.1 — reference-cache EPOCH. The areas/quests tables are cached
+// for 7 days; when a game update adds content (new quests + areas) the cached
+// ROWS don't change SHAPE, so the shape guards below never trip and the new IDs
+// stay invisible until the TTL lapses (up to a week). That's what broke the
+// U81 "Terror of Demogorgon" location line, its LFM badges, and autocomplete:
+// every U81 quest_id/area_id was absent from a pre-U81 cache. Bumping this epoch
+// stamps every fresh write and forces any cache written under an older epoch to
+// refetch ONCE — so new content lands immediately for everyone. Bump on each
+// expansion / content drop that adds quests or areas.
+//   1 = pre-U81 (implicit — caches with no epoch field)
+//   2 = U81 "Terror of Demogorgon" (2026-07-22)
+const DDO_REF_EPOCH = 2;
 
 // In-memory mirrors of the reference tables once resolved this session.
 let _areasMap = null;      // Map<number, {name, region}>
@@ -13675,7 +13700,9 @@ function _readRefCache() {
   catch (e) { return {}; }
 }
 function _writeRefCache(obj) {
-  try { localStorage.setItem(DDO_REF_KEY, JSON.stringify(obj)); } catch (e) {}
+  // Build 07242026.1 — stamp the current epoch on every write so a later load
+  // can tell whether the cache predates the content the running build knows about.
+  try { obj.epoch = DDO_REF_EPOCH; localStorage.setItem(DDO_REF_KEY, JSON.stringify(obj)); } catch (e) {}
 }
 
 // Generic best-effort GET that tries a list of URLs and returns parsed JSON
@@ -13698,7 +13725,7 @@ async function getAreasMap() {
   if (_areasMap) return _areasMap;
   const cache = _readRefCache();
   const now = Date.now();
-  if (cache.areas && cache.areasTs && (now - cache.areasTs) < DDO_REF_TTL && Array.isArray(cache.areas)) {
+  if (cache.epoch === DDO_REF_EPOCH && cache.areas && cache.areasTs && (now - cache.areasTs) < DDO_REF_TTL && Array.isArray(cache.areas)) {
     _areasMap = new Map(cache.areas.map(a => [Number(a.id), { name: a.name, region: a.region || "" }]));
     return _areasMap;
   }
@@ -13746,7 +13773,7 @@ async function getQuestsMap() {
   // Shape guards: caches written before 07052026.1 lack `area`; before
   // 07112026.1 lack `raid`; before 07112026.5 lack `pack`. Any → stale,
   // refetch once.
-  if (cache.quests && cache.questsTs && (now - cache.questsTs) < DDO_REF_TTL && Array.isArray(cache.quests)
+  if (cache.epoch === DDO_REF_EPOCH && cache.quests && cache.questsTs && (now - cache.questsTs) < DDO_REF_TTL && Array.isArray(cache.quests)
       && (cache.quests.length === 0 || (cache.quests[0].area !== undefined && cache.quests[0].raid !== undefined
           && cache.quests[0].pack !== undefined))) {
     _setQuestMaps(cache.quests.map(q => ({ id: Number(q.id), name: q.name, area: Number(q.area) || 0,
