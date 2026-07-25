@@ -1060,6 +1060,54 @@
     line-height: 1;
     cursor: pointer;
   }
+  /* Build 07252026.2 — CONNECT-SWITCH PROMPT banner (fixed, top-center). */
+  #connectSwitchBanner:empty { display: none; }
+  #connectSwitchBanner {
+    position: fixed;
+    top: 14px;
+    left: 50%;
+    transform: translateX(-50%);
+    z-index: 9000;
+    max-width: min(92vw, 640px);
+  }
+  .cs-banner {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+    padding: 10px 16px;
+    font-family: var(--font-body);
+    font-size: 0.98rem;
+    color: var(--wax-red-dark);
+    background: rgba(168,131,46,0.16);
+    border: 1px solid var(--gold);
+    border-left: 4px solid var(--gold);
+    border-radius: var(--radius-card);
+    box-shadow: 0 6px 22px rgba(0,0,0,0.28);
+  }
+  .cs-banner .cs-text { flex: 1 1 220px; }
+  .cs-banner .cs-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .cs-banner .cs-switch {
+    font-family: var(--font-display);
+    font-size: 0.72rem;
+    font-weight: 700;
+    color: #fff;
+    background: var(--wax-red);
+    border: 1px solid var(--wax-red-dark);
+    border-radius: 6px;
+    padding: 5px 10px;
+    cursor: pointer;
+  }
+  .cs-banner .cs-switch:hover { background: var(--wax-red-dark); }
+  .cs-banner .cs-dismiss {
+    background: none;
+    border: none;
+    color: var(--ink-faded);
+    font-size: 1.1rem;
+    line-height: 1;
+    cursor: pointer;
+    padding: 0 2px;
+  }
   .saga.saga-now-playing {
     border-color: var(--gold) !important;
     box-shadow: 0 0 0 2px rgba(168,131,46,0.45), 0 0 14px rgba(168,131,46,0.5);
@@ -4411,7 +4459,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07222026.1</div>
+      <div class="build">Build 07252026.2</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -4422,7 +4470,20 @@
 <script>
 /* ==========================================================================
    Sook's Saga Scroll — local-storage saga tracker
-   Build 07222026.1
+   Build 07242026.1
+   Build 07242026.1 (still v14; live-data fix, no schema change): the DDO Audit
+   reference tables (areas + quests) are cached 7 days; when U81 dropped
+   (2026-07-22) existing caches predated it, so every U81 quest_id/area_id was
+   missing and THREE features silently failed for the new content — the guild
+   roster's location line rendered blank, U81 LFM badges never appeared (the LFM
+   index drops any quest_id it can't resolve to a name), and quest Autocomplete
+   never fired (location_id -> getQuestAreaMap returned nothing). The row schema
+   was unchanged, so the existing shape guards never forced a refetch. Fix: a
+   reference-cache EPOCH (DDO_REF_EPOCH) stamped on every write and checked on
+   read — any cache written under an older epoch refetches once, so U81 IDs land
+   immediately instead of after the TTL lapses. Bump the epoch on each future
+   content drop. (Noted for the U81 re-source: DDO Audit lists a 13th pack quest,
+   "The Darklake", the container omits — likely a wilderness zone; verify on wiki.)
    Build 07222026.1 (still v14; data-only): DDO Update 81 "Terror of Demogorgon"
    (Underdark expansion, released 2026-07-22) added as two containers —
    h-demogorgon (Heroic L11) and l-demogorgon (Legendary L37) — each 12 quests in
@@ -9763,6 +9824,33 @@ const QUEST_DETAILS = {
     }
   },
   "h-pirates": {
+    "Irestone Inlet": {
+      "levels": {"heroic": 4},
+      "story": "Captain Niles Cage told you a sad tale of his lost ship Banshee and her stalwart crew. The Banshee rests beneath the waves, but there is still time to rescue Cage's crew and punish the hobgoblin Yaaryar for his piratical ways! Speak with Captain Cage to find passage to Irestone Inlet, the haunt of Yaaryar and his scurvy mates.",
+      "monsters": [
+        {"name":"Bugbear","url":"https://ddowiki.com/page/Bugbear"},
+        {"name":"Bugbear Warrior","url":"https://ddowiki.com/page/Bugbear_Warrior"},
+        {"name":"Dinks","url":"https://ddowiki.com/page/Dinks"},
+        {"name":"Hobble","url":"https://ddowiki.com/page/Hobble"},
+        {"name":"Hobgoblin Cleric","url":"https://ddowiki.com/page/Hobgoblin_Cleric"},
+        {"name":"Hobgoblin Guard","url":"https://ddowiki.com/page/Hobgoblin_Guard"},
+        {"name":"Hobgoblin Infiltrator","url":"https://ddowiki.com/page/Hobgoblin_Infiltrator"},
+        {"name":"Hobgoblin Marksman","url":"https://ddowiki.com/page/Hobgoblin_Marksman"},
+        {"name":"Hobgoblin Slayer","url":"https://ddowiki.com/page/Hobgoblin_Slayer"},
+        {"name":"Hobgoblin Witch Doctor","url":"https://ddowiki.com/page/Hobgoblin_Witch_Doctor"},
+        {"name":"Kobold Chieftain","url":"https://ddowiki.com/page/Kobold_Chieftain"},
+        {"name":"Kobold Rogue","url":"https://ddowiki.com/page/Kobold_Rogue"},
+        {"name":"Kobold Shaman","url":"https://ddowiki.com/page/Kobold_Shaman"},
+        {"name":"Kobold Thrower","url":"https://ddowiki.com/page/Kobold_Thrower"},
+        {"name":"Mutiny","url":"https://ddowiki.com/page/Mutiny"},
+        {"name":"Ogre","url":"https://ddowiki.com/page/Ogre"},
+        {"name":"Ogre Shaman","url":"https://ddowiki.com/page/Ogre_Shaman"},
+        {"name":"Scurvy","url":"https://ddowiki.com/page/Scurvy"},
+        {"name":"Skartongue","url":"https://ddowiki.com/page/Skartongue"},
+        {"name":"Worg","url":"https://ddowiki.com/page/Worg"},
+        {"name":"Yaaryar","url":"https://ddowiki.com/page/Yaaryar"}
+      ]
+    },
     "The Legend of Two-Toed Tobias": {
       "levels": {"heroic": 5},
       "story": "A ghostly wailing echoes throughout Three Barrel Cove. Most locals believe it emanates from the Wheeping Cove, thought to be the resting place of Two-Toed Tobias.",
@@ -11435,7 +11523,7 @@ const NPC_LOCATIONS = {
 // take you to the wiki where you can see the bestower listed.
 const QUEST_GIVERS = {
   "h-saltmarsh": {"The Haunting of Saltmarsh":"Krag","Under the Cover of Darkness":"Anders Solmor","Danger at Dunwater":"Eliander Fireborn","The Final Enemy":"Gellan Primewater","Swim at Your Own Risk":"Sauriv","Down You Go":"Walk-up (no NPC)","Back to Basics":"Eyrk Hollums","What Sleeps Below":"Bostwick Guern","The Hijacked Haul":"Verna Prow","Rest for the Night":"Walk-up (no NPC)"},
-  "h-pirates": {"The Legend of Two-Toed Tobias":"Laurent Chastel","Prove Your Worth":"Dirty Vingus","Ghost of a Chance":"Marteen Worley","The Troglodytes' Get":"Red Tom","Old Grey Garl":"Red Tom","The Black Loch":"Tyn d'Deneith","Storm the Beaches":"Galton d'Deneith","Bargain of Blood":"Lille d'Deneith","The Tide Turns":"Greigur d'Deneith"},
+  "h-pirates": {"Irestone Inlet":"Niles Cage","The Legend of Two-Toed Tobias":"Laurent Chastel","Prove Your Worth":"Dirty Vingus","Ghost of a Chance":"Marteen Worley","The Troglodytes' Get":"Red Tom","Old Grey Garl":"Red Tom","The Black Loch":"Tyn d'Deneith","Storm the Beaches":"Galton d'Deneith","Bargain of Blood":"Lille d'Deneith","The Tide Turns":"Greigur d'Deneith"},
   "h-feywild": {"The Endless Revels":"Windsor Gruff","Witch Hunt":"Huntress Joranda","Make Believe":"Moscato","Wake Me Up Inside":"Sorghum","A Frosty Reception":"Lady Borealis","Quid Pro Quo":"Madoc Silverlight","Needle in a Fey Stack":"Farrunner","The Thornwright":"Mulberry","Immortality Lessons":"Sir Snowdrift","The Icemount Curse":"Hilda Bitterspine","The Legend of the Lost Locket":"Lord Thekian","The Knight Who Cried Windmill":"Sir Pifflegust","Combatting Corruption":"Thistledown"},
   "h-isle-dread": {"Captive of the Hidden God":"Wulth Sulfork","The Curse and the Captive Crustacean":"Quamak","Bullywugs and Booby Traps":"Rimta","Plundering Pirates' Point":"Akakan","Fall of the Forbidden Temple":"Marikan","All Hail the King":"Huta of Dawa","The Stone Crypt Chronicle":"Petra of Tanaroa","Trials of the Triceratops":"Kaya of Mantru","Wild Thing":"Anaka of Tanaroa","Spiders and Flies":"Aster","The Trouble with Tar Pits":"Tihasi of Dawa","Whispers of Return":"Anahu of the Turtle"},
   "h-chill": {"The Body Snatchers":"Bernd Hersteller","Special Delivery":"Annika von Dolchberg","The Proper Authorities":"Petra Meldung","The Wish":"Wilhelm Finster","Beneath the City Streets":"Erhard Gildemeister","A Miner Sacrifice":"Meinolf Draxsinger","Ends and Means":"Sepp Ohlhausen","Cold Snap":"Katrin Waljager","Locked Away (Part One)":"Renate Follmer","Locked Away (Part Two)":"Wenzel Brickner","Snowfall and Sunlight":"Hellmuth Neff","Zoo Creeper":"Frida Kauss","A Light in the Attic":"Othmar Aderhold"},
@@ -11547,8 +11635,9 @@ const SAGAS = [
     region: "Three Barrel Cove", pack: "Three-Barrel Cove + Sentinels of Stormreach",
     patron: "House Deneith (partial)",
     wiki: "https://ddowiki.com/page/The_Pirates_of_the_Thunder_Sea_(Heroic)",
-    quests: ["Bargain of Blood","The Black Loch","Storm the Beaches","The Tide Turns","The Legend of Two-Toed Tobias","Prove Your Worth","Ghost of a Chance","The Troglodytes' Get","Old Grey Garl"],
+    quests: ["Irestone Inlet","Bargain of Blood","The Black Loch","Storm the Beaches","The Tide Turns","The Legend of Two-Toed Tobias","Prove Your Worth","Ghost of a Chance","The Troglodytes' Get","Old Grey Garl"],
     storyArcs: [
+      { name: "The Harbor", giver: "Niles Cage", giverLocation: "The Harbor, far north-east docks by the lighthouse (former Korthos ship berth)", quests: ["Irestone Inlet"] },
       { name: "Sentinels of Stormreach", giver: "Taggart d'Deneith", giverLocation: "House Deneith Enclave, at the base of Deneith Tower", quests: ["Bargain of Blood","The Black Loch","Storm the Beaches","The Tide Turns"] },
       { name: "Three-Barrel Cove (standalone quests)", giver: null, quests: ["The Legend of Two-Toed Tobias","Prove Your Worth","Ghost of a Chance","The Troglodytes' Get","Old Grey Garl"] }
     ]
@@ -13272,6 +13361,18 @@ const DDO_CACHE_TTL = 60000;     // 1 min — avoid hammering the API on re-rend
 
 const DDO_REF_KEY = "sooksSagaScrollRef";   // separate key — keeps `state` schema untouched
 const DDO_REF_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
+// Build 07242026.1 — reference-cache EPOCH. The areas/quests tables are cached
+// for 7 days; when a game update adds content (new quests + areas) the cached
+// ROWS don't change SHAPE, so the shape guards below never trip and the new IDs
+// stay invisible until the TTL lapses (up to a week). That's what broke the
+// U81 "Terror of Demogorgon" location line, its LFM badges, and autocomplete:
+// every U81 quest_id/area_id was absent from a pre-U81 cache. Bumping this epoch
+// stamps every fresh write and forces any cache written under an older epoch to
+// refetch ONCE — so new content lands immediately for everyone. Bump on each
+// expansion / content drop that adds quests or areas.
+//   1 = pre-U81 (implicit — caches with no epoch field)
+//   2 = U81 "Terror of Demogorgon" (2026-07-22)
+const DDO_REF_EPOCH = 2;
 
 // In-memory mirrors of the reference tables once resolved this session.
 let _areasMap = null;      // Map<number, {name, region}>
@@ -13675,7 +13776,9 @@ function _readRefCache() {
   catch (e) { return {}; }
 }
 function _writeRefCache(obj) {
-  try { localStorage.setItem(DDO_REF_KEY, JSON.stringify(obj)); } catch (e) {}
+  // Build 07242026.1 — stamp the current epoch on every write so a later load
+  // can tell whether the cache predates the content the running build knows about.
+  try { obj.epoch = DDO_REF_EPOCH; localStorage.setItem(DDO_REF_KEY, JSON.stringify(obj)); } catch (e) {}
 }
 
 // Generic best-effort GET that tries a list of URLs and returns parsed JSON
@@ -13698,7 +13801,7 @@ async function getAreasMap() {
   if (_areasMap) return _areasMap;
   const cache = _readRefCache();
   const now = Date.now();
-  if (cache.areas && cache.areasTs && (now - cache.areasTs) < DDO_REF_TTL && Array.isArray(cache.areas)) {
+  if (cache.epoch === DDO_REF_EPOCH && cache.areas && cache.areasTs && (now - cache.areasTs) < DDO_REF_TTL && Array.isArray(cache.areas)) {
     _areasMap = new Map(cache.areas.map(a => [Number(a.id), { name: a.name, region: a.region || "" }]));
     return _areasMap;
   }
@@ -13746,7 +13849,7 @@ async function getQuestsMap() {
   // Shape guards: caches written before 07052026.1 lack `area`; before
   // 07112026.1 lack `raid`; before 07112026.5 lack `pack`. Any → stale,
   // refetch once.
-  if (cache.quests && cache.questsTs && (now - cache.questsTs) < DDO_REF_TTL && Array.isArray(cache.quests)
+  if (cache.epoch === DDO_REF_EPOCH && cache.quests && cache.questsTs && (now - cache.questsTs) < DDO_REF_TTL && Array.isArray(cache.quests)
       && (cache.quests.length === 0 || (cache.quests[0].area !== undefined && cache.quests[0].raid !== undefined
           && cache.quests[0].pack !== undefined))) {
     _setQuestMaps(cache.quests.map(q => ({ id: Number(q.id), name: q.name, area: Number(q.area) || 0,
@@ -16545,6 +16648,99 @@ function toggleReaperFold(band) {
   renderReaperCorner(band);
 }
 
+/* ── Build 07252026.2 — CONNECT-SWITCH PROMPT ─────────────────────────────
+   When the SELECTED character is offline but one or more of the user's OWN
+   characters show up online in the guild roster the 15s poll already fetches,
+   offer to switch the scroll to that character. Reuses the roster data (no new
+   fetch or timer), the app-meta store (no schema bump — SCHEMA_VERSION stays
+   14), and an _acSeen-style in-memory per-login dismiss set. Wired at the tail
+   of renderGuildCorner (U4), so it inherits the tick's hidden/manage gates.
+   Plan: docs/plans/2026-07-25-001-feat-connect-switch-prompt-plan.md
+   ── */
+
+// U2 — global on/off (app-meta, default ON). No visible control yet (deferred);
+// toggle via _setConnectSwitchEnabled(false) until a settings checkbox lands.
+function _connectSwitchEnabled() {
+  const v = _readAppMeta().connectSwitchPrompt;
+  return v !== undefined ? !!v : true;   // undefined → ON by default
+}
+function _setConnectSwitchEnabled(on) {
+  _writeAppMeta({ connectSwitchPrompt: !!on });
+  renderGuildCorner();                   // re-evaluate immediately
+}
+// U2 — owned-char names (lowercased) dismissed for their CURRENT online session.
+// Reconciled each tick: an entry clears once that character is no longer online,
+// so a genuinely new login re-offers (mirrors the _acSeen lifecycle).
+let _switchDismissed = new Set();
+function _reconcileSwitchDismissed(online) {
+  const names = new Set((online || [])
+    .filter(m => m && !m.anon && m.name)
+    .map(m => String(m.name).toLowerCase()));
+  _switchDismissed.forEach(nm => { if (!names.has(nm)) _switchDismissed.delete(nm); });
+}
+
+// U1 — candidates: the user's OWN characters that are online in the roster while
+// the SELECTED character is offline. `res` is fetchCharacter's result for the
+// active char; `online` is _summarizeGuild's online[] (self already excluded,
+// anonymous rows flagged). Returns display names in state.characters order.
+function _connectSwitchCandidates(active, res, online) {
+  if (!res || res.offlineChar !== true) return [];   // only when selected char is offline
+  const activeL = String(active || "").toLowerCase();
+  const onlineNames = new Set((online || [])
+    .filter(m => m && !m.anon && m.name)
+    .map(m => String(m.name).toLowerCase()));
+  return (state.characters || []).filter(c => {
+    const cl = String(c).toLowerCase();
+    return cl !== activeL && onlineNames.has(cl);
+  });
+}
+
+// U3 — the switch action: replicate the medallion-click sequence 1:1.
+function _connectSwitchTo(c) {
+  if (!c || !(state.characters || []).includes(c)) return;
+  _nowPlaying = null; _locBannerDismissed = false;
+  _lfmIndex = {}; _lfmFetchKey = ""; _lfmFetchTs = 0;
+  state.activeChar = c;
+  applyTheme(themeOf(c));
+  saveState();
+  renderAll();
+}
+
+// U3 — render (or clear) the switch-offer banner. Pass the candidate list; the
+// dismiss filter and enable/empty checks are applied here so callers can always
+// call this with the raw candidates (or [] to clear).
+function _connectSwitchBannerEl() {
+  let el = document.getElementById("connectSwitchBanner");
+  if (!el) { el = document.createElement("div"); el.id = "connectSwitchBanner"; document.body.appendChild(el); }
+  return el;
+}
+function renderConnectSwitch(candidates) {
+  const el = _connectSwitchBannerEl();
+  const show = _connectSwitchEnabled()
+    ? (candidates || []).filter(c => !_switchDismissed.has(String(c).toLowerCase()))
+    : [];
+  if (!show.length) { el.innerHTML = ""; return; }
+  const btns = show.map(c =>
+    `<button type="button" class="cs-switch" data-cs-char="${escapeHtml(c)}">Switch to ${escapeHtml(c)} ⚔</button>`
+  ).join("");
+  const lead = show.length === 1
+    ? `You're playing <b>${escapeHtml(show[0])}</b>, but the scroll is on an offline character.`
+    : `${show.length} of your characters are online — switch the scroll to one?`;
+  el.innerHTML =
+    `<div class="cs-banner">` +
+      `<div class="cs-text">${lead}</div>` +
+      `<div class="cs-actions">${btns}` +
+        `<button type="button" class="cs-dismiss" title="Not now">✕</button>` +
+      `</div>` +
+    `</div>`;
+  el.querySelectorAll(".cs-switch").forEach(b =>
+    b.addEventListener("click", () => _connectSwitchTo(b.getAttribute("data-cs-char"))));
+  el.querySelector(".cs-dismiss").addEventListener("click", () => {
+    show.forEach(c => _switchDismissed.add(String(c).toLowerCase()));
+    el.innerHTML = "";
+  });
+}
+
 // Build 06222026.2 — floating guild-roster table (#guildCorner), under the
 // character chips in the upper-right cluster. Shows the ACTIVE character's
 // guildmates who are currently online; the table header is the guild name. The
@@ -16557,12 +16753,12 @@ async function renderGuildCorner() {
   if (!corner) return;
   const active = state.activeChar;
   const server = serverOf(active);
-  if (!active || !server) { corner.innerHTML = ""; return; }   // no live lookup → hide
+  if (!active || !server) { corner.innerHTML = ""; renderConnectSwitch([]); return; }   // no live lookup → hide
   try {
     const res = await fetchCharacter(server, active);
     if (active !== state.activeChar) return;                   // stale (char switched)
     const guild = res && res.data ? _ddoPick(res.data, ["guild_name", "Guild", "GuildName"]) : "";
-    if (!guild) { corner.innerHTML = ""; return; }             // no guild known → hide
+    if (!guild) { corner.innerHTML = ""; renderConnectSwitch([]); return; }             // no guild known → hide
     const g = await fetchGuildmates(server, guild, active);
     if (active !== state.activeChar) return;                   // stale
     // Build 07052026.1 — if any online member has a location_id, resolve the
@@ -16630,7 +16826,12 @@ async function renderGuildCorner() {
         if (e.key === "Enter" || e.key === " ") { e.preventDefault(); toggleGuildFold(); }
       });
     }
-  } catch (e) { corner.innerHTML = ""; }   // degrade silently to hidden
+    // Build 07252026.2 — CONNECT-SWITCH PROMPT (U4): reuse the roster we just
+    // fetched to offer switching when the selected char is offline and an owned
+    // alt is online. No new fetch/timer; inherits this tick's hidden/manage gates.
+    _reconcileSwitchDismissed(g.online);
+    renderConnectSwitch(_connectSwitchCandidates(active, res, g.online));
+  } catch (e) { corner.innerHTML = ""; renderConnectSwitch([]); }   // degrade silently to hidden
 }
 
 // Build 07112026.1 — the RAIDS card (#raidCorner), under the guild card.

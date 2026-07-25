@@ -2,13 +2,54 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07242026-1.html` — Build
-> `07242026.1` (2026-07-24). 2 most recent overall:
-> `sooks-saga-scroll-07242026-1.html` + `sooks-saga-scroll-07222026-1.html`.
-> The 2nd-most-recent (`-07222026-1`, 07-22) is itself the most-recent
-> previous-day build, so it doubles as the cross-day rollback anchor — no
-> distinct 3rd slot needed; retain set is **2 files**. Pruned this park:
-> `sooks-saga-scroll-07192026-5.html` → `_to_delete/`. **Live-data fix — U81
+> **Currently parked:** `sooks-saga-scroll-07252026-3.html` — Build
+> `07252026.3` (2026-07-25). Retain set is **3 files**: the 2 most recent
+> overall (`-07252026-3` + `-07252026-2`, both 07-25) PLUS the most-recent
+> previous-day build (`-07242026-1`, 07-24) as the cross-day rollback anchor.
+> Pruned this park: `sooks-saga-scroll-07252026-1.html` → `_to_delete/` (its
+> Irestone + feature content is fully carried in `-2`/`-3`). **Code-review polish
+> (Build 07252026.3, still v14, no schema/behavior change):** two fixes to the
+> connect-switch banner from a `ce-code-review` pass — (1) a **signature guard**
+> in `renderConnectSwitch` (mirrors the `_lfmSig` LFM-index pattern) so the 15s
+> tick no longer rebuilds the banner DOM / re-binds listeners when the visible
+> candidate set is unchanged (the CPU concern); (2) the switch action now clears
+> the banner **immediately** via `_clearConnectSwitchBanner()` instead of waiting
+> for the async guild-corner re-render. Verified in-browser: guard confirmed to
+> skip rebuilds on unchanged candidates (same DOM node) yet rebuild on change,
+> self-check clean, 0 console errors. **Prior build (07252026.2) — Connect-Switch
+> Prompt (feature, still v14, no schema change):** new feature — when the SELECTED character is offline but
+> one or more of your OWN characters are online in the guild roster the 15s poll
+> already fetches, a top-center banner offers to switch the scroll to that
+> character (lists all when several; ✕ to dismiss). Zero added network/CPU:
+> reuses the roster `renderGuildCorner` already fetches and inherits the tick's
+> `document.hidden`/`charManageMode` gates. Detection `_connectSwitchCandidates`
+> (owned ∩ online − active − anonymous, only when the selected char is offline);
+> per-login dismiss via an in-memory `_switchDismissed` set reconciled each tick
+> (a genuinely new login re-offers); global on/off in app-meta
+> (`connectSwitchPrompt`, default ON; a visible control is deferred). The switch
+> action replicates the medallion-click sequence 1:1. Verified in-browser:
+> self-check clean (64 containers / 541 quests / 100% detailed), 0 console
+> errors, U1/U2/U3 logic + banner UI driven with synthetic inputs. Plan:
+> `docs/plans/2026-07-25-001-feat-connect-switch-prompt-plan.md`. **Prior build
+> (07252026.1) — Wiki saga audit + data fix (still v14, no schema change):** audited all **31
+> official saga containers** (Heroic/Epic/Legendary) against their DDO wiki saga
+> pages by quest count + inclusion rule — **30 matched the wiki exactly**; **1
+> real gap fixed**: Heroic `h-pirates` (The Pirates of the Thunder Sea) was
+> missing **Irestone Inlet** (L4, The Harbor; giver **Niles Cage**), which the
+> wiki saga requires (10 quests; app had 9). Added it to `quests[]`, a new "The
+> Harbor" story arc, plus wiki-sourced `QUEST_DETAILS` (story + 21 monsters) and
+> `QUEST_GIVERS`. Verified in-browser via localhost + Claude-in-Chrome: self-check
+> **"No structural issues found"**, **0 console errors**, h-pirates 9→10.
+> **Method note for future audits:** DDO wiki **saga** pages give the quest COUNT
+> + inclusion rule ("all pack quests except X") but NOT names; quest NAMES live on
+> the **pack** page — an audit needs both. **Also confirmed:** the user's original
+> report (Heroic Myth Drannor "missing Secrets of the Red Wizards") was checked
+> and found **already correct** — 13/13, plural spelling matches the wiki; no
+> change made. **Still un-audited (`TODO`):** the **24 Non-Saga containers**
+> (Non-Saga Epic + Non-Saga Legendary) are the author's curated leveling/reaper
+> groupings, not official wiki sagas, so the count audit doesn't apply — a
+> name-level spot-check against individual quest pages is still pending. **Prior
+> build (07242026.1) — Live-data fix — U81
 > reference-cache staleness (no schema change, still v14):** the DDO Audit
 > `areas`/`quests` reference tables are cached 7 days outside `state`; when U81
 > dropped (2026-07-22) any existing cache predated it, so every U81
@@ -55,12 +96,58 @@ details tucked behind each quest. Companion to the source spreadsheet
 "Sook's Saga Database" (Google Sheets).
 
 ## Files
-- `sooks-saga-scroll-07242026-1.html` — the live build. Open in any
+- `sooks-saga-scroll-07252026-3.html` — the live build. Open in any
   browser; no server or build step. Progress auto-saves to browser
   storage (key `sooksSagaScroll`, **schema v14** as of Build
   07142026.1 — see notes below). See **Data Schema & Import/Export
   Contract** below for the durable shape and the rules every future
   build must follow.
+
+  **Build 07252026.3 — Connect-Switch code-review polish (no schema/behavior
+  change, still v14).** Two fixes from a `ce-code-review` pass on the 07252026.2
+  banner: (1) a **signature guard** in `renderConnectSwitch` (`_switchSig`,
+  mirroring the `_lfmSig` LFM-index pattern) so the 15s guild-corner tick skips
+  the banner DOM rebuild + listener re-bind when the visible candidate set is
+  unchanged — removes per-tick churn and a hover-then-tick click-drop risk; and
+  (2) `_connectSwitchTo` now clears the banner **immediately** via the new
+  `_clearConnectSwitchBanner()` helper (which also resets `_switchSig`) instead
+  of waiting for the async guild-corner re-render, so the offer disappears the
+  instant you click Switch. Verified in-browser: the guard keeps the same DOM
+  node across identical re-renders and rebuilds on change; dismiss + clear reset
+  the signature (no stuck-empty); self-check clean, 0 console errors.
+
+  **Build 07252026.2 — Connect-Switch Prompt (feature; no schema change, still
+  v14).** When the SELECTED character is offline but one or more of your OWN
+  characters are online in the guild roster the 15s poll already fetches, a
+  top-center banner offers to switch the scroll to that character (lists all
+  when several; ✕ dismiss). Reuses the roster `renderGuildCorner` already
+  fetches (zero added network/CPU) and inherits the tick's `document.hidden` /
+  `charManageMode` gates. Pieces: `_connectSwitchCandidates` (owned ∩ online −
+  active − anonymous, only when selected offline); in-memory `_switchDismissed`
+  set reconciled each tick so a new login re-offers; global on/off in app-meta
+  (`connectSwitchPrompt`, default ON — visible control deferred); switch action
+  replicates the medallion-click sequence 1:1. Detection wired at the tail of
+  `renderGuildCorner`; banner is a fixed `#connectSwitchBanner` styled like
+  `.loc-banner`. No storage/schema change. Verified in-browser: self-check clean
+  (64 containers / 541 quests / 100% detailed), 0 console errors, U1/U2/U3 logic
+  + banner UI driven with synthetic inputs (live end-to-end needs a real offline
+  selected char + online in-guild alt, not reproducible in a fresh browser).
+  Plan: `docs/plans/2026-07-25-001-feat-connect-switch-prompt-plan.md`.
+
+  **Build 07252026.1 — Wiki saga audit + Irestone Inlet fix (data-only, no
+  schema change, still v14).** Audited all 31 official saga containers
+  (Heroic/Epic/Legendary) against their DDO wiki saga pages: 30 matched the wiki
+  quest list exactly. Fixed the one real gap — Heroic `h-pirates` (The Pirates
+  of the Thunder Sea) was missing **Irestone Inlet** (Heroic L4, The Harbor;
+  giver Niles Cage), a wiki-required saga quest (wiki lists 10, app had 9).
+  Added to `quests[]` + a new "The Harbor" story arc, with wiki-sourced
+  `QUEST_DETAILS` (story + 21 monsters) and `QUEST_GIVERS`. Container quest total
+  540→541 (self-check verified 541 total quest slots). Verified: self-check "No structural issues found", 0 console errors.
+  The Epic `e-pirates` "Old Tomb, New Tenants" is a single comma-named quest
+  (correct, 10 quests) — flagged only because a naive comma-split parser
+  miscounted it; no change. Myth Drannor (H+L) re-verified already-correct
+  (13/13). **Not audited:** the 24 Non-Saga containers (curated groupings, no
+  official wiki saga) — name-level spot-check still `TODO`.
 
   **Build 07242026.1 — U81 live-data fix: reference-cache epoch (no schema
   change, still v14).** Fixed three live features that silently broke for U81
@@ -3932,7 +4019,7 @@ Adding a new piece of user data (e.g. a per-saga colored flag)?
 > `SAGA_STORIES`, `QUEST_DETAILS`, `QUEST_GIVERS`; never fabricate — use
 > Chrome MCP against `ddowiki.com` (direct `web_fetch` is blocked by the
 > proxy). Footer uses `Build ` prefix with `mmddyyyy.x` format,
-> currently `Build 07242026.1`. **Live-data note (important for future content
+> currently `Build 07252026.3`. **Live-data note (important for future content
 > drops): the guild-roster location line, live LFM badges, and quest Autocomplete
 > all resolve against the DDO Audit `areas`/`quests` reference tables, cached 7
 > days in `localStorage` key `sooksSagaScrollRef` (NOT `state`; NOT the hand-coded
@@ -3941,6 +4028,35 @@ Adding a new piece of user data (e.g. a per-saga colored flag)?
 > the TTL lapses. Guard with the reference-cache epoch: bump the `DDO_REF_EPOCH`
 > constant (currently `2`) whenever an expansion/patch adds quests or areas — it
 > forces every stale cache to refetch once.**
+> **Build 07252026.3 (still v14; code-review polish, no behavior change): two
+> fixes to the connect-switch banner — a `_switchSig` signature guard in
+> `renderConnectSwitch` (mirrors `_lfmSig`) so the 15s tick skips the banner
+> rebuild when the candidate set is unchanged; and `_connectSwitchTo` clears the
+> banner immediately via `_clearConnectSwitchBanner()` rather than waiting for
+> the async re-render. Verified in-browser (guard skips/rebuilds correctly,
+> self-check clean, 0 console errors).**
+> **Build 07252026.2 (still v14; feature): Connect-Switch Prompt — when the
+> SELECTED character is offline but an OWN character is online in the guild
+> roster the 15s poll already fetches, a top-center banner offers to switch the
+> scroll to it (lists all when several; ✕ dismiss). Zero added network/CPU
+> (reuses `renderGuildCorner`'s roster; inherits the tick's hidden/manage
+> gates). `_connectSwitchCandidates` (owned ∩ online − active − anonymous, only
+> when selected offline); in-memory `_switchDismissed` reconciled each tick (new
+> login re-offers); app-meta `connectSwitchPrompt` on/off (default ON, visible
+> control deferred); switch = medallion-click sequence 1:1. Verified in-browser
+> (self-check clean, 0 console errors, logic + banner driven synthetically).
+> Plan: docs/plans/2026-07-25-001-feat-connect-switch-prompt-plan.md.**
+> **Build 07252026.1 (still v14; data-only): wiki saga audit — compared all 31
+> official saga containers (Heroic/Epic/Legendary) to their DDO wiki saga pages
+> (quest count + inclusion rule). 30/31 matched exactly; fixed the one gap —
+> Heroic `h-pirates` was missing the wiki-required quest "Irestone Inlet" (L4,
+> The Harbor, giver Niles Cage): added to `quests[]` + a new "The Harbor" arc
+> with wiki-sourced `QUEST_DETAILS` (story + 21 monsters) and `QUEST_GIVERS`
+> (540→541 quests; self-check verified 541). Verified: self-check clean, 0 console errors. Method: wiki
+> SAGA pages give the COUNT + "all pack quests except X"; quest NAMES come from
+> the PACK page. Myth Drannor (H+L) re-verified already-correct (13/13). The 24
+> Non-Saga containers are curated groupings (no official wiki saga) — name-level
+> spot-check still TODO.**
 > **Build 07242026.1 (still v14; live-data fix, no schema change): added
 > `DDO_REF_EPOCH` (epoch 2), stamped on every `_writeRefCache` and required by
 > both `getAreasMap`/`getQuestsMap` read guards. Fixes the U81 roster-location /
