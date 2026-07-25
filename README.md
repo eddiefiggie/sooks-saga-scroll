@@ -2,13 +2,21 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07252026-3.html` — Build
-> `07252026.3` (2026-07-25). Retain set is **3 files**: the 2 most recent
-> overall (`-07252026-3` + `-07252026-2`, both 07-25) PLUS the most-recent
+> **Currently parked:** `sooks-saga-scroll-07252026-4.html` — Build
+> `07252026.4` (2026-07-25). Retain set is **3 files**: the 2 most recent
+> overall (`-07252026-4` + `-07252026-3`, both 07-25) PLUS the most-recent
 > previous-day build (`-07242026-1`, 07-24) as the cross-day rollback anchor.
-> Pruned this park: `sooks-saga-scroll-07252026-1.html` → `_to_delete/` (its
-> Irestone + feature content is fully carried in `-2`/`-3`). **Code-review polish
-> (Build 07252026.3, still v14, no schema/behavior change):** two fixes to the
+> Pruned this park: `sooks-saga-scroll-07252026-2.html` → `_to_delete/`
+> (untracked; superseded by `-3`/`-4`). **Connect-switch banner visibility
+> (Build 07252026.4, CSS-only, no schema/behavior change):** the 07252026.2
+> banner (16% gold on parchment) was too faint and easy to miss; remade as a
+> **dark wax-red seal** — cream text, gold-highlighted character name, gold CTA
+> buttons, gold border, and a pulsing gold glow that animates OPACITY on a
+> `::after` overlay (GPU-friendly per the 07182026.9 CPU pass; no box-shadow
+> animation) and stills under `prefers-reduced-motion`. Theme-variable driven
+> (adapts per character theme). Verified in-browser (renders, self-check
+> unaffected). **Prior build (07252026.3) — Connect-Switch code-review polish
+> (still v14, no schema/behavior change):** two fixes to the
 > connect-switch banner from a `ce-code-review` pass — (1) a **signature guard**
 > in `renderConnectSwitch` (mirrors the `_lfmSig` LFM-index pattern) so the 15s
 > tick no longer rebuilds the banner DOM / re-binds listeners when the visible
@@ -96,12 +104,22 @@ details tucked behind each quest. Companion to the source spreadsheet
 "Sook's Saga Database" (Google Sheets).
 
 ## Files
-- `sooks-saga-scroll-07252026-3.html` — the live build. Open in any
+- `sooks-saga-scroll-07252026-4.html` — the live build. Open in any
   browser; no server or build step. Progress auto-saves to browser
   storage (key `sooksSagaScroll`, **schema v14** as of Build
   07142026.1 — see notes below). See **Data Schema & Import/Export
   Contract** below for the durable shape and the rules every future
   build must follow.
+
+  **Build 07252026.4 — Connect-switch banner visibility (CSS-only, no
+  schema/behavior change, still v14).** User feedback: the 07252026.2 banner
+  (16% gold on the parchment page) was too faint and easy to miss. Remade as a
+  prominent **dark wax-red seal** — cream text, the character name highlighted
+  in gold, gold CTA buttons, a gold border, and a pulsing gold glow. The glow
+  animates **opacity** on a `.cs-banner::after` overlay (GPU-friendly per the
+  07182026.9 CPU pass — no box-shadow animation) and stills under
+  `prefers-reduced-motion`. Built on the theme color variables, so it adapts to
+  each character theme. No JS change; self-check unaffected.
 
   **Build 07252026.3 — Connect-Switch code-review polish (no schema/behavior
   change, still v14).** Two fixes from a `ce-code-review` pass on the 07252026.2
@@ -4019,7 +4037,7 @@ Adding a new piece of user data (e.g. a per-saga colored flag)?
 > `SAGA_STORIES`, `QUEST_DETAILS`, `QUEST_GIVERS`; never fabricate — use
 > Chrome MCP against `ddowiki.com` (direct `web_fetch` is blocked by the
 > proxy). Footer uses `Build ` prefix with `mmddyyyy.x` format,
-> currently `Build 07252026.3`. **Live-data note (important for future content
+> currently `Build 07252026.4`. **Live-data note (important for future content
 > drops): the guild-roster location line, live LFM badges, and quest Autocomplete
 > all resolve against the DDO Audit `areas`/`quests` reference tables, cached 7
 > days in `localStorage` key `sooksSagaScrollRef` (NOT `state`; NOT the hand-coded
@@ -4028,6 +4046,12 @@ Adding a new piece of user data (e.g. a per-saga colored flag)?
 > the TTL lapses. Guard with the reference-cache epoch: bump the `DDO_REF_EPOCH`
 > constant (currently `2`) whenever an expansion/patch adds quests or areas — it
 > forces every stale cache to refetch once.**
+> **Build 07252026.4 (still v14; CSS-only, no behavior change): connect-switch
+> banner visibility — the faint 16% gold banner was easy to miss, so it's now a
+> dark wax-red seal (cream text, gold-highlighted name, gold CTA buttons, gold
+> border) with a pulsing gold glow that animates opacity on a `.cs-banner::after`
+> overlay (GPU-friendly; stills under prefers-reduced-motion). Theme-variable
+> driven. No JS change.**
 > **Build 07252026.3 (still v14; code-review polish, no behavior change): two
 > fixes to the connect-switch banner — a `_switchSig` signature guard in
 > `renderConnectSwitch` (mirrors `_lfmSig`) so the 15s tick skips the banner

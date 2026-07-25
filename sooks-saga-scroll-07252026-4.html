@@ -1060,54 +1060,80 @@
     line-height: 1;
     cursor: pointer;
   }
-  /* Build 07252026.2 — CONNECT-SWITCH PROMPT banner (fixed, top-center). */
+  /* Build 07252026.2 — CONNECT-SWITCH PROMPT banner (fixed, top-center).
+     Build 07252026.4 — made prominent (the 07252026.2 version at 16% gold was
+     too faint against the parchment page and easy to miss): a dark wax-red SEAL
+     banner with a gold border, cream text, gold CTA buttons, and a pulsing gold
+     glow. The glow animates OPACITY on a ::after overlay (GPU-friendly, per the
+     07182026.9 CPU pass — no box-shadow animation) and stills under
+     prefers-reduced-motion. High contrast against the light page = unmissable. */
   #connectSwitchBanner:empty { display: none; }
   #connectSwitchBanner {
     position: fixed;
-    top: 14px;
+    top: 16px;
     left: 50%;
     transform: translateX(-50%);
     z-index: 9000;
-    max-width: min(92vw, 640px);
+    max-width: min(94vw, 660px);
   }
   .cs-banner {
+    position: relative;
     display: flex;
     align-items: center;
-    gap: 12px;
+    gap: 14px;
     flex-wrap: wrap;
-    padding: 10px 16px;
+    padding: 13px 18px;
     font-family: var(--font-body);
-    font-size: 0.98rem;
-    color: var(--wax-red-dark);
-    background: rgba(168,131,46,0.16);
-    border: 1px solid var(--gold);
-    border-left: 4px solid var(--gold);
+    font-size: 1.04rem;
+    font-weight: 600;
+    color: var(--parchment-base);
+    background: var(--wax-red);
+    border: 2px solid var(--gold-light);
     border-radius: var(--radius-card);
-    box-shadow: 0 6px 22px rgba(0,0,0,0.28);
+    box-shadow: 0 10px 30px rgba(0,0,0,0.5);
+  }
+  .cs-banner::after {
+    content: "";
+    position: absolute;
+    inset: -2px;
+    border-radius: inherit;
+    box-shadow: 0 0 20px 3px var(--gold-light);
+    opacity: 0.3;
+    pointer-events: none;
+    animation: csGlow 2.1s ease-in-out infinite;
+  }
+  @keyframes csGlow {
+    0%, 100% { opacity: 0.22; }
+    50%      { opacity: 0.85; }
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .cs-banner::after { animation: none; opacity: 0.5; }
   }
   .cs-banner .cs-text { flex: 1 1 220px; }
+  .cs-banner .cs-text b { color: var(--gold-light); }
   .cs-banner .cs-actions { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
   .cs-banner .cs-switch {
     font-family: var(--font-display);
-    font-size: 0.72rem;
+    font-size: 0.74rem;
     font-weight: 700;
-    color: #fff;
-    background: var(--wax-red);
-    border: 1px solid var(--wax-red-dark);
+    color: var(--wax-red-dark);
+    background: var(--gold-light);
+    border: 1px solid var(--gold);
     border-radius: 6px;
-    padding: 5px 10px;
+    padding: 6px 12px;
     cursor: pointer;
   }
-  .cs-banner .cs-switch:hover { background: var(--wax-red-dark); }
+  .cs-banner .cs-switch:hover { background: #fff; }
   .cs-banner .cs-dismiss {
     background: none;
     border: none;
-    color: var(--ink-faded);
-    font-size: 1.1rem;
+    color: rgba(237,225,191,0.75);
+    font-size: 1.2rem;
     line-height: 1;
     cursor: pointer;
     padding: 0 2px;
   }
+  .cs-banner .cs-dismiss:hover { color: #fff; }
   .saga.saga-now-playing {
     border-color: var(--gold) !important;
     box-shadow: 0 0 0 2px rgba(168,131,46,0.45), 0 0 14px rgba(168,131,46,0.5);
@@ -4459,7 +4485,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07252026.2</div>
+      <div class="build">Build 07252026.4</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -16672,6 +16698,9 @@ function _setConnectSwitchEnabled(on) {
 // Reconciled each tick: an entry clears once that character is no longer online,
 // so a genuinely new login re-offers (mirrors the _acSeen lifecycle).
 let _switchDismissed = new Set();
+// Build 07252026.3 — signature of the last-rendered banner; the guard in
+// renderConnectSwitch skips the DOM rebuild + listener re-bind on unchanged ticks.
+let _switchSig = "";
 function _reconcileSwitchDismissed(online) {
   const names = new Set((online || [])
     .filter(m => m && !m.anon && m.name)
@@ -16698,6 +16727,7 @@ function _connectSwitchCandidates(active, res, online) {
 // U3 — the switch action: replicate the medallion-click sequence 1:1.
 function _connectSwitchTo(c) {
   if (!c || !(state.characters || []).includes(c)) return;
+  _clearConnectSwitchBanner();   // Build 07252026.3 — clear immediately; renderAll re-evaluates
   _nowPlaying = null; _locBannerDismissed = false;
   _lfmIndex = {}; _lfmFetchKey = ""; _lfmFetchTs = 0;
   state.activeChar = c;
@@ -16714,11 +16744,24 @@ function _connectSwitchBannerEl() {
   if (!el) { el = document.createElement("div"); el.id = "connectSwitchBanner"; document.body.appendChild(el); }
   return el;
 }
+// Build 07252026.3 — clear the banner and reset the signature so the next
+// renderConnectSwitch always re-evaluates (used by dismiss + the switch action).
+function _clearConnectSwitchBanner() {
+  const el = document.getElementById("connectSwitchBanner");
+  if (el) el.innerHTML = "";
+  _switchSig = "";
+}
 function renderConnectSwitch(candidates) {
-  const el = _connectSwitchBannerEl();
   const show = _connectSwitchEnabled()
     ? (candidates || []).filter(c => !_switchDismissed.has(String(c).toLowerCase()))
     : [];
+  // Build 07252026.3 — signature guard (mirrors the _lfmSig LFM-index pattern):
+  // the 15s tick repaints the guild corner every time; skip the banner rebuild +
+  // listener re-bind when the visible candidate set is unchanged.
+  const sig = show.join("\n");   // newline can't appear in a character name
+  if (sig === _switchSig) return;
+  _switchSig = sig;
+  const el = _connectSwitchBannerEl();
   if (!show.length) { el.innerHTML = ""; return; }
   const btns = show.map(c =>
     `<button type="button" class="cs-switch" data-cs-char="${escapeHtml(c)}">Switch to ${escapeHtml(c)} ⚔</button>`
