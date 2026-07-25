@@ -103,6 +103,22 @@ banked vs. redeemed reward states, and DDO Wiki–sourced story / monster / trap
 details tucked behind each quest. Companion to the source spreadsheet
 "Sook's Saga Database" (Google Sheets).
 
+## Future build considerations
+
+Non-urgent items to fold into a later build:
+
+- **Deploy workflow — Node 20 deprecation.** `.github/workflows/deploy.yml`
+  uses `actions/checkout@v4`, `actions/configure-pages@v5`,
+  `actions/deploy-pages@v4`, and `actions/upload-artifact@v4`, which target
+  Node 20; GitHub now force-runs them on Node 24 and logs a deprecation warning
+  (deploys still succeed). Bump these action versions when convenient.
+- **Connect-switch — visible master toggle.** The connect-switch prompt's
+  global on/off lives only in the app-meta store (`connectSwitchPrompt`, default
+  ON), toggled via `_setConnectSwitchEnabled()`. A visible control (e.g. in the
+  Filters & Alerts panel) was deferred from the plan
+  (`docs/plans/2026-07-25-001-feat-connect-switch-prompt-plan.md`); add it if the
+  feature needs a user-facing off switch.
+
 ## Files
 - `sooks-saga-scroll-07252026-4.html` — the live build. Open in any
   browser; no server or build step. Progress auto-saves to browser
