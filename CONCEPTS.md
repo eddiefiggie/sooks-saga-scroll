@@ -31,6 +31,28 @@ A cluster of live-status cards anchored to a screen corner: one cluster holds th
 ### Roll-over tier
 One of the three priority groups a saga container header or quest row is composed of for responsive stacking: Tier 1 (name + level), Tier 2 (the actions group — reward pill + progress bars on a container header, or the completion controls on a quest row), and Tier 3 (LFM info). As a row loses width the tiers roll to new lines lowest-priority first (LFM, then the actions group), and each tier rolls as one atomic unit — a tier never fragments so a lone bar or button never strands on its own line. Distinct from a container's [Tier](#tier) (Heroic/Epic/Legendary classification) — this "tier" is a within-row layout band, not a saga grouping.
 
+## Live data
+
+### Reference cache
+The locally cached copy of DDO Audit's static lookup tables — the `areas` table
+(area id → name/region) and the `quests` table (quest id → name, area id, raid
+flag, adventure pack). Stored in `localStorage` under its own key, separate from
+the app's saved `state`, with a multi-day TTL. It is the shared backbone of the
+live features: the guild roster's location line, live LFM badges, and quest
+Autocomplete all resolve a numeric id (a character's `location_id`, an LFM's
+`quest_id`) against it. Distinct from the hand-authored quest/saga data that
+renders the containers — a container can display perfectly while the reference
+cache is stale, which is why a stale cache breaks the *live* features only.
+
+### Content epoch
+An integer stamped into the [Reference cache](#reference-cache) and bumped whenever
+a game update adds quests or areas the current build knows about. Read-time the
+cache is only trusted when its stored epoch matches the current one; an older or
+absent epoch forces a one-time refetch. It is a third invalidation signal
+alongside the TTL and the row-shape guard, and the only one that catches
+*content-only* upstream changes (new rows, same schema) — the case where a new
+expansion's data would otherwise stay invisible until the TTL lapsed.
+
 ## Flagged ambiguities
 
 - **"Tier"** is used for two unrelated things: a container's [Tier](#tier) (its Heroic/Epic/Legendary/Non-Saga classification and level band) and a [Roll-over tier](#roll-over-tier) (one of the three responsive-layout priority bands a row stacks into). When unqualified, "tier" means the container classification; the layout sense is always "roll-over tier".
