@@ -1138,13 +1138,12 @@
     padding: 0 2px;
   }
   .cs-banner .cs-dismiss:hover { color: #fff; }
-  /* Build 07262026.5 — Focus View pulse. The card keeps a STATIC gold "now
-     playing" glow; the PULSE is now a GPU-friendly OPACITY animation on an inset
-     ::before overlay (was an animated box-shadow — the exact CPU pattern the
-     07182026.9 pass removed elsewhere). Inset glow so overflow:hidden on a
-     banked/complete card can't clip it; ::before is free (banked uses ::after).
-     Only Focus-View-matched sagas carry the class, so at most a few elements ever
-     animate, and it stills to the static glow under prefers-reduced-motion. */
+  /* Build 07262026.7 — Focus View emphasis is now a STATIC illuminated frame, not
+     a pulse. The location-matched saga gets a gold outer ring + an inset gold
+     "picture frame" with a soft inner glow — zero animation, so the lowest possible
+     CPU cost (the pulse from .5 is gone). Only Focus-View-matched sagas carry the
+     class, and the frame sits INSIDE the card edge so overflow:hidden on a
+     banked/complete card can't clip it; ::before is free (banked uses ::after). */
   .saga.saga-now-playing {
     border-color: var(--gold) !important;
     box-shadow: 0 0 0 2px rgba(168,131,46,0.45), 0 0 14px rgba(168,131,46,0.5);
@@ -1152,21 +1151,17 @@
   .saga.saga-now-playing::before {
     content: "";
     position: absolute;
-    inset: 0;
-    border-radius: inherit;
+    inset: 5px;
+    border: 2px solid rgba(168,131,46,0.9);
+    border-radius: 6px;
     pointer-events: none;
     z-index: 1;
-    box-shadow: inset 0 0 0 2px rgba(168,131,46,0.75), inset 0 0 18px rgba(168,131,46,0.55);
-    opacity: 0;                       /* resting: invisible — the static glow above is the resting look */
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .saga.saga-now-playing::before {
-      animation: sagaNowPulse 2.2s ease-in-out infinite;
-    }
-  }
-  @keyframes sagaNowPulse {
-    0%, 100% { opacity: 0; }
-    50%      { opacity: 1; }
+    /* layered "illuminated" frame: a thin wax-red keyline on each side of the gold
+       band (double-frame) plus a soft inner glow — reads as a deliberate frame, in
+       theme, and still fully static. */
+    box-shadow: inset 0 0 0 1px rgba(93,20,17,0.40),
+                inset 0 0 14px rgba(168,131,46,0.40),
+                0 0 0 1px rgba(93,20,17,0.28);
   }
 
   /* Tier sections */
@@ -1382,7 +1377,19 @@
   }
   .hdr-t3 .lfm-r1 { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.3px; white-space: nowrap; }
   .hdr-t3 .lfm-r2 { font-size: 0.88rem; font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
-  .hdr-t3 .lfm-r3 { font-size: 0.8rem;  font-style: italic; opacity: 0.85; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  .hdr-t3 .lfm-r3 { font-size: 0.72rem; font-style: italic; opacity: 0.85; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* Build 07262026.7 — the row-1 reaper skull ☠ matches the row-2 leader ★: same
+     size and same fixed leading slot, so ☠ (r1), ★ (r2) and the quest (r3) share
+     one left column and the three rows' first glyphs align vertically. Scoped to
+     the saga-header pill so the global ★ (reaper cards, quest line) is untouched. */
+  .hdr-t3 .lfm-skull,
+  .hdr-t3 .lfm-r2 .lfm-star {
+    display: inline-block;
+    width: 1.1em;
+    margin-right: 3px;
+    font-size: 0.84rem;
+    text-align: center;
+  }
   /* Build 07192026.5 — multi-LFM pill variants (same fixed 210x72 footprint). */
   .hdr-t3 .lfm-skull-tag.multi {
     color: var(--ink); background: rgba(43,26,8,0.16); border-color: var(--gold);
@@ -1605,14 +1612,13 @@
   /* SEALED (fully reaped) reaper bar is COMPLETE → keep the rich gradient + the
      shimmer (animated below). Declared after the partial rule so it wins on a
      bar carrying both .has-progress and .sealed. */
-  /* Build 07262026.1 — sealed fill is a rich ALL-RED gradient (no gold stop):
-     light wax-red → wax-red → dark wax-red, so "done" reads as a deeper, fuller
-     red rather than shifting to gold at the right end. */
+  /* Build 07262026.7 — sealed (completed) fill now uses the SAME solid red as the
+     in-progress reaper bar (var(--wax-red)) instead of a light→dark gradient — one
+     red across both reaper states, per the user's preference for the in-progress
+     hue. The done-glow box-shadow stays as the "completed" cue so a full bar still
+     reads as finished. */
   .saga-progress-bar.reaper.sealed .saga-progress-fill {
-    background: linear-gradient(90deg,
-      var(--wax-red-light) 0%,
-      var(--wax-red) 55%,
-      var(--wax-red-dark) 100%);
+    background: var(--wax-red);
     box-shadow: 0 0 8px rgba(181,67,63,0.6);
   }
   /* Build 07052026.5 — bars with ANY progress turn brilliant: gold-trimmed
@@ -3894,6 +3900,18 @@
      online guildmates) is the highlight — emerald + bold; Grouped (with non-guild
      players) is wax-red; Solo is faded italic. All carry a hover tooltip. */
   .guild-table .gm-grp { cursor: help; }
+  /* Build 07262026.7 — a small icon left of each group-status label: 👤 Solo /
+     👥 Grouped / 🛡 Guild Grouped. A shared leading slot keeps the labels aligned
+     regardless of glyph width; the icon is decorative (aria-hidden), the coloured
+     label text still carries the meaning. */
+  .guild-table .gm-grp .gm-ico {
+    display: inline-block;
+    width: 1.15em;
+    margin-right: 3px;
+    text-align: center;
+    font-size: 0.9em;
+    filter: saturate(0.85);
+  }
   .guild-table .gm-grp.guild-grouped {
     color: var(--emerald);
     font-weight: 700;
@@ -3902,9 +3920,12 @@
     color: var(--wax-red);
     font-weight: 600;
   }
+  /* Build 07262026.6 — Solo now uses the same font/style as Grouped / Guild
+     Grouped (solid colour, same weight, not italic); a neutral ink colour keeps
+     it distinct from the red/emerald grouped states without reading as "faded". */
   .guild-table .gm-grp.solo {
-    color: var(--ink-faded);
-    font-style: italic;
+    color: var(--ink);
+    font-weight: 600;
   }
   .guild-table .gm-empty {
     color: var(--ink-faded);
@@ -4569,8 +4590,8 @@
         <div class="control-group view-group">
           <label>View &amp; Alerts</label>
           <div class="audio-checks" role="group" aria-label="View and alert toggles">
-            <label class="audio-check" title="Focus View — when ON, the sagas matching where your active character currently is gently pulse, and the '📍 you're in …' banner + highlight show. Turn OFF to hide all location emphasis."><input type="checkbox" id="focusViewToggle"> Focus View</label>
-            <label class="audio-check" title="Switch prompt — when the character you're tracking is offline but another of your characters is online in the guild, offer to switch the scroll to that online character."><input type="checkbox" id="connectSwitchToggle"> Switch prompt</label>
+            <label class="audio-check" title="Focus View — focus content based on your location: the sagas matching where your active character currently is get an illuminated gold frame, and the '📍 you're in …' banner + highlight show. Turn OFF to hide all location emphasis."><input type="checkbox" id="focusViewToggle"> Focus View</label>
+            <label class="audio-check" title="Switch prompt — warns when you're in-game with a character that doesn't match the focus of your Sook's Saga Scroll: if the character you're tracking is offline but another of your characters is online in the guild, it offers to switch the scroll to that online character."><input type="checkbox" id="connectSwitchToggle"> Switch prompt</label>
           </div>
         </div>
       </div>
@@ -4627,7 +4648,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07262026.5</div>
+      <div class="build">Build 07262026.7</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -15188,7 +15209,7 @@ function renderSagaCard(saga) {
   let lfmSkullTag = "";
   if (lfmGroups.length === 1) {
     const g = lfmGroups[0];
-    lfmSkullTag = `<span class="lfm-skull-tag ${_lfmTier(g.skulls)}" title="Live LFM: ★ ${escapeHtml(g.leader)}'s group (${g.party} of 6) · ☠ R${g.skulls}${g.quest ? " · " + escapeHtml(g.quest) : ""}"><span class="lfm-r1">☠ R${g.skulls} · ${g.party}/6</span><span class="lfm-r2">${_leadStar(g.leader)}</span>${g.quest ? `<span class="lfm-r3">${escapeHtml(g.quest)}</span>` : ""}</span>`;
+    lfmSkullTag = `<span class="lfm-skull-tag ${_lfmTier(g.skulls)}" title="Live LFM: ★ ${escapeHtml(g.leader)}'s group (${g.party} of 6) · ☠ R${g.skulls}${g.quest ? " · " + escapeHtml(g.quest) : ""}"><span class="lfm-r1"><span class="lfm-skull" aria-hidden="true">☠</span>R${g.skulls} · ${g.party}/6</span><span class="lfm-r2">${_leadStar(g.leader)}</span>${g.quest ? `<span class="lfm-r3">${escapeHtml(g.quest)}</span>` : ""}</span>`;
   } else if (lfmGroups.length >= 2 && lfmGroups.length <= 3) {
     const rows = lfmGroups.map(g => `<span class="lfm-mini ${_lfmTier(g.skulls)}"><span class="lfm-mini-r">☠ R${g.skulls}</span><span class="lfm-mini-lead">${_leadStar(g.leader)}</span></span>`).join("");
     lfmSkullTag = `<span class="lfm-skull-tag multi" title="${lfmGroups.length} live LFM groups in this saga">${rows}</span>`;
@@ -17100,12 +17121,12 @@ async function renderGuildCorner() {
         if (mates.length) {
           const who = mates.map(o => escapeHtml(o.name || "Anonymous")).join(", ");
           const n = mates.length;
-          groupHtml = `<span class="gm-grp guild-grouped" title="Guild Grouped — in a party with ${n} other online guildmate${n > 1 ? "s" : ""}: ${who}">Guild Grouped</span>`;
+          groupHtml = `<span class="gm-grp guild-grouped" title="Guild Grouped — in a party with ${n} other online guildmate${n > 1 ? "s" : ""}: ${who}"><span class="gm-ico" aria-hidden="true">🛡</span>Guild Grouped</span>`;
         } else {
-          groupHtml = `<span class="gm-grp grouped" title="Grouped — in a party, but not with other online guildmates">Grouped</span>`;
+          groupHtml = `<span class="gm-grp grouped" title="Grouped — in a party, but not with other online guildmates"><span class="gm-ico" aria-hidden="true">👥</span>Grouped</span>`;
         }
       } else {
-        groupHtml = `<span class="gm-grp solo" title="Solo — not in a party right now">Solo</span>`;
+        groupHtml = `<span class="gm-grp solo" title="Solo — not in a party right now"><span class="gm-ico" aria-hidden="true">👤</span>Solo</span>`;
       }
       const groupLine = `<div class="gm-group">${groupHtml}</div>`;
       return `<tr><td class="gm-cell">` +
