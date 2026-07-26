@@ -53,17 +53,19 @@ alongside the TTL and the row-shape guard, and the only one that catches
 *content-only* upstream changes (new rows, same schema) — the case where a new
 expansion's data would otherwise stay invisible until the TTL lapsed.
 
-### Grouped / Solo (roster status)
-The per-member status shown on the online-guild roster: "Grouped" when a
-guildmate currently appears in a party, "Solo" otherwise. It is **best-effort**
-and derived only from the advertised group feed (the same live LFM data the
-reaper alerts use) — a guildmate in a full, private, or otherwise unadvertised
-group therefore reads "Solo" (a false negative), and a member hidden by the
-in-game Anonymous flag can't be matched at all. The status is server-scoped and
-name-keyed, so it is only meaningful for the currently-active character's server
-and is cleared on any server/character change (see [derived-cache reset parity](docs/solutions/logic-errors/derived-cache-reset-parity.md)). A reliable
-per-character group identifier from the live source, which would make the status
-exact, was identified but deferred.
+### Group status (roster: Solo / Grouped / Guild Grouped)
+The per-member party status shown on the online-guild roster, read directly and
+reliably from each member's live record via `is_in_party` and `group_id` (as of
+Build 07262026.4). Three states: **Solo** (`is_in_party` false — not in a party),
+**Grouped** (in a party, but no *online guildmate* shares the party), and **Guild
+Grouped** (shares a nonzero `group_id` with one or more other online guildmates —
+the tooltip names them). Because it uses per-character party status, it sees
+private and full groups too, so "Solo" is honest. Earlier builds inferred this
+from the advertised-LFM feed (`_groupIndex`), which could not see unadvertised
+groups and so used a hedged "Pugging/blank"; that LFM-derived path was removed
+once the live probe confirmed `is_in_party`/`group_id` ride the guild fetch. (The
+[derived-cache reset parity](docs/solutions/logic-errors/derived-cache-reset-parity.md)
+learning came from that now-removed `_groupIndex`; its general lesson still holds.)
 
 ## Flagged ambiguities
 
