@@ -6,6 +6,7 @@ problem_type: design_pattern
 component: frontend_stimulus
 severity: medium
 resolution_type: code_fix
+last_updated: 2026-07-26
 applies_when:
   - "A page runs many continuous (infinite) CSS animations at once and the browser tab shows high CPU / fan spin even while idle"
   - "An animation targets `background-position`, `box-shadow`, `top/left/width`, `filter`, or another property that cannot be GPU-composited"
@@ -96,7 +97,7 @@ When you move a glow onto a pseudo-element overlay, watch the containing box. An
 Two ways out, pick by whether the glow is outer or inner:
 
 - **Outer glow** → anchor the opacity overlay on a **non-clipping ancestor** (a wrapper without `overflow: hidden`), not on a pseudo-element inside the clipped box.
-- **Inner glow** (`inset` shadow) → an inset shadow renders *inside* the child's box, so it is clip-safe; a `::before`/`::after` on the clipped element works. Place it at a `z-index` above the fill but below any text (equal `z-index` resolves by DOM order — a pseudo before the text span, both at `z-index:1`, paints under the text).
+- **Inner glow** (`inset` shadow) → an inset shadow renders *inside* the child's box, so it is clip-safe; a `::before`/`::after` on the clipped element works. Place it at a `z-index` above the fill but below any text (equal `z-index` resolves by DOM order — a pseudo before the text span, both at `z-index:1`, paints under the text). **Pseudo-element collision:** an element has only one `::before` and one `::after` — if the target already uses one for another decoration, put the pulse on the *other*. In this app a banked/complete saga's corner ribbon lives on `.saga::after`, so the now-playing pulse had to use `.saga-now-playing::before` (build 07262026.5); reusing `::after` would have clobbered the ribbon.
 
 Elements with no `overflow: hidden` (tags, table cells, list rows) can use a plain pseudo-element overlay with an outer glow — the clipping trap is specific to the clipped ancestor.
 
