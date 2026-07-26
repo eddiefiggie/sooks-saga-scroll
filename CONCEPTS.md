@@ -53,6 +53,18 @@ alongside the TTL and the row-shape guard, and the only one that catches
 *content-only* upstream changes (new rows, same schema) — the case where a new
 expansion's data would otherwise stay invisible until the TTL lapsed.
 
+### Grouped / Solo (roster status)
+The per-member status shown on the online-guild roster: "Grouped" when a
+guildmate currently appears in a party, "Solo" otherwise. It is **best-effort**
+and derived only from the advertised group feed (the same live LFM data the
+reaper alerts use) — a guildmate in a full, private, or otherwise unadvertised
+group therefore reads "Solo" (a false negative), and a member hidden by the
+in-game Anonymous flag can't be matched at all. The status is server-scoped and
+name-keyed, so it is only meaningful for the currently-active character's server
+and is cleared on any server/character change (see [derived-cache reset parity](docs/solutions/logic-errors/derived-cache-reset-parity.md)). A reliable
+per-character group identifier from the live source, which would make the status
+exact, was identified but deferred.
+
 ## Flagged ambiguities
 
 - **"Tier"** is used for two unrelated things: a container's [Tier](#tier) (its Heroic/Epic/Legendary/Non-Saga classification and level band) and a [Roll-over tier](#roll-over-tier) (one of the three responsive-layout priority bands a row stacks into). When unqualified, "tier" means the container classification; the layout sense is always "roll-over tier".
