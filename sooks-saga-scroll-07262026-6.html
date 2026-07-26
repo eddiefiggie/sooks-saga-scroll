@@ -632,6 +632,10 @@
     align-items: stretch;
   }
   .ctl-row-top .control-group { min-height: 118px; justify-content: flex-start; }
+  /* Build 07262026.5 — the View & Alerts group (Focus View + Switch prompt)
+     spans the full width as a tidy row under the 2×2, and doesn't need the tall
+     min-height the multi-option groups use. */
+  .ctl-row-top .view-group { grid-column: 1 / -1; min-height: 0; }
   /* Tier buttons center under their (now centered) label. */
   .ctl-row-tiers .tier-segment.bar { justify-content: center; }
 
@@ -1134,14 +1138,35 @@
     padding: 0 2px;
   }
   .cs-banner .cs-dismiss:hover { color: #fff; }
+  /* Build 07262026.5 — Focus View pulse. The card keeps a STATIC gold "now
+     playing" glow; the PULSE is now a GPU-friendly OPACITY animation on an inset
+     ::before overlay (was an animated box-shadow — the exact CPU pattern the
+     07182026.9 pass removed elsewhere). Inset glow so overflow:hidden on a
+     banked/complete card can't clip it; ::before is free (banked uses ::after).
+     Only Focus-View-matched sagas carry the class, so at most a few elements ever
+     animate, and it stills to the static glow under prefers-reduced-motion. */
   .saga.saga-now-playing {
     border-color: var(--gold) !important;
     box-shadow: 0 0 0 2px rgba(168,131,46,0.45), 0 0 14px rgba(168,131,46,0.5);
-    animation: sagaNowPulse 2.2s ease-in-out infinite;
+  }
+  .saga.saga-now-playing::before {
+    content: "";
+    position: absolute;
+    inset: 0;
+    border-radius: inherit;
+    pointer-events: none;
+    z-index: 1;
+    box-shadow: inset 0 0 0 2px rgba(168,131,46,0.75), inset 0 0 18px rgba(168,131,46,0.55);
+    opacity: 0;                       /* resting: invisible — the static glow above is the resting look */
+  }
+  @media (prefers-reduced-motion: no-preference) {
+    .saga.saga-now-playing::before {
+      animation: sagaNowPulse 2.2s ease-in-out infinite;
+    }
   }
   @keyframes sagaNowPulse {
-    0%, 100% { box-shadow: 0 0 0 2px rgba(168,131,46,0.35), 0 0 8px rgba(168,131,46,0.35); }
-    50%      { box-shadow: 0 0 0 2px rgba(168,131,46,0.60), 0 0 18px rgba(168,131,46,0.65); }
+    0%, 100% { opacity: 0; }
+    50%      { opacity: 1; }
   }
 
   /* Tier sections */
@@ -3877,9 +3902,12 @@
     color: var(--wax-red);
     font-weight: 600;
   }
+  /* Build 07262026.6 — Solo now uses the same font/style as Grouped / Guild
+     Grouped (solid colour, same weight, not italic); a neutral ink colour keeps
+     it distinct from the red/emerald grouped states without reading as "faded". */
   .guild-table .gm-grp.solo {
-    color: var(--ink-faded);
-    font-style: italic;
+    color: var(--ink);
+    font-weight: 600;
   }
   .guild-table .gm-empty {
     color: var(--ink-faded);
@@ -4539,6 +4567,15 @@
             <label class="audio-check autoc-mode" title="Autocomplete ALSO seals First-Time Reaper for the quest (same as clicking the ☠ REAPER ☠ button) — use when you run everything on Reaper"><input type="radio" name="acMode" id="acModeReaper" value="reaper"> ☠ Reaper</label>
           </div>
         </div>
+        <!-- Build 07262026.5 — View & Alerts: Focus View (location emphasis) + the
+             connect-switch prompt on/off. Full-width row under the 2×2. -->
+        <div class="control-group view-group">
+          <label>View &amp; Alerts</label>
+          <div class="audio-checks" role="group" aria-label="View and alert toggles">
+            <label class="audio-check" title="Focus View — when ON, the sagas matching where your active character currently is gently pulse, and the '📍 you're in …' banner + highlight show. Turn OFF to hide all location emphasis."><input type="checkbox" id="focusViewToggle"> Focus View</label>
+            <label class="audio-check" title="Switch prompt — when the character you're tracking is offline but another of your characters is online in the guild, offer to switch the scroll to that online character."><input type="checkbox" id="connectSwitchToggle"> Switch prompt</label>
+          </div>
+        </div>
       </div>
       <div class="ctl-row ctl-row-tiers">
         <div class="control-group tier-group">
@@ -4593,7 +4630,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07262026.4</div>
+      <div class="build">Build 07262026.6</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -13694,6 +13731,22 @@ function bindAutoCompleteControls() {
   syncAutoCompleteControls();
 }
 
+// Build 07262026.5 — wire the View & Alerts toggles (Focus View + Switch prompt)
+// to their app-meta settings: reflect current state on load, apply on change.
+// The setters (_setFocusViewEnabled / _setConnectSwitchEnabled) persist + repaint.
+function bindViewToggles() {
+  const fv = document.getElementById("focusViewToggle");
+  const cs = document.getElementById("connectSwitchToggle");
+  if (fv) {
+    fv.checked = _focusViewEnabled();
+    fv.addEventListener("change", () => _setFocusViewEnabled(fv.checked));
+  }
+  if (cs) {
+    cs.checked = _connectSwitchEnabled();
+    cs.addEventListener("change", () => _setConnectSwitchEnabled(cs.checked));
+  }
+}
+
 // Reflect the ACTIVE character's autocomplete prefs in the controls.
 // Called at bind time and from renderAll (character switch / import).
 function syncAutoCompleteControls() {
@@ -14940,7 +14993,7 @@ function renderSagaList() {
   // Build 06222026.1 (F1) — "now playing" location banner. Cleared elsewhere
   // when the active char changes / goes offline; here we render it if present
   // and not dismissed. A saga link scrolls to the matched card.
-  if (_nowPlaying && _nowPlaying.char === char && _nowPlaying.area && !_locBannerDismissed) {
+  if (_focusViewEnabled() && _nowPlaying && _nowPlaying.char === char && _nowPlaying.area && !_locBannerDismissed) {
     const banner = document.createElement("div");
     banner.className = "loc-banner";
     const matched = (_nowPlaying.sagaIds || []).map(id => SAGA_BY_ID.get(id)).filter(Boolean);
@@ -15074,7 +15127,10 @@ function renderSagaCard(saga) {
   if (isExpanded) cls += " expanded";
   // Build 06222026.1 (F1) — gentle gold "now playing" highlight when the active
   // char's resolved area matched this container (conservative name/pack/region).
-  if (_nowPlaying && _nowPlaying.sagaIds && _nowPlaying.sagaIds.includes(saga.id)) {
+  // Build 07262026.5 — gated on Focus View (checked last so it's only read for
+  // the few matched sagas). When Focus View is off, no highlight class → no
+  // highlight and no pulse (the pulse lives on .saga-now-playing).
+  if (_nowPlaying && _nowPlaying.sagaIds && _nowPlaying.sagaIds.includes(saga.id) && _focusViewEnabled()) {
     cls += " saga-now-playing";
   }
   card.className = cls;
@@ -16814,15 +16870,34 @@ function toggleReaperFold(band) {
    Plan: docs/plans/2026-07-25-001-feat-connect-switch-prompt-plan.md
    ── */
 
-// U2 — global on/off (app-meta, default ON). No visible control yet (deferred);
-// toggle via _setConnectSwitchEnabled(false) until a settings checkbox lands.
+// U2 — global on/off (app-meta, default ON). Surfaced as the "Switch prompt"
+// checkbox in Filters & Alerts (Build 07262026.5); still toggleable in code.
 function _connectSwitchEnabled() {
   const v = _readAppMeta().connectSwitchPrompt;
   return v !== undefined ? !!v : true;   // undefined → ON by default
 }
 function _setConnectSwitchEnabled(on) {
   _writeAppMeta({ connectSwitchPrompt: !!on });
+  const cb = document.getElementById("connectSwitchToggle");
+  if (cb) cb.checked = !!on;             // keep the panel checkbox in sync (also covers code-path callers)
   renderGuildCorner();                   // re-evaluate immediately
+}
+
+// Build 07262026.5 — FOCUS VIEW: the master switch for the location-emphasis
+// feature (the "📍 you're in …" banner, the .saga-now-playing highlight, and the
+// pulse on matched sagas). App-meta, default ON (preserves the previously
+// always-on location feature). Read at render time by the banner/highlight/pulse
+// paths, so toggling it just re-renders — the already-resolved _nowPlaying is
+// reused, no refetch needed.
+function _focusViewEnabled() {
+  const v = _readAppMeta().focusView;
+  return v !== undefined ? !!v : true;   // undefined → ON by default
+}
+function _setFocusViewEnabled(on) {
+  _writeAppMeta({ focusView: !!on });
+  const cb = document.getElementById("focusViewToggle");
+  if (cb) cb.checked = !!on;             // keep the panel checkbox in sync (also covers code-path callers)
+  if (typeof renderSagaList === "function") renderSagaList();   // repaint banner/highlight/pulse per the new state
 }
 // U2 — owned-char names (lowercased) dismissed for their CURRENT online session.
 // Reconciled each tick: an entry clears once that character is no longer online,
@@ -17462,6 +17537,7 @@ renderAll();
 bindControls();
 bindAudioChecks();   // Build 07112026.6 — Audio Alerts checkboxes ↔ META key
 bindAutoCompleteControls();   // Build 07142026.1 — Quest Autocomplete controls ↔ per-character state (v14)
+bindViewToggles();   // Build 07262026.5 — Focus View + Switch prompt toggles ↔ app-meta
 bindControlsFold();  // Build 07142026.1 — filter-panel roll-up bar ↔ META key (controlsFolded)
 refreshBonusBanner(); // Build 07112026.15 — Bonus Days banner from the user's gist (every load)
 renderSelfCheck();

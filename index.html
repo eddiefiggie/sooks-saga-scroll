@@ -3902,9 +3902,12 @@
     color: var(--wax-red);
     font-weight: 600;
   }
+  /* Build 07262026.6 — Solo now uses the same font/style as Grouped / Guild
+     Grouped (solid colour, same weight, not italic); a neutral ink colour keeps
+     it distinct from the red/emerald grouped states without reading as "faded". */
   .guild-table .gm-grp.solo {
-    color: var(--ink-faded);
-    font-style: italic;
+    color: var(--ink);
+    font-weight: 600;
   }
   .guild-table .gm-empty {
     color: var(--ink-faded);
@@ -4627,7 +4630,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07262026.5</div>
+      <div class="build">Build 07262026.6</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
