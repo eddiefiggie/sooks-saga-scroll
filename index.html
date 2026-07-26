@@ -1237,6 +1237,39 @@
     border-left-color: var(--emerald);
   }
 
+  /* Build 07262026.3 — a BANKED-reward container reads as COMPLETED. In the JS a
+     reward-banked saga is `.banked` (reward claimed) OR `.complete` (also all
+     quests done), so both get the treatment: (1) the whole card washes to the
+     darker "zebra" tone (the same rgba(101,78,40,…) dark stripe used on quest
+     rows), and (2) a small emerald "BANKED" ribbon hangs off the top-right
+     corner. `.saga` is position:relative already, so the ribbon anchors to it;
+     there's no overflow:hidden, so the ribbon can hang past the top edge. */
+  .saga.banked,
+  .saga.complete {
+    background: linear-gradient(180deg, rgba(101,78,40,0.32), rgba(0,0,0,0.20));
+  }
+  .saga.banked::after,
+  .saga.complete::after {
+    content: "\2726\00a0 BANKED";      /* ✦ + nbsp + label (the \00a0 keeps a visible gap; a bare space would be eaten as the hex-escape terminator) */
+    position: absolute;
+    top: -4px;
+    right: 16px;
+    z-index: 2;
+    font-family: var(--font-display);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    color: #f4e8c8;
+    background: linear-gradient(180deg, #6e8a5a, var(--emerald));
+    border: 1px solid #24401d;
+    border-top: none;
+    padding: 4px 8px 9px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.35);
+    /* notched ribbon tail at the bottom */
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+    pointer-events: none;
+  }
+
   /* Saga row: grid so the controls line up in columns across all rows.
      Build 07182026.1 — the old standalone FTR badge column is gone; the
      far-right cell now holds the twin bars (reaper + completion).
@@ -1303,7 +1336,7 @@
     justify-self: stretch;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;   /* Build 07262026.3 — LFM pill left-justified in its band (was center) */
   }
   .hdr-t3 .lfm-skull-tag {
     width: 210px;
@@ -1312,11 +1345,11 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;       /* Build 07262026.3 — pill content left-aligned (was center) */
     justify-content: center;
     gap: 2px;
     padding: 8px 12px;
-    text-align: center;
+    text-align: left;              /* Build 07262026.3 — was center */
   }
   .hdr-t3 .lfm-r1 { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.3px; white-space: nowrap; }
   .hdr-t3 .lfm-r2 { font-size: 0.88rem; font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1582,41 +1615,15 @@
      repaints. The fill has `overflow: hidden`, so the band is clipped as it
      sweeps off each end (seamless loop). Respects prefers-reduced-motion:
      when reduced, complete bars fall back to the same static resting shine. */
-  /* Build 07192026.1 — the shine band is COMPLETE-only now (partial bars are
-     flat, per U6). Present on .all-done and fully-reaped .reaper.sealed; the
-     reduced-motion-gated rule below animates it into a sweep, static otherwise. */
+  /* Build 07262026.3 — completed bars are now FLAT (user preference): the
+     animated/static "shimmer" sheen band on .all-done / .reaper.sealed bars is
+     removed entirely — no ::after band, no progressSheen animation (also drops
+     the last remaining GPU-composited animation on the page). The fill keeps its
+     solid gradient, so a complete bar simply reads as a full, richly-coloured
+     bar with no moving light. */
   .saga-progress-bar.all-done .saga-progress-fill::after,
   .saga-progress-bar.reaper.sealed .saga-progress-fill::after {
-    content: "";
-    position: absolute;
-    top: 0; bottom: 0; left: 0;
-    width: 100%;
-    background: linear-gradient(115deg,
-      transparent 38%,
-      rgba(255,246,214,0.42) 50%,
-      transparent 62%);
-    transform: translateX(0);   /* resting: static centered gold shine */
-  }
-  /* Build 07262026.1 — the sealed REAPER bar keeps its animated "done" sheen,
-     but retinted to a pale warm-RED highlight (no cream/gold), so the all-red
-     done state has no gold anywhere. The .all-done completion bar keeps the
-     cream sheen above (it's the green→gold bar, not a reaper bar). */
-  .saga-progress-bar.reaper.sealed .saga-progress-fill::after {
-    background: linear-gradient(115deg,
-      transparent 38%,
-      rgba(255,214,205,0.40) 50%,
-      transparent 62%);
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .saga-progress-bar.all-done .saga-progress-fill::after,
-    .saga-progress-bar.reaper.sealed .saga-progress-fill::after {
-      animation: progressSheen 3.2s linear infinite;
-      will-change: transform;
-    }
-  }
-  @keyframes progressSheen {
-    from { transform: translateX(-130%); }
-    to   { transform: translateX(130%); }
+    content: none;
   }
   .saga-progress-bar.all-done {
     box-shadow: 0 0 10px rgba(200,147,42,0.65), inset 0 0 4px rgba(200,147,42,0.35);
@@ -4567,7 +4574,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07262026.2</div>
+      <div class="build">Build 07262026.3</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>

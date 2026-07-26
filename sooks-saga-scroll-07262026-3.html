@@ -1237,6 +1237,39 @@
     border-left-color: var(--emerald);
   }
 
+  /* Build 07262026.3 — a BANKED-reward container reads as COMPLETED. In the JS a
+     reward-banked saga is `.banked` (reward claimed) OR `.complete` (also all
+     quests done), so both get the treatment: (1) the whole card washes to the
+     darker "zebra" tone (the same rgba(101,78,40,…) dark stripe used on quest
+     rows), and (2) a small emerald "BANKED" ribbon hangs off the top-right
+     corner. `.saga` is position:relative already, so the ribbon anchors to it;
+     there's no overflow:hidden, so the ribbon can hang past the top edge. */
+  .saga.banked,
+  .saga.complete {
+    background: linear-gradient(180deg, rgba(101,78,40,0.32), rgba(0,0,0,0.20));
+  }
+  .saga.banked::after,
+  .saga.complete::after {
+    content: "\2726\00a0 BANKED";      /* ✦ + nbsp + label (the \00a0 keeps a visible gap; a bare space would be eaten as the hex-escape terminator) */
+    position: absolute;
+    top: -4px;
+    right: 16px;
+    z-index: 2;
+    font-family: var(--font-display);
+    font-size: 0.56rem;
+    font-weight: 700;
+    letter-spacing: 1.3px;
+    color: #f4e8c8;
+    background: linear-gradient(180deg, #6e8a5a, var(--emerald));
+    border: 1px solid #24401d;
+    border-top: none;
+    padding: 4px 8px 9px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.35);
+    /* notched ribbon tail at the bottom */
+    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+    pointer-events: none;
+  }
+
   /* Saga row: grid so the controls line up in columns across all rows.
      Build 07182026.1 — the old standalone FTR badge column is gone; the
      far-right cell now holds the twin bars (reaper + completion).
@@ -1303,7 +1336,7 @@
     justify-self: stretch;
     display: flex;
     align-items: center;
-    justify-content: center;
+    justify-content: flex-start;   /* Build 07262026.3 — LFM pill left-justified in its band (was center) */
   }
   .hdr-t3 .lfm-skull-tag {
     width: 210px;
@@ -1312,11 +1345,11 @@
     box-sizing: border-box;
     display: flex;
     flex-direction: column;
-    align-items: center;
+    align-items: flex-start;       /* Build 07262026.3 — pill content left-aligned (was center) */
     justify-content: center;
     gap: 2px;
     padding: 8px 12px;
-    text-align: center;
+    text-align: left;              /* Build 07262026.3 — was center */
   }
   .hdr-t3 .lfm-r1 { font-size: 0.95rem; font-weight: 700; letter-spacing: 0.3px; white-space: nowrap; }
   .hdr-t3 .lfm-r2 { font-size: 0.88rem; font-weight: 600; max-width: 100%; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
@@ -1335,6 +1368,16 @@
   .hdr-t3 .lfm-mini.high { border-left-color: #ff2f1f; background: rgba(207,38,27,0.20); }
   .hdr-t3 .lfm-mini-r    { font-family: var(--font-display); font-weight: 700; font-size: 0.82rem; white-space: nowrap; }
   .hdr-t3 .lfm-mini-lead { font-family: var(--font-body); font-weight: 600; font-size: 0.82rem; min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+  /* Build 07262026.2 — gold ★ marking the group leader across every LFM
+     indicator (reaper/raid cards, saga-header tags, quest live line). Gold so it
+     stands out from the surrounding tinted text; a hair of right margin sets it
+     off the name. text-shadow gives it a crisp edge so it clearly reads as a star. */
+  .lfm-star {
+    color: var(--gold);
+    margin-right: 3px;
+    font-size: 0.95em;
+    text-shadow: 0 0 1px rgba(90,50,10,0.5);
+  }
   .hdr-t3 .lfm-many-count { font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; }
   .hdr-t3 .lfm-frac {
     display: flex; width: 100%; height: 14px; gap: 1px; border-radius: 4px;
@@ -1572,41 +1615,15 @@
      repaints. The fill has `overflow: hidden`, so the band is clipped as it
      sweeps off each end (seamless loop). Respects prefers-reduced-motion:
      when reduced, complete bars fall back to the same static resting shine. */
-  /* Build 07192026.1 — the shine band is COMPLETE-only now (partial bars are
-     flat, per U6). Present on .all-done and fully-reaped .reaper.sealed; the
-     reduced-motion-gated rule below animates it into a sweep, static otherwise. */
+  /* Build 07262026.3 — completed bars are now FLAT (user preference): the
+     animated/static "shimmer" sheen band on .all-done / .reaper.sealed bars is
+     removed entirely — no ::after band, no progressSheen animation (also drops
+     the last remaining GPU-composited animation on the page). The fill keeps its
+     solid gradient, so a complete bar simply reads as a full, richly-coloured
+     bar with no moving light. */
   .saga-progress-bar.all-done .saga-progress-fill::after,
   .saga-progress-bar.reaper.sealed .saga-progress-fill::after {
-    content: "";
-    position: absolute;
-    top: 0; bottom: 0; left: 0;
-    width: 100%;
-    background: linear-gradient(115deg,
-      transparent 38%,
-      rgba(255,246,214,0.42) 50%,
-      transparent 62%);
-    transform: translateX(0);   /* resting: static centered gold shine */
-  }
-  /* Build 07262026.1 — the sealed REAPER bar keeps its animated "done" sheen,
-     but retinted to a pale warm-RED highlight (no cream/gold), so the all-red
-     done state has no gold anywhere. The .all-done completion bar keeps the
-     cream sheen above (it's the green→gold bar, not a reaper bar). */
-  .saga-progress-bar.reaper.sealed .saga-progress-fill::after {
-    background: linear-gradient(115deg,
-      transparent 38%,
-      rgba(255,214,205,0.40) 50%,
-      transparent 62%);
-  }
-  @media (prefers-reduced-motion: no-preference) {
-    .saga-progress-bar.all-done .saga-progress-fill::after,
-    .saga-progress-bar.reaper.sealed .saga-progress-fill::after {
-      animation: progressSheen 3.2s linear infinite;
-      will-change: transform;
-    }
-  }
-  @keyframes progressSheen {
-    from { transform: translateX(-130%); }
-    to   { transform: translateX(130%); }
+    content: none;
   }
   .saga-progress-bar.all-done {
     box-shadow: 0 0 10px rgba(200,147,42,0.65), inset 0 0 4px rgba(200,147,42,0.35);
@@ -3774,7 +3791,7 @@
      the right edge. */
   .guild-table .gm-line1 {
     display: flex;
-    justify-content: flex-start;     /* Build 07262026.1 — name + class/level read left-to-right, left-justified (was space-between) */
+    justify-content: space-between;  /* Build 07262026.2 — name left, class+level right-justified (reverts the 07262026.1 all-left) */
     align-items: baseline;
     flex-wrap: wrap;                 /* meta drops under the name when tight */
     gap: 0 6px;
@@ -3797,7 +3814,7 @@
   }
   .guild-table .gm-meta {
     color: var(--ink);               /* Build 07052026.3 — full-strength ink, was faded */
-    text-align: left;                /* Build 07262026.1 — abbreviated class/level hugs the name, left-justified (was right) */
+    text-align: right;               /* Build 07262026.2 — class+level right-justified opposite the name (reverts 07262026.1 left) */
     white-space: normal;             /* let "Ftr/Mnk · Lvl 34" wrap inside the box */
     overflow-wrap: anywhere;
     word-break: break-word;
@@ -3817,24 +3834,33 @@
        whether or not their location is known. */
     min-height: calc(0.8rem * 1.3);
   }
-  /* Build 07262026.1 — line 3: LFM/group status. Like .gm-quest it ALWAYS
-     renders and reserves one line of height (min-height), so every member row
-     is the same thickness whether or not there's a Grouped/Solo status to show
-     (anonymous members leave it blank-but-reserved). */
+  /* Build 07262026.2 — row 3: story / zone context. Always renders and reserves
+     one line of height so rows stay uniform whether or not a story/zone resolves.
+     Faded italic so it reads as secondary context under the location line. */
+  .guild-table .gm-story {
+    font-size: 0.78rem;
+    line-height: 1.3;
+    min-height: calc(0.78rem * 1.3);
+    color: var(--ink-faded);
+    font-style: italic;
+    padding-left: 0;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+  /* Build 07262026.2 — row 4: group status (Pugging / blank). Like the rows
+     above it ALWAYS renders and reserves one line of height (min-height), so
+     every member row is the same thickness whether or not there's a status. */
   .guild-table .gm-group {
     font-size: 0.75rem;
     line-height: 1.3;
     min-height: calc(0.75rem * 1.3);
     padding-left: 0;
   }
-  .guild-table .gm-grp.grouped {
+  .guild-table .gm-grp.pugging {
     color: var(--wax-red);
     font-weight: 600;
     cursor: help;
-  }
-  .guild-table .gm-grp.solo {
-    color: var(--ink-faded);
-    font-style: italic;
   }
   .guild-table .gm-empty {
     color: var(--ink-faded);
@@ -4548,7 +4574,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07262026.1</div>
+      <div class="build">Build 07262026.3</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -13461,7 +13487,7 @@ const DDO_REF_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
 // expansion / content drop that adds quests or areas.
 //   1 = pre-U81 (implicit — caches with no epoch field)
 //   2 = U81 "Terror of Demogorgon" (2026-07-22)
-const DDO_REF_EPOCH = 2;
+const DDO_REF_EPOCH = 3;   // Build 07262026.1 → 3: areas cache now carries is_public/is_wilderness (roster zone-type row); forces a one-time refetch of pre-epoch-3 caches
 
 // In-memory mirrors of the reference tables once resolved this session.
 let _areasMap = null;      // Map<number, {name, region}>
@@ -13898,7 +13924,7 @@ async function getAreasMap() {
   const cache = _readRefCache();
   const now = Date.now();
   if (cache.epoch === DDO_REF_EPOCH && cache.areas && cache.areasTs && (now - cache.areasTs) < DDO_REF_TTL && Array.isArray(cache.areas)) {
-    _areasMap = new Map(cache.areas.map(a => [Number(a.id), { name: a.name, region: a.region || "" }]));
+    _areasMap = new Map(cache.areas.map(a => [Number(a.id), { name: a.name, region: a.region || "", is_public: !!a.is_public, is_wilderness: !!a.is_wilderness }]));
     return _areasMap;
   }
   if (_refFetchInFlight.areas) return _refFetchInFlight.areas;
@@ -13908,10 +13934,13 @@ async function getAreasMap() {
     if (rows.length) {
       const slim = rows.map(a => ({ id: Number(_ddoPick(a, ["id", "Id"])),
         name: _ddoPick(a, ["name", "Name"]) || "",
-        region: _ddoPick(a, ["region", "Region"]) || "" }))
+        region: _ddoPick(a, ["region", "Region"]) || "",
+        // Build 07262026.2 — area type for the roster's story/zone row (R3).
+        is_public: _ddoPick(a, ["is_public", "IsPublic"]) === true,
+        is_wilderness: _ddoPick(a, ["is_wilderness", "IsWilderness"]) === true }))
         .filter(a => isFinite(a.id) && a.name);
       const c = _readRefCache(); c.areas = slim; c.areasTs = now; _writeRefCache(c);
-      _areasMap = new Map(slim.map(a => [a.id, { name: a.name, region: a.region }]));
+      _areasMap = new Map(slim.map(a => [a.id, { name: a.name, region: a.region, is_public: a.is_public, is_wilderness: a.is_wilderness }]));
     } else {
       _areasMap = new Map();   // empty but resolved — features stay inert, no errors
     }
@@ -15087,7 +15116,9 @@ function renderSagaCard(saga) {
     // Build 07192026.5 — only DECLARED-reaper groups (skulls>0) light the header
     // pill; a normal-difficulty LFM (skulls 0) must not render a misleading "☠ R0"
     // (regression caught in code review — build .3 gated the pill on skulls>0).
-    if (hit && hit.groups) lfmGroups.push(...hit.groups.filter(g => g.skulls > 0));
+    // Build 07262026.2 — attach the QUEST name to each group so the header tag
+    // can show it (R8: show the quest, not the adventure zone/area).
+    if (hit && hit.groups) lfmGroups.push(...hit.groups.filter(g => g.skulls > 0).map(g => ({ ...g, quest: q })));
   });
   lfmGroups.sort((a, b) => (b.skulls - a.skulls) || (b.party - a.party));
   const lfmMaxSkulls = lfmGroups.length ? lfmGroups[0].skulls : 0;
@@ -15104,14 +15135,14 @@ function renderSagaCard(saga) {
   let lfmSkullTag = "";
   if (lfmGroups.length === 1) {
     const g = lfmGroups[0];
-    lfmSkullTag = `<span class="lfm-skull-tag ${_lfmTier(g.skulls)}" title="Live LFM: ${escapeHtml(g.leader)}'s group (${g.party} of 6) · ☠ R${g.skulls}${g.zone ? " · " + escapeHtml(g.zone) : ""}"><span class="lfm-r1">☠ R${g.skulls} · ${g.party}/6</span><span class="lfm-r2">${escapeHtml(g.leader)}</span>${g.zone ? `<span class="lfm-r3">${escapeHtml(g.zone)}</span>` : ""}</span>`;
+    lfmSkullTag = `<span class="lfm-skull-tag ${_lfmTier(g.skulls)}" title="Live LFM: ★ ${escapeHtml(g.leader)}'s group (${g.party} of 6) · ☠ R${g.skulls}${g.quest ? " · " + escapeHtml(g.quest) : ""}"><span class="lfm-r1">☠ R${g.skulls} · ${g.party}/6</span><span class="lfm-r2">${_leadStar(g.leader)}</span>${g.quest ? `<span class="lfm-r3">${escapeHtml(g.quest)}</span>` : ""}</span>`;
   } else if (lfmGroups.length >= 2 && lfmGroups.length <= 3) {
-    const rows = lfmGroups.map(g => `<span class="lfm-mini ${_lfmTier(g.skulls)}"><span class="lfm-mini-r">☠ R${g.skulls}</span><span class="lfm-mini-lead">${escapeHtml(g.leader)}</span></span>`).join("");
+    const rows = lfmGroups.map(g => `<span class="lfm-mini ${_lfmTier(g.skulls)}"><span class="lfm-mini-r">☠ R${g.skulls}</span><span class="lfm-mini-lead">${_leadStar(g.leader)}</span></span>`).join("");
     lfmSkullTag = `<span class="lfm-skull-tag multi" title="${lfmGroups.length} live LFM groups in this saga">${rows}</span>`;
   } else if (lfmGroups.length >= 4) {
     const top = lfmGroups[0];
     const segs = lfmGroups.slice(0, 12).map(g => `<span class="lfm-seg ${_lfmTier(g.skulls)}" title="☠ R${g.skulls} · ${escapeHtml(g.leader)}"></span>`).join("");
-    lfmSkullTag = `<span class="lfm-skull-tag multi many" title="${lfmGroups.length} live LFM groups in this saga"><span class="lfm-many-count">${lfmGroups.length} groups</span><span class="lfm-frac">${segs}</span><span class="lfm-many-top">top ☠ R${top.skulls} · ${escapeHtml(top.leader)}</span></span>`;
+    lfmSkullTag = `<span class="lfm-skull-tag multi many" title="${lfmGroups.length} live LFM groups in this saga"><span class="lfm-many-count">${lfmGroups.length} groups</span><span class="lfm-frac">${segs}</span><span class="lfm-many-top">top ☠ R${top.skulls} · ${_leadStar(top.leader)}</span></span>`;
   }
   // Build 07192026.2 — `toggleLabel` (the in-body End Reward button's label)
   // was removed with that control; the header pill uses `rewardLabel`.
@@ -15753,7 +15784,7 @@ function renderQuestRow(sagaId, questName, qState) {
     const tierCls = lfmHit.skulls >= 8 ? " high" : (lfmHit.skulls >= 4 ? " mid" : "");
     const bits = [];
     if (lfmHit.skulls > 0) bits.push(`R${lfmHit.skulls}`);
-    if (lfmHit.leader) bits.push(`${escapeHtml(lfmHit.leader)}&#8217;s group`, `${lfmHit.party}/6`);
+    if (lfmHit.leader) bits.push(`${_leadStar(lfmHit.leader)}&#8217;s group`, `${lfmHit.party}/6`);
     if (lfmHit.count > 1) bits.push(`${lfmHit.count} groups`);
     if (lvlSpan) bits.push(lvlSpan);
     const tip = `${lfmHit.count} open group(s) forming now`
@@ -16329,6 +16360,13 @@ function escapeHtml(s) {
     .replace(/>/g, "&gt;")
     .replace(/"/g, "&quot;")
     .replace(/'/g, "&#039;");
+}
+
+// Build 07262026.2 — a gold ★ immediately left of a group-leader's name, used
+// across every LFM indicator (reaper/raid cards, saga-header tags, quest live
+// line) so the leader is visually distinguished. Returns escaped HTML.
+function _leadStar(name) {
+  return `<span class="lfm-star" aria-hidden="true">★</span>${escapeHtml(name || "Anonymous")}`;
 }
 
 /* -------------------- Controls wiring -------------------- */
@@ -16954,30 +16992,43 @@ async function renderGuildCorner() {
       const nameHtml = m.anon
         ? `<span class="gm-name gm-anon" title="This guildmate has the in-game Anonymous flag on — DDO Audit hides their name">Anonymous</span>`
         : `<span class="gm-name">${escapeHtml(m.name)}</span>`;
-      // Build 07262026.1 — line 3: LFM/group status. "Grouped" (with a tooltip
-      // naming the party) when the member appears in a posted LFM group; "Solo"
-      // otherwise. Best-effort — see _groupIndex. Anonymous members can't be
-      // matched by name, so their line-3 slot stays reserved but blank. The
-      // <div> always renders (min-height reserved in CSS) so every row is the
-      // same height whether or not there's a status to show.
+      // Build 07262026.2 — row 3: story / zone context. For a quest, the saga
+      // ("story") the quest belongs to via _sagaForQuest (the app's own story
+      // grouping); for a non-quest area, "Wilderness Zone" / "Public Zone" from
+      // the areas table's is_wilderness/is_public flags (epoch 3). Blank when
+      // none resolve. The <div> always renders (min-height reserved) so rows
+      // stay uniform. NOTE: no adventure-pack fallback — the DDO Audit "pack" is
+      // a purchase bundle, not a story, so blank is more honest than showing it.
+      let ctx = "", ctxTip = "";
+      if (quest) {
+        const saga = (typeof _sagaForQuest === "function") ? _sagaForQuest(quest, m.level, m.level) : null;
+        if (saga && saga.name) { ctx = escapeHtml(saga.name); ctxTip = "Story / saga this quest belongs to"; }
+      } else if (area) {
+        if (area.is_wilderness) { ctx = "Wilderness Zone"; ctxTip = "A wilderness adventure area (live from DDO Audit)"; }
+        else if (area.is_public) { ctx = "Public Zone"; ctxTip = "A public zone (live from DDO Audit)"; }
+      }
+      const storyLine = `<div class="gm-story"${ctxTip ? ` title="${ctxTip}"` : ""}>${ctx}</div>`;
+      // Build 07262026.2 — row 4: group status. "Pugging" when the member is in
+      // an ADVERTISED LFM group (a pick-up group); BLANK otherwise. Never "Solo":
+      // the LFM feed can't see private/full/unadvertised groups, so absence isn't
+      // evidence of solo. Anonymous members can't be name-matched → blank. Tooltip
+      // gives the group size and the leader, marked with a ★. Slot reserved.
       let groupHtml = "";
       if (!m.anon && m.name) {
         const grp = _groupIndex[m.name.toLowerCase()] || null;
         if (grp) {
-          const others = grp.members.filter(nm => nm.toLowerCase() !== m.name.toLowerCase());
-          const who = others.length ? others.map(escapeHtml).join(", ") : "party members";
-          const lead = grp.leader && grp.leader.toLowerCase() !== m.name.toLowerCase()
-            ? escapeHtml(grp.leader) + "'s group" : "their group";
-          groupHtml = `<span class="gm-grp grouped" title="In ${lead}: ${who} — from posted LFMs (DDO Audit)">👥 Grouped</span>`;
-        } else {
-          groupHtml = `<span class="gm-grp solo" title="Not in any posted group right now — best-effort: only groups advertising an LFM are visible">Solo</span>`;
+          const size = (grp.members && grp.members.length) || 0;
+          const leadTxt = grp.leader ? `★ ${escapeHtml(grp.leader)}` : "an unnamed leader";
+          groupHtml = `<span class="gm-grp pugging" title="Pugging — in a posted LFM group of ${size}, led by ${leadTxt}. Private or full groups aren't visible to the API.">Pugging</span>`;
         }
+        // else: blank — can't distinguish true-solo from a private group.
       }
       const groupLine = `<div class="gm-group">${groupHtml}</div>`;
       return `<tr><td class="gm-cell">` +
                `<div class="gm-line1">${nameHtml}` +
                `<span class="gm-meta">${escapeHtml(meta)}</span></div>` +
                questLine +
+               storyLine +
                groupLine +
              `</td></tr>`;
     }).join("");
@@ -16992,7 +17043,7 @@ async function renderGuildCorner() {
       `<table class="guild-table" title="Online members of ${escapeHtml(guild)} on ${escapeHtml(server)} — live from DDO Audit">` +
         `<thead><tr><th class="gm-fold" role="button" tabindex="0" ` +
           `title="Click to ${_guildFolded ? "unfold" : "fold up"} the guild roster">` +
-          `<span class="gm-caret">${caret}</span> ⟨${escapeHtml(guild)}⟩ · ${g.count} online</th></tr></thead>` +
+          `<span class="gm-caret">${caret}</span> ${escapeHtml(guild)} · ${g.count} online</th></tr></thead>` +
         (_guildFolded ? "" : `<tbody>${body}</tbody>`) +
       `</table>`;
     const foldTh = corner.querySelector("th.gm-fold");
@@ -17052,8 +17103,8 @@ function renderRaidCorner() {
       return `<tr><td class="gm-cell">` +
                `<div class="rd-name"><a href="${_wikiHref(r.name)}" target="_blank" rel="noopener" title="Open this raid on the DDO Wiki">${escapeHtml(r.name)}</a></div>` +
                `<div class="rd-meta" title="Posted level range and difficulty">${meta.join(" · ")}</div>` +
-               `<div class="rd-live${tier}" title="Live raid group from DDO Audit — leader · party fill (12 max)">` +
-                 `${escapeHtml(r.leader || "Anonymous")} · ` +
+               `<div class="rd-live${tier}" title="Live raid group from DDO Audit — ★ leader · party fill (12 max)">` +
+                 `${_leadStar(r.leader)} · ` +
                  `<span class="rd-fill" title="${r.party} of 12 raid spots filled">${r.party}/12</span>` +
                `</div>` +
              `</td></tr>`;
@@ -17189,8 +17240,8 @@ function renderReaperCorner(band) {
                ftrLine +
                `<div class="rd-saga"${src ? ` title="${srcTip}"` : ""}>${src ? "❧ " + escapeHtml(src) : ""}</div>` +
                `<div class="rd-meta" title="Posted level range and difficulty">${meta.join(" · ")}</div>` +
-               `<div class="rd-live${cfg.tint}" title="Live ${cfg.label.toLowerCase()} group from DDO Audit — leader · party fill (6 max)">` +
-                 `${escapeHtml(h.leader || "Anonymous")} · ` +
+               `<div class="rd-live${cfg.tint}" title="Live ${cfg.label.toLowerCase()} group from DDO Audit — ★ leader · party fill (6 max)">` +
+                 `${_leadStar(h.leader)} · ` +
                  `<span class="rd-fill" title="${h.party} of 6 party spots filled">${h.party}/6</span>` +
                `</div>` +
              `</td></tr>`;
