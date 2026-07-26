@@ -1237,36 +1237,40 @@
     border-left-color: var(--emerald);
   }
 
-  /* Build 07262026.3 — a BANKED-reward container reads as COMPLETED. In the JS a
+  /* Build 07262026.4 — a BANKED-reward container reads as COMPLETED. In the JS a
      reward-banked saga is `.banked` (reward claimed) OR `.complete` (also all
      quests done), so both get the treatment: (1) the whole card washes to the
-     darker "zebra" tone (the same rgba(101,78,40,…) dark stripe used on quest
-     rows), and (2) a small emerald "BANKED" ribbon hangs off the top-right
-     corner. `.saga` is position:relative already, so the ribbon anchors to it;
-     there's no overflow:hidden, so the ribbon can hang past the top edge. */
+     exact quest-row zebra dark tone (rgba(101,78,40,0.26), flat — matches the
+     dark stripe on quest rows, per user preference over the darker gradient),
+     and (2) an elegant emerald-and-gold ribbon crosses the top-right corner
+     diagonally. overflow:hidden clips the diagonal band to the card's rounded
+     corner so it reads as a corner banner (added only on banked/complete cards). */
   .saga.banked,
   .saga.complete {
-    background: linear-gradient(180deg, rgba(101,78,40,0.32), rgba(0,0,0,0.20));
+    background: rgba(101,78,40,0.26);
+    overflow: hidden;
   }
   .saga.banked::after,
   .saga.complete::after {
-    content: "\2726\00a0 BANKED";      /* ✦ + nbsp + label (the \00a0 keeps a visible gap; a bare space would be eaten as the hex-escape terminator) */
+    content: "\2726\00a0 BANKED";      /* ✦ + nbsp + label (\00a0 keeps a visible gap; a bare space is eaten as the hex-escape terminator) */
     position: absolute;
-    top: -4px;
-    right: 16px;
+    top: 16px;
+    right: -40px;
+    width: 150px;
+    transform: rotate(45deg);
+    text-align: center;
     z-index: 2;
     font-family: var(--font-display);
-    font-size: 0.56rem;
+    font-size: 0.6rem;
     font-weight: 700;
-    letter-spacing: 1.3px;
-    color: #f4e8c8;
+    letter-spacing: 2px;
+    color: #f7ecca;
     background: linear-gradient(180deg, #6e8a5a, var(--emerald));
-    border: 1px solid #24401d;
-    border-top: none;
-    padding: 4px 8px 9px;
-    box-shadow: 0 2px 4px rgba(0,0,0,0.35);
-    /* notched ribbon tail at the bottom */
-    clip-path: polygon(0 0, 100% 0, 100% 100%, 50% 76%, 0 100%);
+    border-top: 1px solid var(--gold);
+    border-bottom: 1px solid var(--gold);
+    padding: 3px 0;
+    box-shadow: 0 1px 5px rgba(0,0,0,0.45);
+    text-shadow: 0 1px 1px rgba(0,0,0,0.5);
     pointer-events: none;
   }
 
@@ -1376,7 +1380,11 @@
     color: var(--gold);
     margin-right: 3px;
     font-size: 0.95em;
-    text-shadow: 0 0 1px rgba(90,50,10,0.5);
+    /* Build 07262026.4 — a white outline so the gold star stays legible on the
+       orange (mid) and red (high) LFM blocks, where a bare gold star vanished. */
+    text-shadow:
+      0 0 1px #fff, 0 0 2px #fff, 0 0 3px #fff,
+      0 1px 1px rgba(0,0,0,0.35);
   }
   .hdr-t3 .lfm-many-count { font-family: var(--font-display); font-weight: 700; font-size: 0.9rem; }
   .hdr-t3 .lfm-frac {
@@ -3857,10 +3865,21 @@
     min-height: calc(0.75rem * 1.3);
     padding-left: 0;
   }
-  .guild-table .gm-grp.pugging {
+  /* Build 07262026.4 — three group states. Guild Grouped (in a party with other
+     online guildmates) is the highlight — emerald + bold; Grouped (with non-guild
+     players) is wax-red; Solo is faded italic. All carry a hover tooltip. */
+  .guild-table .gm-grp { cursor: help; }
+  .guild-table .gm-grp.guild-grouped {
+    color: var(--emerald);
+    font-weight: 700;
+  }
+  .guild-table .gm-grp.grouped {
     color: var(--wax-red);
     font-weight: 600;
-    cursor: help;
+  }
+  .guild-table .gm-grp.solo {
+    color: var(--ink-faded);
+    font-style: italic;
   }
   .guild-table .gm-empty {
     color: var(--ink-faded);
@@ -4574,7 +4593,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07262026.3</div>
+      <div class="build">Build 07262026.4</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -13500,13 +13519,10 @@ const _refFetchInFlight = {};  // de-dupe concurrent fetches by table name
 
 // Live LFM index keyed by normalizeQuestName(name) -> {count,minLevel,maxLevel,difficulties:Set}.
 let _lfmIndex = {};
-// Build 07262026.1 — group-membership index for the guild roster's line-3
-// Grouped/Solo signal. Keyed by lowercased player name → { leader, members[] }.
-// Built as a side-effect of refreshLfmIndex's existing /lfms fetch (zero added
-// network) and read by renderGuildCorner. BEST-EFFORT: it only sees groups that
-// are advertising an LFM, so a player in a full/private/unadvertised group reads
-// as "Solo" (a false negative), and anonymous members can't be matched by name.
-let _groupIndex = {};
+// Build 07262026.4 — the old LFM-derived `_groupIndex` (a best-effort guess at
+// grouping from the advertised /lfms feed) is REMOVED: the guild roster now reads
+// real `is_in_party`/`group_id` straight off the roster record, which also sees
+// private/full groups the LFM feed couldn't.
 // Build 07192026.1 — cached signature of the CURRENT _lfmIndex, paired with the
 // object it was computed for (_lfmSigFor). refreshLfmIndex compares the new
 // index's signature against this cache instead of re-serializing _lfmIndex every
@@ -14271,29 +14287,10 @@ async function refreshLfmIndex(server) {
     const lfms = j && j.data ? j.data : null;
     const list = Array.isArray(lfms) ? lfms : (lfms && typeof lfms === "object" ? Object.values(lfms) : []);
     const idx = {};
-    const groupIdx = {}; // Build 07262026.1 — name → group membership (see _groupIndex)
     const raids = [];   // Build 07112026.1 — raid LFMs collected this pass
     const reapers = []; // Build 07112026.6 — ☠ R1+ quest (non-raid) LFMs this pass
     list.forEach(lfm => {
       if (!lfm) return;
-      // Build 07262026.1 — capture group membership BEFORE the quest-id guard, so
-      // a group standing in a public space with no quest posted still counts as
-      // "grouped". A group only registers when it has 2+ named people (a solo
-      // leader looking for members is not yet grouped).
-      {
-        const gl = _ddoPick(lfm, ["leader", "Leader"]);
-        const glName = gl ? (_ddoPick(gl, ["name", "Name"]) || "") : "";
-        const gm = _ddoPick(lfm, ["members", "Members"]);
-        const gmNames = (Array.isArray(gm) ? gm : [])
-          .map(mm => (mm && _ddoPick(mm, ["name", "Name"])) || "").filter(Boolean);
-        const everyone = [glName, ...gmNames].filter(Boolean);
-        if (everyone.length >= 2) {
-          everyone.forEach(nm => {
-            const gk = nm.toLowerCase();
-            if (!groupIdx[gk]) groupIdx[gk] = { leader: glName, members: everyone };
-          });
-        }
-      }
       const qid = Number(_ddoPick(lfm, ["quest_id", "QuestId"]));
       if (!qid) return;                       // quest_id 0 / missing = no quest selected → skip
       const qname = qmap.get(qid);
@@ -14365,9 +14362,6 @@ async function refreshLfmIndex(server) {
         });
       }
     });
-    // Build 07262026.1 — publish the group-membership index for the guild
-    // roster (best-effort; read by the next renderGuildCorner tick).
-    _groupIndex = groupIdx;
     // Only repaint if the resulting index differs from the current one.
     const sig = o => Object.keys(o).sort().map(k =>
       `${k}:${o[k].groups.map(g => [g.minL, g.maxL, g.diff, g.skulls, g.leader, g.party].join("~")).sort().join("^")}`).join("|");
@@ -14613,7 +14607,13 @@ function _summarizeGuild(roster, selfName) {
       // Build 07052026.1 — keep the member's location_id so the roster can
       // show the quest they're running (area_id match via getQuestAreaMap).
       const loc = Number(_ddoPick(c, ["location_id", "LocationId"])) || 0;
-      return { name: nm, level: lv, cls, loc, anon: anon || !nm };
+      // Build 07262026.4 — real party status straight off the roster record.
+      // `is_in_party` = grouped at all (incl. private/full groups the LFM feed
+      // can't see); `group_id` = which party (0 when solo), so members sharing a
+      // nonzero group_id are in the SAME party — the basis for "Guild Grouped".
+      const inParty = _ddoPick(c, ["is_in_party", "IsInParty"]) === true;
+      const groupId = Number(_ddoPick(c, ["group_id", "GroupId"])) || 0;
+      return { name: nm, level: lv, cls, loc, anon: anon || !nm, inParty, groupId };
     });
   return { count: online.length, online };
 }
@@ -14722,7 +14722,7 @@ function renderChars() {
       // location banner/highlight and the LFM index so badges re-resolve for the
       // newly-active char's server. (No schema impact — all module-level live state.)
       _nowPlaying = null; _locBannerDismissed = false;
-      _lfmIndex = {}; _groupIndex = {}; _lfmFetchKey = ""; _lfmFetchTs = 0;
+      _lfmIndex = {}; _lfmFetchKey = ""; _lfmFetchTs = 0;
       state.activeChar = c;
       // Re-theme the page to match the newly-active character.
       applyTheme(themeOf(c));
@@ -14934,7 +14934,7 @@ function renderSagaList() {
   if (activeServer) {
     refreshLfmIndex(activeServer);   // async; repaints once when badges are ready
   } else {
-    _lfmIndex = {}; _groupIndex = {}; // no server → no badges / no group data
+    _lfmIndex = {};                  // no server → no badges
   }
 
   // Build 06222026.1 (F1) — "now playing" location banner. Cleared elsewhere
@@ -16859,10 +16859,7 @@ function _connectSwitchTo(c) {
   if (!c || !(state.characters || []).includes(c)) return;
   _clearConnectSwitchBanner();   // Build 07252026.3 — clear immediately; renderAll re-evaluates
   _nowPlaying = null; _locBannerDismissed = false;
-  // Build 07262026.1 — also clear _groupIndex (mirrors the medallion-click path),
-  // so switching to a character on a different server can't briefly show a stale
-  // cross-server Grouped/Solo status before refreshLfmIndex rebuilds it.
-  _lfmIndex = {}; _groupIndex = {}; _lfmFetchKey = ""; _lfmFetchTs = 0;
+  _lfmIndex = {}; _lfmFetchKey = ""; _lfmFetchTs = 0;
   state.activeChar = c;
   applyTheme(themeOf(c));
   saveState();
@@ -16973,6 +16970,16 @@ async function renderGuildCorner() {
     // instance, 📍 zone when the location resolves to a non-quest area (public
     // spaces included), blank-but-reserved when the location is unknown. All
     // content wraps inside the fixed card width — nothing overflows the edge.
+    // Build 07262026.4 — tally group_id → the online guildmates sharing it, so a
+    // party shared by 2+ ONLINE GUILDMATES is "Guild Grouped" (vs merely grouped
+    // with non-guild players). Keyed by member object so self-exclusion is exact.
+    const _partyByGid = new Map();
+    (g.online || []).forEach(m => {
+      if (m.inParty && m.groupId) {
+        if (!_partyByGid.has(m.groupId)) _partyByGid.set(m.groupId, []);
+        _partyByGid.get(m.groupId).push(m);
+      }
+    });
     const rows = _guildFolded ? "" : (g.online || []).map(m => {
       const meta = [_abbrevClasses(m.cls) || "", m.level != null ? "Lvl " + m.level : ""].filter(Boolean).join(" · ");
       const quest = m.loc > 0 ? (questByArea.get(m.loc) || "") : "";
@@ -17003,25 +17010,30 @@ async function renderGuildCorner() {
       if (quest) {
         const saga = (typeof _sagaForQuest === "function") ? _sagaForQuest(quest, m.level, m.level) : null;
         if (saga && saga.name) { ctx = escapeHtml(saga.name); ctxTip = "Story / saga this quest belongs to"; }
-      } else if (area) {
-        if (area.is_wilderness) { ctx = "Wilderness Zone"; ctxTip = "A wilderness adventure area (live from DDO Audit)"; }
-        else if (area.is_public) { ctx = "Public Zone"; ctxTip = "A public zone (live from DDO Audit)"; }
+      } else if (area && area.is_wilderness) {
+        // Build 07262026.4 — "Public Zone" removed (added no value); only a
+        // wilderness area gets a row-3 label. Public / unknown areas stay blank.
+        ctx = "Wilderness Zone"; ctxTip = "A wilderness adventure area (live from DDO Audit)";
       }
       const storyLine = `<div class="gm-story"${ctxTip ? ` title="${ctxTip}"` : ""}>${ctx}</div>`;
-      // Build 07262026.2 — row 4: group status. "Pugging" when the member is in
-      // an ADVERTISED LFM group (a pick-up group); BLANK otherwise. Never "Solo":
-      // the LFM feed can't see private/full/unadvertised groups, so absence isn't
-      // evidence of solo. Anonymous members can't be name-matched → blank. Tooltip
-      // gives the group size and the leader, marked with a ★. Slot reserved.
-      let groupHtml = "";
-      if (!m.anon && m.name) {
-        const grp = _groupIndex[m.name.toLowerCase()] || null;
-        if (grp) {
-          const size = (grp.members && grp.members.length) || 0;
-          const leadTxt = grp.leader ? `★ ${escapeHtml(grp.leader)}` : "an unnamed leader";
-          groupHtml = `<span class="gm-grp pugging" title="Pugging — in a posted LFM group of ${size}, led by ${leadTxt}. Private or full groups aren't visible to the API.">Pugging</span>`;
+      // Build 07262026.4 — row 4: REAL group status from is_in_party + group_id
+      // (straight off the roster record, so it sees private/full groups too).
+      //   not in a party                              → "Solo" (now honest)
+      //   in a party WITH ≥1 other online guildmate   → "Guild Grouped" (+ names them)
+      //   in a party, no online guildmate in it       → "Grouped"
+      // Slot reserved (min-height) so rows stay uniform.
+      let groupHtml;
+      if (m.inParty) {
+        const mates = (m.groupId ? (_partyByGid.get(m.groupId) || []) : []).filter(o => o !== m);
+        if (mates.length) {
+          const who = mates.map(o => escapeHtml(o.name || "Anonymous")).join(", ");
+          const n = mates.length;
+          groupHtml = `<span class="gm-grp guild-grouped" title="Guild Grouped — in a party with ${n} other online guildmate${n > 1 ? "s" : ""}: ${who}">Guild Grouped</span>`;
+        } else {
+          groupHtml = `<span class="gm-grp grouped" title="Grouped — in a party, but not with other online guildmates">Grouped</span>`;
         }
-        // else: blank — can't distinguish true-solo from a private group.
+      } else {
+        groupHtml = `<span class="gm-grp solo" title="Solo — not in a party right now">Solo</span>`;
       }
       const groupLine = `<div class="gm-group">${groupHtml}</div>`;
       return `<tr><td class="gm-cell">` +
