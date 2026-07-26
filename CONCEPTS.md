@@ -67,6 +67,17 @@ once the live probe confirmed `is_in_party`/`group_id` ride the guild fetch. (Th
 [derived-cache reset parity](docs/solutions/logic-errors/derived-cache-reset-parity.md)
 learning came from that now-removed `_groupIndex`; its general lesson still holds.)
 
+### Quest Autocomplete
+An opt-in, per-character setting that watches the live location feed and, when the
+tracked character enters a quest instance the scroll knows, automatically marks
+that quest for them. Two modes: **Non-Reaper** marks only the green Completed seal;
+**Reaper** also seals [First-Time Reaper](#first-time-reaper-ftr) — degrading to a
+plain Completed mark when FTR is already claimed, since a permanent claim is never
+re-celebrated. It resolves *which* container to mark by the character's level band,
+so a quest that exists under more than one [Tier](#tier) is marked on the tier
+matching the character's current level; because those per-tier copies are tracked
+independently, marking or resetting one never affects the other.
+
 ## Flagged ambiguities
 
 - **"Tier"** is used for two unrelated things: a container's [Tier](#tier) (its Heroic/Epic/Legendary/Non-Saga classification and level band) and a [Roll-over tier](#roll-over-tier) (one of the three responsive-layout priority bands a row stacks into). When unqualified, "tier" means the container classification; the layout sense is always "roll-over tier".
