@@ -272,12 +272,27 @@ Non-urgent items to fold into a later build:
   feature needs a user-facing off switch.
 
 ## Files
-- `sooks-saga-scroll-07262026-8.html` — the live build. Open in any
+- `sooks-saga-scroll-07272026-2.html` — the live build. Open in any
   browser; no server or build step. Progress auto-saves to browser
   storage (key `sooksSagaScroll`, **schema v14** as of Build
   07142026.1 — see notes below). See **Data Schema & Import/Export
   Contract** below for the durable shape and the rules every future
   build must follow.
+
+  **Build 07272026.2 — Patron favor: benefit cross-index (Pass 2, U7).**
+  The Patrons tab's "chase a benefit" control: pick a benefit type (+HP,
+  +Saves, Bank space, …) → every patron granting it, with tier/reward and
+  the active character's earned / favor-to-go, sorted closest-first
+  (`renderBenefitCrossIndex` + `BENEFIT_INDEX`; ephemeral selection). Adds a
+  benefit-tag assertion to `runDataSelfCheck`. No schema change (still v14).
+
+  **Build 07272026.1 — Patron favor tracking (Pass 1, U1–U5) + two-tab shell
+  (Saga | Patrons).** New `Patrons` tab shows character-level, this-life patron
+  favor: an all-patron dashboard (bars sorted closest-to-next-tier, inline
+  reward-tier detail) derived from saga-seal completions (Elite assumed, deduped
+  per `shares favor` group). Wiki-sourced `QUEST_FAVOR` (286 quests) + `PATRON_TIERS`
+  (21 patrons). Favor is DERIVED — `SCHEMA_VERSION` stays 14, no new persisted
+  state (fully backwards compatible). Data provenance in `data/`.
 
   **Build 07262026.8 — Slimmer saga-header LFM pill: off row one,
   reordered, quest wiki-linked (CSS + JS, no schema change, still v14).**
@@ -4316,6 +4331,24 @@ Adding a new piece of user data (e.g. a per-saga colored flag)?
 > a field that older builds wrote, always bump `SCHEMA_VERSION`, never bump
 > `STORAGE_KEY`). Import/Export must round-trip every user-editable field
 > losslessly — that's the user's only backup path.
+> **As of Build 07272026.1 the app has a top-level TWO-TAB shell: `Saga` (the
+> existing tracker, unchanged) and `Patrons` (NEW). The tab bar toggles ONLY the
+> central content (`#sagaList` ↔ `#patronsView`); header/Filters/corner-clusters
+> persist on both (Filters dimmed + inert on Patrons). The Patrons tab shows
+> character-level, this-life patron favor: an all-patron dashboard (bars sorted
+> closest-to-next-tier, maxed→bottom, click to inline-expand reward tiers) and a
+> "chase a benefit" cross-index. Favor is DERIVED (never stored — no schema
+> change): `computeCharacterFavor(progress)` sums the Elite `favor` of each
+> quest whose per-life saga seal (`sagaDone`) is set, deduped per `shares favor`
+> group via `FAVOR_INDEX` (Heroic/Epic/Legendary count once), grouped by patron;
+> assume-Elite, resets on TR. Data lives in code constants `QUEST_FAVOR` (286
+> wiki-sourced quests: patron/favor/shares-favor), `PATRON_TIERS` (21 patrons:
+> thresholds/ranks/reward text + a benefit tag), `BENEFIT_INDEX` (inverted, for
+> the cross-index), `PATRON_FAVOR_EPOCH` — all sourced critically from ddowiki
+> (`data/patron-favor-harvest.md` is the reconciliation log). Favor computes ONLY
+> on Patrons-tab render, never on `renderAll` or the 15s live tick. The data
+> self-check (`runDataSelfCheck`) now also validates favor integrity. When new
+> content drops, re-harvest and bump `PATRON_FAVOR_EPOCH`.**
 > Read the latest `sooks-saga-scroll-<MMDDYYYY>-<N>.html` (full kebab-case +
 > build suffix; folder keeps the latest 3 build files) to load the
 > current state. Key mechanics:
@@ -4328,7 +4361,7 @@ Adding a new piece of user data (e.g. a per-saga colored flag)?
 > `SAGA_STORIES`, `QUEST_DETAILS`, `QUEST_GIVERS`; never fabricate — use
 > Chrome MCP against `ddowiki.com` (direct `web_fetch` is blocked by the
 > proxy). Footer uses `Build ` prefix with `mmddyyyy.x` format,
-> currently `Build 07262026.8`. **Live-data note (important for future content
+> currently `Build 07272026.2`. **Live-data note (important for future content
 > drops): the guild-roster location line, live LFM badges, and quest Autocomplete
 > all resolve against the DDO Audit `areas`/`quests` reference tables, cached 7
 > days in `localStorage` key `sooksSagaScrollRef` (NOT `state`; NOT the hand-coded
@@ -4337,6 +4370,30 @@ Adding a new piece of user data (e.g. a per-saga colored flag)?
 > the TTL lapses. Guard with the reference-cache epoch: bump the `DDO_REF_EPOCH`
 > constant (currently `2`) whenever an expansion/patch adds quests or areas — it
 > forces every stale cache to refetch once.**
+> **Build 07272026.2 (still v14; CSS + JS, no schema change): patron favor —
+> benefit cross-index (Pass 2, U7).** Adds the "chase a benefit" control to the
+> Patrons tab: `renderBenefitCrossIndex(fav)` + `BENEFIT_LABELS`, wired into
+> `renderPatronsView` and bound via the `#chaseBenefit` select (ephemeral
+> `_chasedBenefit`, not persisted). Pick a benefit type (+HP, +Saves, Bank
+> space, …) → every patron granting it, with tier/reward and the active
+> character's earned / favor-to-go, sorted closest-first (O(1) `BENEFIT_INDEX`
+> lookup + join against the already-computed favor). `runDataSelfCheck` now also
+> asserts every `PATRON_TIERS` benefit tag is `"none"` or has a `BENEFIT_LABELS`
+> entry. Completes the patron-favor feature (plan
+> `docs/plans/2026-07-27-001-feat-patron-favor-tracking-plan.md`). Verified:
+> node --check, self-check 0 errors, browser render + 0 console errors.**
+> **Build 07272026.1 (still v14; JS + CSS, NO schema change — favor is derived,
+> zero new persisted state): patron favor tracking (Pass 1, U1–U5) + the two-tab
+> shell.** New `Patrons` tab (see the two-tab description above). Adds constants
+> `QUEST_FAVOR`/`PATRON_TIERS`/`PATRON_FAVOR_EPOCH`; `buildFavorIndex`→`FAVOR_INDEX`
+> + `computeCharacterFavor` + `patronTierState`; `buildBenefitIndex`→`BENEFIT_INDEX`;
+> `setActiveTab`/`bindTabBar` (ARIA tablist) + `renderPatronsView` (dashboard +
+> inline per-patron tier detail, empty/zero-favor state, GPU-friendly
+> reduced-motion bars); favor self-check in `runDataSelfCheck`. `SCHEMA_VERSION`
+> stays 14, `STORAGE_KEY` untouched. Wiki harvest via same-origin MediaWiki API
+> (286 quests, 0 missing, 8 shares-favor groups); provenance in `data/`. Verified:
+> node --check, self-check 0 errors (283 favor + 3 null, 278 groups, 18 patrons),
+> Node+browser dedup, 0 console errors.**
 > **Build 07262026.8 (still v14; CSS + JS, no schema change): slimmer
 > saga-header LFM pill.** The single live-LFM pill was too bulky. (1) Header grid
 > `grid-template-areas` changed `"t1 t3"/"t2 t3"` → `"t1 t1"/"t2 t3"` so the title
