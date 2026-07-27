@@ -23,6 +23,28 @@ FTR is a **permanent, one-time claim**: once earned it is never lost and it does
 ### Reaper-eligible quest
 A quest that can count toward a container's First-Time Reaper progress. Some quests are permanently excluded (solo-only / no-Reaper quests) and never count toward the reaper denominator, so a container of only these has zero reaper-eligible quests.
 
+## Favor
+
+### Patron favor
+A character's accumulated favor with a single DDO patron, as tracked by this app. Project-specific
+meaning: it is **derived, not stored** — computed live each render as the sum of the Elite base favor
+of every quest whose per-life saga seal (`sagaDone`) is set, grouped by the quest's patron. Two
+deliberate simplifications define it here: every sealed quest is counted at **Elite** (maximum
+favor), and the total is **this-life only** — it follows the saga seal and resets on True
+Reincarnation, with no permanent "ever-earned" underlay. This makes it a this-life favor tracker, not
+a mirror of the game's permanent patron favor. Distinct from account-wide total favor, which is
+explicitly out of scope.
+
+### Favor-group
+The unit favor is counted by: a quest together with any `shares favor` partners across its Heroic /
+Epic / Legendary versions. Verified on the DDO Wiki — the Heroic and Epic versions of a quest carry
+the **same patron and the same favor value** and are linked by a `shares favor` infobox field;
+completing either at Elite grants that favor **once**. So favor is deduped per favor-group and never
+counted per tier-instance (naive per-slot summing would double-count every Heroic↔Epic pair). The
+app's existing `normalizeQuestName` already groups these versions and is the ready-made dedup key,
+cross-checked against the wiki's `shares favor` field. A quest may have **no patron and no favor**
+(some free-to-play/event quests), represented explicitly rather than defaulted.
+
 ## Layout
 
 ### Corner cluster

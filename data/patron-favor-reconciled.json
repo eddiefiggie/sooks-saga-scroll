@@ -1,0 +1,1493 @@
+{
+ "quest_favor": {
+  "A Blood Pact": {
+   "patron": "Battlehammer Expedition",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "A Break in the Ice": {
+   "patron": "The Harpers",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "A Cabal for One": {
+   "patron": "Agents of Argonnessen",
+   "favor": 6,
+   "sharesFavor": "Return to Cabal for One"
+  },
+  "A Cry for Help": {
+   "patron": "Agents of Argonnessen",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "A Frosty Reception": {
+   "patron": "The Summer Court",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "A Legend Revisited": {
+   "patron": "The Free Agents",
+   "favor": 4,
+   "sharesFavor": "The Legend of Two-Toed Tobias"
+  },
+  "A Lesson in Deception": {
+   "patron": "Purple Dragon Knights",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "A Light in the Attic": {
+   "patron": "Keepers of Lamordia",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "A Long Way to Mushrooms": {
+   "patron": "Battlehammer Expedition",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "A Mad Tea Party": {
+   "patron": "Keepers of Barovia",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "A Miner Sacrifice": {
+   "patron": "Keepers of Lamordia",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "A Raven at the Door": {
+   "patron": "Keepers of Barovia",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "A Sharn Welcome": {
+   "patron": "Sharn City Council",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "A Small Problem": {
+   "patron": "House Phiarlan",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "A Stay at the Inn": {
+   "patron": "The Harpers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "All Hail the King": {
+   "patron": "The Gatekeepers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "An Element of Chaos": {
+   "patron": "Morgrave University",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "An Invitation to Dinner": {
+   "patron": "Keepers of Barovia",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Army of Eternal Night": {
+   "patron": "Morgrave University",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Army of Shadow": {
+   "patron": "Purple Dragon Knights",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Assault on Summerfield": {
+   "patron": "The Coin Lords",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Assault on the Aerie of the Slave Lords": {
+   "patron": "The Gatekeepers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Astral Ambush": {
+   "patron": "The Twelve",
+   "favor": 9,
+   "sharesFavor": null
+  },
+  "Back to Basics": {
+   "patron": "The Gatekeepers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Back to the Abyss": {
+   "patron": "Battlehammer Expedition",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Bargain of Blood": {
+   "patron": "House Deneith",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Beautiful Nightmares": {
+   "patron": "Morgrave University",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Beneath the City Streets": {
+   "patron": "Keepers of Lamordia",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Best Laid Plans": {
+   "patron": "Sharn City Council",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Beyond the Rift": {
+   "patron": "The Silver Flame",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Black and Blue": {
+   "patron": "Agents of Argonnessen",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Blockade Buster": {
+   "patron": "The Coin Lords",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Blown Deadline": {
+   "patron": "Sharn City Council",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Body and Mind": {
+   "patron": "Keepers of Lamordia",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Book Burning": {
+   "patron": "Cormanthor Elves",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Breaking the Ranks": {
+   "patron": "The Harpers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Bullywugs and Booby Traps": {
+   "patron": "The Gatekeepers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Burning Down the House": {
+   "patron": "Agents of Argonnessen",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Caged Beast": {
+   "patron": "The Gatekeepers",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "Captive of the Hidden God": {
+   "patron": "The Gatekeepers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Catastrophe": {
+   "patron": "Agents of Argonnessen",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Cold Snap": {
+   "patron": "Keepers of Lamordia",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Combatting Corruption": {
+   "patron": "The Summer Court",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "Creeping Death": {
+   "patron": "The Twelve",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Danger at Dunwater": {
+   "patron": "The Gatekeepers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Death Hosts This Banquet": {
+   "patron": "Cormanthor Elves",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Death House": {
+   "patron": "Keepers of Barovia",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Demon Assault": {
+   "patron": "The Gatekeepers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Demon in the Rough": {
+   "patron": "Battlehammer Expedition",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Desire in the Dark": {
+   "patron": "The Harpers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Detour": {
+   "patron": "The Harpers",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Diplomatic Impunity": {
+   "patron": "The Coin Lords",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Disciples of Shar": {
+   "patron": "Purple Dragon Knights",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Don't Drink the Water": {
+   "patron": "Purple Dragon Knights",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "Down You Go": {
+   "patron": "The Gatekeepers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Dread Sea Scrolls": {
+   "patron": "The Gatekeepers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Ends and Means": {
+   "patron": "Keepers of Lamordia",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Enemy of My Enemy": {
+   "patron": "Morgrave University",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Escape Plan": {
+   "patron": "Purple Dragon Knights",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Ettercap Incursion": {
+   "patron": "Cormanthor Elves",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Eye Know Whodunnit": {
+   "patron": "Morgrave University",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Eyes of Stone": {
+   "patron": "The Coin Lords",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Fall of the Forbidden Temple": {
+   "patron": "The Gatekeepers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Feast or Famine": {
+   "patron": "Agents of Argonnessen",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Finding Dorris": {
+   "patron": "Sharn City Council",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Flocked Together": {
+   "patron": "Battlehammer Expedition",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "For Want of a Heart": {
+   "patron": "Battlehammer Expedition",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Foundation of Discord": {
+   "patron": "Agents of Argonnessen",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Frame Work": {
+   "patron": "The Coin Lords",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Fred's First Date": {
+   "patron": "Morgrave University",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Fresh-baked Dreams": {
+   "patron": "Keepers of Barovia",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Friends in Low Places": {
+   "patron": "Purple Dragon Knights",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Ghost of a Chance": {
+   "patron": "The Free Agents",
+   "favor": 4,
+   "sharesFavor": "Ghost of a Chance (Epic)"
+  },
+  "Ghost of a Chance (Epic)": {
+   "patron": "The Free Agents",
+   "favor": 4,
+   "sharesFavor": "Ghost of a Chance"
+  },
+  "Gianthold Tor": {
+   "patron": "Agents of Argonnessen",
+   "favor": 7,
+   "sharesFavor": "Return to Gianthold Tor"
+  },
+  "Going Rogue": {
+   "patron": "Agents of Argonnessen",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Good Intentions": {
+   "patron": "The Free Agents",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Grand Theft Aureon": {
+   "patron": "Morgrave University",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Graveyard Shift": {
+   "patron": "The Harpers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Grim and Barett": {
+   "patron": "The Gatekeepers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Growing Pains": {
+   "patron": "Morgrave University",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Heart of the Problem": {
+   "patron": "The Gatekeepers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Hideous to Behold": {
+   "patron": "Battlehammer Expedition",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Horde of the Illithid Controller": {
+   "patron": "The Twelve",
+   "favor": 9,
+   "sharesFavor": null
+  },
+  "House of Pain": {
+   "patron": "Sharn City Council",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Housekeeping": {
+   "patron": "The Gatekeepers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "If It Wasn't For Bad Luck": {
+   "patron": "Battlehammer Expedition",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Immortality Lessons": {
+   "patron": "The Summer Court",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Impossible Demands": {
+   "patron": "Purple Dragon Knights",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "In the Belly of the Beast": {
+   "patron": "Purple Dragon Knights",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "Into the Mists": {
+   "patron": "Keepers of Barovia",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Irestone Inlet": {
+   "patron": "The Coin Lords",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Just Business": {
+   "patron": "Sharn City Council",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Kill Ten Rats": {
+   "patron": "Morgrave University",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Law and Order": {
+   "patron": "Morgrave University",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Lines of Supply": {
+   "patron": "The Harpers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Locked Away (Part One)": {
+   "patron": "Keepers of Lamordia",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Locked Away (Part Two)": {
+   "patron": "Keepers of Lamordia",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Lost at Sea": {
+   "patron": "The Free Agents",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Lost in the Swamp": {
+   "patron": "The Harpers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Madstone Crater": {
+   "patron": "Agents of Argonnessen",
+   "favor": 8,
+   "sharesFavor": "Return to Madstone Crater"
+  },
+  "Make Believe": {
+   "patron": "The Summer Court",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Members Only": {
+   "patron": "Sharn City Council",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Multitude of Menace": {
+   "patron": "The Gatekeepers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Murder by Night": {
+   "patron": "Purple Dragon Knights",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Needle in a Fey Stack": {
+   "patron": "The Summer Court",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Night Falls on Stormreach": {
+   "patron": "House Jorasco",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "No Refunds": {
+   "patron": "Sharn City Council",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Oath of Vengeance": {
+   "patron": "Keepers of Barovia",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Obstructing the Orcs": {
+   "patron": "The Gatekeepers",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "Oghma's Song": {
+   "patron": "Cormanthor Elves",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Old Grey Garl": {
+   "patron": "The Free Agents",
+   "favor": 5,
+   "sharesFavor": "Old Tomb, New Tenants"
+  },
+  "Old Tomb, New Tenants": {
+   "patron": "The Free Agents",
+   "favor": 5,
+   "sharesFavor": "Old Grey Garl"
+  },
+  "One Dame Thing After Another": {
+   "patron": "The Summer Court",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Order in the Court!": {
+   "patron": "Morgrave University",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Outbreak": {
+   "patron": "The Harpers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Overgrowth": {
+   "patron": "The Harpers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Paper Trail": {
+   "patron": "Morgrave University",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Party 101": {
+   "patron": "Morgrave University",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Partycrashers": {
+   "patron": "House Phiarlan",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Pilgrims' Peril": {
+   "patron": "The Twelve",
+   "favor": 9,
+   "sharesFavor": null
+  },
+  "Plundering Pirates' Point": {
+   "patron": "The Gatekeepers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Portal to Below": {
+   "patron": "Cormanthor Elves",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Precious Cargo": {
+   "patron": "The Free Agents",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Prove Your Worth": {
+   "patron": "The Free Agents",
+   "favor": 4,
+   "sharesFavor": "Prove Your Worth (Epic)"
+  },
+  "Prove Your Worth (Epic)": {
+   "patron": "The Free Agents",
+   "favor": 4,
+   "sharesFavor": "Prove Your Worth"
+  },
+  "Quarantine": {
+   "patron": "House Jorasco",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Quid Pro Quo": {
+   "patron": "The Summer Court",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Rats in a Cage": {
+   "patron": "The Harpers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Ravens' Bane": {
+   "patron": "Keepers of Barovia",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Reach for the Sky": {
+   "patron": "Sharn City Council",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Reclaiming the Rift": {
+   "patron": "Purple Dragon Knights",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "Records of the Past": {
+   "patron": "The Harpers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Red Rain": {
+   "patron": "Sharn City Council",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Rest Stop": {
+   "patron": "The Harpers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Rest for the Night": {
+   "patron": "The Gatekeepers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Return to Cabal for One": {
+   "patron": "Agents of Argonnessen",
+   "favor": 6,
+   "sharesFavor": "A Cabal for One"
+  },
+  "Return to Gianthold Tor": {
+   "patron": "Agents of Argonnessen",
+   "favor": 7,
+   "sharesFavor": "Gianthold Tor"
+  },
+  "Return to Madstone Crater": {
+   "patron": "Agents of Argonnessen",
+   "favor": 8,
+   "sharesFavor": "Madstone Crater"
+  },
+  "Return to Prison of the Planes": {
+   "patron": "Agents of Argonnessen",
+   "favor": 6,
+   "sharesFavor": "The Prison of the Planes"
+  },
+  "Roll Call": {
+   "patron": "Sharn City Council",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Rosemary's Ballad": {
+   "patron": "The Gatekeepers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Ruinous Schemes": {
+   "patron": "Sharn City Council",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Safety in Numbers": {
+   "patron": "Sharn City Council",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Scavenger Hunt": {
+   "patron": "Sharn City Council",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Sealed in Amber": {
+   "patron": "Keepers of Barovia",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Search and Rescue": {
+   "patron": "The Harpers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Secret of the Slavers' Stockade": {
+   "patron": "The Gatekeepers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Secrets of the Red Wizards": {
+   "patron": "Cormanthor Elves",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Security Detail": {
+   "patron": "Sharn City Council",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Seeds of Decay": {
+   "patron": "Cormanthor Elves",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Seizing the Dawn": {
+   "patron": "Morgrave University",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Servants of the Overlord": {
+   "patron": "The Silver Flame",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Shadow of a Doubt": {
+   "patron": "Purple Dragon Knights",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Siegebreaker": {
+   "patron": "The Coin Lords",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Slave Pits of the Undercity": {
+   "patron": "The Gatekeepers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Sleeping with the Fishes": {
+   "patron": "The Free Agents",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Smash and Burn": {
+   "patron": "Sharn City Council",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Snowfall and Sunlight": {
+   "patron": "Keepers of Lamordia",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Soul Survivor": {
+   "patron": "Sharn City Council",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Special Delivery": {
+   "patron": "Keepers of Lamordia",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Spiders and Flies": {
+   "patron": "The Gatekeepers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Spies in the House": {
+   "patron": "House Deneith",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Stealing from Sorcere": {
+   "patron": "Battlehammer Expedition",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Stolen Power": {
+   "patron": "The Twelve",
+   "favor": 9,
+   "sharesFavor": null
+  },
+  "Storm the Beaches": {
+   "patron": "House Deneith",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Strike Back": {
+   "patron": "The Harpers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Subversion": {
+   "patron": "The Gatekeepers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Sunrise": {
+   "patron": "Keepers of Barovia",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Swim at Your Own Risk": {
+   "patron": "The Gatekeepers",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "Taken in Hand": {
+   "patron": "Morgrave University",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Tavern Brawl": {
+   "patron": "The Gatekeepers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Age of Rage": {
+   "patron": "House Jorasco",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Archons' Trial": {
+   "patron": "The Gatekeepers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "The Bark and the Blade": {
+   "patron": "Morgrave University",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "The Battle for Eveningstar": {
+   "patron": "Purple Dragon Knights",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "The Black Loch": {
+   "patron": "House Deneith",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Body Snatchers": {
+   "patron": "Keepers of Lamordia",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Bugbear Bandits": {
+   "patron": "The Gatekeepers",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "The Covered Culvert": {
+   "patron": "The Free Agents",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The Crucible": {
+   "patron": "Agents of Argonnessen",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "The Curse and the Captive Crustacean": {
+   "patron": "The Gatekeepers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Darkness and the Light": {
+   "patron": "The Harpers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Deal and the Demon": {
+   "patron": "Purple Dragon Knights",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "The Devil's Details": {
+   "patron": "The Gatekeepers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "The Devils to Pay": {
+   "patron": "Morgrave University",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Druid's Curse": {
+   "patron": "The Harpers",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "The End of the Road": {
+   "patron": "The Harpers",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "The Endless Revels": {
+   "patron": "The Summer Court",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The Evil We Know": {
+   "patron": "Morgrave University",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "The Fetid Wedding": {
+   "patron": "Battlehammer Expedition",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "The Final Draw": {
+   "patron": "Agents of Argonnessen",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Final Enemy": {
+   "patron": "The Gatekeepers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Final Vintage": {
+   "patron": "Keepers of Barovia",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Hand and the Eyes": {
+   "patron": "Morgrave University",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "The Haunting of Saltmarsh": {
+   "patron": "The Gatekeepers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The Hijacked Haul": {
+   "patron": "The Gatekeepers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The Hobgoblin Horde": {
+   "patron": "The Gatekeepers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The Home of Memory": {
+   "patron": "The Gatekeepers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The House of Broken Chains": {
+   "patron": "Purple Dragon Knights",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "The House of Death Undone": {
+   "patron": "Purple Dragon Knights",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "The House of Gems": {
+   "patron": "Cormanthor Elves",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The House of Rusted Blades": {
+   "patron": "Purple Dragon Knights",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "The Icemount Curse": {
+   "patron": "The Summer Court",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Key to the Mythal": {
+   "patron": "Cormanthor Elves",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "The Knife's Edge": {
+   "patron": "The Harpers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The Knight Who Cried Windmill": {
+   "patron": "The Summer Court",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The Legend of Two-Toed Tobias": {
+   "patron": "The Free Agents",
+   "favor": 4,
+   "sharesFavor": "A Legend Revisited"
+  },
+  "The Legend of the Lost Locket": {
+   "patron": "The Summer Court",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The Lords of Dust": {
+   "patron": "The Silver Flame",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "The Lost Thread": {
+   "patron": "Purple Dragon Knights",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "The Madness of Crowds": {
+   "patron": "House Jorasco",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Magma Must Flow": {
+   "patron": "Sharn City Council",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Mask of Deception": {
+   "patron": "The Harpers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "The Maze of Madness": {
+   "patron": "Agents of Argonnessen",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "The Newcomers": {
+   "patron": "Agents of Argonnessen",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Offshore Account": {
+   "patron": "Sharn City Council",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "The Portal Opens": {
+   "patron": "Purple Dragon Knights",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "The Price of an Egg": {
+   "patron": "Battlehammer Expedition",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Prison of the Planes": {
+   "patron": "Agents of Argonnessen",
+   "favor": 6,
+   "sharesFavor": "Return to Prison of the Planes"
+  },
+  "The Proper Authorities": {
+   "patron": "Keepers of Lamordia",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Riddle": {
+   "patron": "Purple Dragon Knights",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "The Sacred Bounty": {
+   "patron": "The Gatekeepers",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "The Safehold": {
+   "patron": "Cormanthor Elves",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Same Old Song": {
+   "patron": "Sharn City Council",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Snitch": {
+   "patron": "House Phiarlan",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Spinner of Shadows": {
+   "patron": "The Silver Flame",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "The Stone Crypt Chronicle": {
+   "patron": "The Gatekeepers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Thornwright": {
+   "patron": "The Summer Court",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The Thrill of the Hunt": {
+   "patron": "Purple Dragon Knights",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "The Tide Turns": {
+   "patron": "House Deneith",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Tracker's Trap": {
+   "patron": "The Harpers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "The Troglodytes' Get": {
+   "patron": "The Free Agents",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Trouble with Tar Pits": {
+   "patron": "The Gatekeepers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Underlane Assignment": {
+   "patron": "Sharn City Council",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "The Unquiet Graves": {
+   "patron": "Purple Dragon Knights",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "The Wish": {
+   "patron": "Keepers of Lamordia",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Wizard's Labyrinth": {
+   "patron": "The Harpers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The Wraithcallers": {
+   "patron": "Sharn City Council",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Zulkir's Plan": {
+   "patron": "Cormanthor Elves",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Third Time's a Charm": {
+   "patron": "The Harpers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "This Old Haunt": {
+   "patron": "Morgrave University",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Thorn and Paw": {
+   "patron": "The Harpers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Thrall of Duty": {
+   "patron": "Agents of Argonnessen",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Thralls of the Fungus Lord": {
+   "patron": "Sharn City Council",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Three Paths to Battle": {
+   "patron": "Morgrave University",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Through a Mirror Darkly": {
+   "patron": "Purple Dragon Knights",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Through the Tulgey Wood": {
+   "patron": "The Summer Court",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Time Flies": {
+   "patron": null,
+   "favor": null,
+   "sharesFavor": null
+  },
+  "Times Long Past": {
+   "patron": "Cormanthor Elves",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "To Curse the Sky": {
+   "patron": "House Deneith",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "ToEE: Air Node": {
+   "patron": "The Gatekeepers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "ToEE: Depths of the Temple": {
+   "patron": "The Gatekeepers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "ToEE: Earth Node": {
+   "patron": "The Gatekeepers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "ToEE: Fire Node": {
+   "patron": "The Gatekeepers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "ToEE: First Level and Earth Temple": {
+   "patron": "The Gatekeepers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "ToEE: Lower Temple Complex": {
+   "patron": "The Gatekeepers",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "ToEE: Water Node": {
+   "patron": "The Gatekeepers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Too Many Cooks": {
+   "patron": "Morgrave University",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Total Chaos": {
+   "patron": "The Gatekeepers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Tower of Vengeance": {
+   "patron": "Battlehammer Expedition",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Toxic Treatment": {
+   "patron": "House Jorasco",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Treasure Hunt": {
+   "patron": "The Gatekeepers",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "Trial by Fire": {
+   "patron": "Agents of Argonnessen",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Trial by Fury": {
+   "patron": "Purple Dragon Knights",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "Trials of the Triceratops": {
+   "patron": "The Gatekeepers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Turn the Page": {
+   "patron": null,
+   "favor": null,
+   "sharesFavor": null
+  },
+  "Under the Big Top": {
+   "patron": "House Phiarlan",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Under the Cover of Darkness": {
+   "patron": "The Gatekeepers",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "Undermine": {
+   "patron": "The Coin Lords",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Vecna Denied": {
+   "patron": "Morgrave University",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "Vecna Unleashed": {
+   "patron": null,
+   "favor": null,
+   "sharesFavor": null
+  },
+  "Violent Delights": {
+   "patron": "The Gatekeepers",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "Voices of the Dead": {
+   "patron": "Cormanthor Elves",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Wake Me Up Inside": {
+   "patron": "The Summer Court",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Watch Your Step": {
+   "patron": "The Gatekeepers",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "What Dreams May Come": {
+   "patron": "Morgrave University",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "What Goes Up": {
+   "patron": "The Harpers",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "What Sleeps Below": {
+   "patron": "The Gatekeepers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Whispers of Return": {
+   "patron": "The Gatekeepers",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "White Plume Mountain": {
+   "patron": "The Gatekeepers",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Wild Thing": {
+   "patron": "The Gatekeepers",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Wish Upon a Card": {
+   "patron": "Agents of Argonnessen",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Witch Hunt": {
+   "patron": "The Summer Court",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Wrath of the Earth": {
+   "patron": "Keepers of Barovia",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Zoo Creeper": {
+   "patron": "Keepers of Lamordia",
+   "favor": 4,
+   "sharesFavor": null
+  }
+ },
+ "patrons": [
+  "Agents of Argonnessen",
+  "Battlehammer Expedition",
+  "Cormanthor Elves",
+  "House Deneith",
+  "House Jorasco",
+  "House Phiarlan",
+  "Keepers of Barovia",
+  "Keepers of Lamordia",
+  "Morgrave University",
+  "Purple Dragon Knights",
+  "Sharn City Council",
+  "The Coin Lords",
+  "The Free Agents",
+  "The Gatekeepers",
+  "The Harpers",
+  "The Silver Flame",
+  "The Summer Court",
+  "The Twelve"
+ ],
+ "shareGroups": [
+  [
+   "A Cabal for One",
+   "Return to Cabal for One"
+  ],
+  [
+   "A Legend Revisited",
+   "The Legend of Two-Toed Tobias"
+  ],
+  [
+   "Ghost of a Chance",
+   "Ghost of a Chance (Epic)"
+  ],
+  [
+   "Gianthold Tor",
+   "Return to Gianthold Tor"
+  ],
+  [
+   "Madstone Crater",
+   "Return to Madstone Crater"
+  ],
+  [
+   "Old Grey Garl",
+   "Old Tomb, New Tenants"
+  ],
+  [
+   "Prove Your Worth",
+   "Prove Your Worth (Epic)"
+  ],
+  [
+   "Return to Prison of the Planes",
+   "The Prison of the Planes"
+  ]
+ ],
+ "nullPatron": [
+  "Time Flies",
+  "Turn the Page",
+  "Vecna Unleashed"
+ ]
+}

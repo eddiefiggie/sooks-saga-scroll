@@ -4459,6 +4459,69 @@
     .corner-panel { width: 100%; flex-basis: 100%; }
     .char-medallion { max-width: 100%; }
   }
+/* ── Build 07272026.1 — two-tab shell (Saga | Patrons) + favor dashboard ── */
+#sagaList[hidden], #patronsView[hidden] { display: none; }
+.tab-bar {
+  display: flex; gap: 6px; justify-content: center;
+  max-width: 1180px; margin: 14px auto 0; padding: 0 12px;
+}
+.tab-btn {
+  font-family: 'Cinzel', 'EB Garamond', Georgia, serif; font-size: 0.98rem; font-weight: 600;
+  letter-spacing: 0.03em; cursor: pointer; padding: 8px 22px;
+  color: var(--ink-faded); background: var(--parchment-shadow);
+  border: 1px solid var(--parchment-edge); border-bottom: none;
+  border-radius: 9px 9px 0 0; transition: color .15s ease, background .15s ease;
+}
+.tab-btn:hover { color: var(--ink-primary); }
+.tab-btn.is-active {
+  color: var(--wax-red); background: var(--parchment-base);
+  box-shadow: inset 0 3px 0 var(--gold);
+}
+.tab-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
+/* dim the inert Filters panel while the Patrons tab is active */
+body.patrons-active .controls { opacity: 0.45; pointer-events: none; filter: saturate(0.6); transition: opacity .2s ease; }
+
+#patronsView { max-width: 1180px; margin: 0 auto; padding: 0 12px 40px; }
+.patrons-empty { text-align: center; padding: 60px 20px; font-family: 'EB Garamond', Georgia, serif;
+  font-style: italic; font-size: 1.1rem; color: var(--ink-faded); }
+.patrons-wrap { padding-top: 18px; }
+.patrons-title { font-family: 'Cinzel', serif; color: var(--wax-red); font-size: 1.35rem; margin: 0 0 4px; }
+.patrons-sub { color: var(--ink-faded); font-weight: 400; font-size: 0.95rem; }
+.patrons-foot { color: var(--ink-faded); font-style: italic; font-size: 0.82rem; margin: 14px 2px 0; }
+.patrons-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
+.patron-card { border: 1px solid var(--parchment-edge); border-radius: 8px; background: var(--parchment-mid); overflow: hidden; }
+.patron-maxed { opacity: 0.82; }
+.patron-head {
+  display: grid; grid-template-columns: minmax(150px, 210px) 1fr minmax(150px, auto);
+  align-items: center; gap: 14px; width: 100%; text-align: left; cursor: pointer;
+  padding: 10px 14px; background: transparent; border: none;
+  font-family: 'EB Garamond', Georgia, serif; color: var(--ink-primary);
+}
+.patron-head:hover { background: var(--parchment-shadow); }
+.patron-head:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
+.patron-name { font-weight: 600; font-size: 1.02rem; }
+.patron-bar { position: relative; height: 12px; border-radius: 6px; background: var(--parchment-deep); overflow: hidden; }
+.patron-fill { position: absolute; inset: 0 auto 0 0; border-radius: 6px;
+  background: linear-gradient(90deg, var(--wax-red-light), var(--wax-red));
+  transform-origin: left center; transition: width .3s ease; }
+@media (prefers-reduced-motion: reduce) { .patron-fill { transition: none; } }
+.patron-maxed .patron-fill { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
+.patron-next { font-size: 0.9rem; color: var(--ink-secondary); white-space: nowrap; text-align: right; }
+.patron-detail { border-top: 1px dashed var(--parchment-edge); padding: 6px 14px 10px; }
+.ptier { display: grid; grid-template-columns: 52px minmax(120px, 180px) 1fr; gap: 12px; align-items: baseline;
+  padding: 5px 0; border-bottom: 1px solid var(--parchment-shadow); font-size: 0.9rem; }
+.ptier:last-child { border-bottom: none; }
+.ptier-thresh { font-variant-numeric: tabular-nums; color: var(--wax-red); font-weight: 600; }
+.ptier-rank { color: var(--ink-secondary); font-weight: 600; }
+.ptier-reward { color: var(--ink-primary); }
+.ptier-done { opacity: 0.62; }
+.ptier-done .ptier-thresh { color: var(--ink-faded); }
+@media (max-width: 640px) {
+  .patron-head { grid-template-columns: 1fr; gap: 6px; }
+  .patron-next { text-align: left; }
+  .ptier { grid-template-columns: 44px 1fr; }
+  .ptier-reward { grid-column: 1 / -1; }
+}
 </style>
 </head>
 <body>
@@ -4640,7 +4703,17 @@
        so the narrow column reads Filters -> Characters -> LFM -> Server. -->
   <div id="narrowStack" aria-hidden="false"></div>
 
+  <!-- Build 07272026.1 — top-level two-tab shell (Saga | Patrons). The tab bar
+       toggles ONLY the central content (#sagaList <-> #patronsView); the header
+       (incl. Filters), corner clusters, and footer persist on both tabs (KTD5).
+       ARIA tablist pattern; arrow-key nav wired in bindTabBar(). -->
+  <nav class="tab-bar" role="tablist" aria-label="Views">
+    <button class="tab-btn is-active" id="tabSaga"    role="tab" aria-selected="true"  aria-controls="sagaList"    type="button" data-tab="saga">📜 Saga</button>
+    <button class="tab-btn"           id="tabPatrons" role="tab" aria-selected="false" aria-controls="patronsView" type="button" data-tab="patrons">⚜ Patrons</button>
+  </nav>
+
   <main id="sagaList"></main>
+  <section id="patronsView" role="tabpanel" aria-labelledby="tabPatrons" hidden></section>
 
   <footer>
     <div class="credit">Created by Sook &amp; Claude</div>
@@ -4664,7 +4737,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07262026.8</div>
+      <div class="build">Build 07272026.1</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -13214,6 +13287,404 @@ for (const _s of SAGAS) {
   });
 }
 
+// Wiki-sourced 2026-07-27 (per-quest {{Quest}} infobox, action=query API; KTD7 accuracy-first).
+// Shape: questName -> { p:patron|null, f:eliteFavor|null, s:sharesFavorQuest|null }.
+// favor value is the wiki Elite/max figure, stored as-is (KTD4). null p/f = no patron/no favor.
+const QUEST_FAVOR = {
+  "A Blood Pact":{p:"Battlehammer Expedition",f:6,s:null},
+  "A Break in the Ice":{p:"The Harpers",f:7,s:null},
+  "A Cabal for One":{p:"Agents of Argonnessen",f:6,s:"Return to Cabal for One"},
+  "A Cry for Help":{p:"Agents of Argonnessen",f:7,s:null},
+  "A Frosty Reception":{p:"The Summer Court",f:4,s:null},
+  "A Legend Revisited":{p:"The Free Agents",f:4,s:"The Legend of Two-Toed Tobias"},
+  "A Lesson in Deception":{p:"Purple Dragon Knights",f:7,s:null},
+  "A Light in the Attic":{p:"Keepers of Lamordia",f:4,s:null},
+  "A Long Way to Mushrooms":{p:"Battlehammer Expedition",f:5,s:null},
+  "A Mad Tea Party":{p:"Keepers of Barovia",f:6,s:null},
+  "A Miner Sacrifice":{p:"Keepers of Lamordia",f:4,s:null},
+  "A Raven at the Door":{p:"Keepers of Barovia",f:6,s:null},
+  "A Sharn Welcome":{p:"Sharn City Council",f:5,s:null},
+  "A Small Problem":{p:"House Phiarlan",f:4,s:null},
+  "A Stay at the Inn":{p:"The Harpers",f:6,s:null},
+  "All Hail the King":{p:"The Gatekeepers",f:4,s:null},
+  "An Element of Chaos":{p:"Morgrave University",f:5,s:null},
+  "An Invitation to Dinner":{p:"Keepers of Barovia",f:6,s:null},
+  "Army of Eternal Night":{p:"Morgrave University",f:6,s:null},
+  "Army of Shadow":{p:"Purple Dragon Knights",f:7,s:null},
+  "Assault on Summerfield":{p:"The Coin Lords",f:5,s:null},
+  "Assault on the Aerie of the Slave Lords":{p:"The Gatekeepers",f:5,s:null},
+  "Astral Ambush":{p:"The Twelve",f:9,s:null},
+  "Back to Basics":{p:"The Gatekeepers",f:3,s:null},
+  "Back to the Abyss":{p:"Battlehammer Expedition",f:5,s:null},
+  "Bargain of Blood":{p:"House Deneith",f:4,s:null},
+  "Beautiful Nightmares":{p:"Morgrave University",f:6,s:null},
+  "Beneath the City Streets":{p:"Keepers of Lamordia",f:5,s:null},
+  "Best Laid Plans":{p:"Sharn City Council",f:5,s:null},
+  "Beyond the Rift":{p:"The Silver Flame",f:7,s:null},
+  "Black and Blue":{p:"Agents of Argonnessen",f:5,s:null},
+  "Blockade Buster":{p:"The Coin Lords",f:5,s:null},
+  "Blown Deadline":{p:"Sharn City Council",f:6,s:null},
+  "Body and Mind":{p:"Keepers of Lamordia",f:5,s:null},
+  "Book Burning":{p:"Cormanthor Elves",f:4,s:null},
+  "Breaking the Ranks":{p:"The Harpers",f:6,s:null},
+  "Bullywugs and Booby Traps":{p:"The Gatekeepers",f:5,s:null},
+  "Burning Down the House":{p:"Agents of Argonnessen",f:4,s:null},
+  "Caged Beast":{p:"The Gatekeepers",f:2,s:null},
+  "Captive of the Hidden God":{p:"The Gatekeepers",f:4,s:null},
+  "Catastrophe":{p:"Agents of Argonnessen",f:3,s:null},
+  "Cold Snap":{p:"Keepers of Lamordia",f:4,s:null},
+  "Combatting Corruption":{p:"The Summer Court",f:2,s:null},
+  "Creeping Death":{p:"The Twelve",f:6,s:null},
+  "Danger at Dunwater":{p:"The Gatekeepers",f:4,s:null},
+  "Death Hosts This Banquet":{p:"Cormanthor Elves",f:5,s:null},
+  "Death House":{p:"Keepers of Barovia",f:4,s:null},
+  "Demon Assault":{p:"The Gatekeepers",f:6,s:null},
+  "Demon in the Rough":{p:"Battlehammer Expedition",f:5,s:null},
+  "Desire in the Dark":{p:"The Harpers",f:5,s:null},
+  "Detour":{p:"The Harpers",f:7,s:null},
+  "Diplomatic Impunity":{p:"The Coin Lords",f:6,s:null},
+  "Disciples of Shar":{p:"Purple Dragon Knights",f:6,s:null},
+  "Don't Drink the Water":{p:"Purple Dragon Knights",f:8,s:null},
+  "Down You Go":{p:"The Gatekeepers",f:3,s:null},
+  "Dread Sea Scrolls":{p:"The Gatekeepers",f:4,s:null},
+  "Ends and Means":{p:"Keepers of Lamordia",f:4,s:null},
+  "Enemy of My Enemy":{p:"Morgrave University",f:6,s:null},
+  "Escape Plan":{p:"Purple Dragon Knights",f:5,s:null},
+  "Ettercap Incursion":{p:"Cormanthor Elves",f:5,s:null},
+  "Eye Know Whodunnit":{p:"Morgrave University",f:6,s:null},
+  "Eyes of Stone":{p:"The Coin Lords",f:6,s:null},
+  "Fall of the Forbidden Temple":{p:"The Gatekeepers",f:5,s:null},
+  "Feast or Famine":{p:"Agents of Argonnessen",f:6,s:null},
+  "Finding Dorris":{p:"Sharn City Council",f:7,s:null},
+  "Flocked Together":{p:"Battlehammer Expedition",f:5,s:null},
+  "For Want of a Heart":{p:"Battlehammer Expedition",f:5,s:null},
+  "Foundation of Discord":{p:"Agents of Argonnessen",f:6,s:null},
+  "Frame Work":{p:"The Coin Lords",f:5,s:null},
+  "Fred's First Date":{p:"Morgrave University",f:6,s:null},
+  "Fresh-baked Dreams":{p:"Keepers of Barovia",f:4,s:null},
+  "Friends in Low Places":{p:"Purple Dragon Knights",f:7,s:null},
+  "Ghost of a Chance":{p:"The Free Agents",f:4,s:"Ghost of a Chance (Epic)"},
+  "Ghost of a Chance (Epic)":{p:"The Free Agents",f:4,s:"Ghost of a Chance"},
+  "Gianthold Tor":{p:"Agents of Argonnessen",f:7,s:"Return to Gianthold Tor"},
+  "Going Rogue":{p:"Agents of Argonnessen",f:4,s:null},
+  "Good Intentions":{p:"The Free Agents",f:7,s:null},
+  "Grand Theft Aureon":{p:"Morgrave University",f:7,s:null},
+  "Graveyard Shift":{p:"The Harpers",f:5,s:null},
+  "Grim and Barett":{p:"The Gatekeepers",f:6,s:null},
+  "Growing Pains":{p:"Morgrave University",f:6,s:null},
+  "Heart of the Problem":{p:"The Gatekeepers",f:3,s:null},
+  "Hideous to Behold":{p:"Battlehammer Expedition",f:6,s:null},
+  "Horde of the Illithid Controller":{p:"The Twelve",f:9,s:null},
+  "House of Pain":{p:"Sharn City Council",f:7,s:null},
+  "Housekeeping":{p:"The Gatekeepers",f:3,s:null},
+  "If It Wasn't For Bad Luck":{p:"Battlehammer Expedition",f:5,s:null},
+  "Immortality Lessons":{p:"The Summer Court",f:5,s:null},
+  "Impossible Demands":{p:"Purple Dragon Knights",f:7,s:null},
+  "In the Belly of the Beast":{p:"Purple Dragon Knights",f:8,s:null},
+  "Into the Mists":{p:"Keepers of Barovia",f:3,s:null},
+  "Irestone Inlet":{p:"The Coin Lords",f:4,s:null},
+  "Just Business":{p:"Sharn City Council",f:5,s:null},
+  "Kill Ten Rats":{p:"Morgrave University",f:6,s:null},
+  "Law and Order":{p:"Morgrave University",f:7,s:null},
+  "Lines of Supply":{p:"The Harpers",f:6,s:null},
+  "Locked Away (Part One)":{p:"Keepers of Lamordia",f:4,s:null},
+  "Locked Away (Part Two)":{p:"Keepers of Lamordia",f:4,s:null},
+  "Lost at Sea":{p:"The Free Agents",f:5,s:null},
+  "Lost in the Swamp":{p:"The Harpers",f:6,s:null},
+  "Madstone Crater":{p:"Agents of Argonnessen",f:8,s:"Return to Madstone Crater"},
+  "Make Believe":{p:"The Summer Court",f:3,s:null},
+  "Members Only":{p:"Sharn City Council",f:6,s:null},
+  "Multitude of Menace":{p:"The Gatekeepers",f:6,s:null},
+  "Murder by Night":{p:"Purple Dragon Knights",f:6,s:null},
+  "Needle in a Fey Stack":{p:"The Summer Court",f:5,s:null},
+  "Night Falls on Stormreach":{p:"House Jorasco",f:5,s:null},
+  "No Refunds":{p:"Sharn City Council",f:6,s:null},
+  "Oath of Vengeance":{p:"Keepers of Barovia",f:6,s:null},
+  "Obstructing the Orcs":{p:"The Gatekeepers",f:2,s:null},
+  "Oghma's Song":{p:"Cormanthor Elves",f:5,s:null},
+  "Old Grey Garl":{p:"The Free Agents",f:5,s:"Old Tomb, New Tenants"},
+  "Old Tomb, New Tenants":{p:"The Free Agents",f:5,s:"Old Grey Garl"},
+  "One Dame Thing After Another":{p:"The Summer Court",f:4,s:null},
+  "Order in the Court!":{p:"Morgrave University",f:6,s:null},
+  "Outbreak":{p:"The Harpers",f:6,s:null},
+  "Overgrowth":{p:"The Harpers",f:6,s:null},
+  "Paper Trail":{p:"Morgrave University",f:6,s:null},
+  "Party 101":{p:"Morgrave University",f:5,s:null},
+  "Partycrashers":{p:"House Phiarlan",f:4,s:null},
+  "Pilgrims' Peril":{p:"The Twelve",f:9,s:null},
+  "Plundering Pirates' Point":{p:"The Gatekeepers",f:4,s:null},
+  "Portal to Below":{p:"Cormanthor Elves",f:5,s:null},
+  "Precious Cargo":{p:"The Free Agents",f:7,s:null},
+  "Prove Your Worth":{p:"The Free Agents",f:4,s:"Prove Your Worth (Epic)"},
+  "Prove Your Worth (Epic)":{p:"The Free Agents",f:4,s:"Prove Your Worth"},
+  "Quarantine":{p:"House Jorasco",f:5,s:null},
+  "Quid Pro Quo":{p:"The Summer Court",f:4,s:null},
+  "Rats in a Cage":{p:"The Harpers",f:3,s:null},
+  "Ravens' Bane":{p:"Keepers of Barovia",f:5,s:null},
+  "Reach for the Sky":{p:"Sharn City Council",f:7,s:null},
+  "Reclaiming the Rift":{p:"Purple Dragon Knights",f:8,s:null},
+  "Records of the Past":{p:"The Harpers",f:5,s:null},
+  "Red Rain":{p:"Sharn City Council",f:5,s:null},
+  "Rest Stop":{p:"The Harpers",f:6,s:null},
+  "Rest for the Night":{p:"The Gatekeepers",f:3,s:null},
+  "Return to Cabal for One":{p:"Agents of Argonnessen",f:6,s:"A Cabal for One"},
+  "Return to Gianthold Tor":{p:"Agents of Argonnessen",f:7,s:"Gianthold Tor"},
+  "Return to Madstone Crater":{p:"Agents of Argonnessen",f:8,s:"Madstone Crater"},
+  "Return to Prison of the Planes":{p:"Agents of Argonnessen",f:6,s:"The Prison of the Planes"},
+  "Roll Call":{p:"Sharn City Council",f:5,s:null},
+  "Rosemary's Ballad":{p:"The Gatekeepers",f:3,s:null},
+  "Ruinous Schemes":{p:"Sharn City Council",f:4,s:null},
+  "Safety in Numbers":{p:"Sharn City Council",f:6,s:null},
+  "Scavenger Hunt":{p:"Sharn City Council",f:5,s:null},
+  "Sealed in Amber":{p:"Keepers of Barovia",f:6,s:null},
+  "Search and Rescue":{p:"The Harpers",f:6,s:null},
+  "Secret of the Slavers' Stockade":{p:"The Gatekeepers",f:6,s:null},
+  "Secrets of the Red Wizards":{p:"Cormanthor Elves",f:6,s:null},
+  "Security Detail":{p:"Sharn City Council",f:5,s:null},
+  "Seeds of Decay":{p:"Cormanthor Elves",f:5,s:null},
+  "Seizing the Dawn":{p:"Morgrave University",f:5,s:null},
+  "Servants of the Overlord":{p:"The Silver Flame",f:7,s:null},
+  "Shadow of a Doubt":{p:"Purple Dragon Knights",f:6,s:null},
+  "Siegebreaker":{p:"The Coin Lords",f:6,s:null},
+  "Slave Pits of the Undercity":{p:"The Gatekeepers",f:5,s:null},
+  "Sleeping with the Fishes":{p:"The Free Agents",f:4,s:null},
+  "Smash and Burn":{p:"Sharn City Council",f:5,s:null},
+  "Snowfall and Sunlight":{p:"Keepers of Lamordia",f:6,s:null},
+  "Soul Survivor":{p:"Sharn City Council",f:7,s:null},
+  "Special Delivery":{p:"Keepers of Lamordia",f:4,s:null},
+  "Spiders and Flies":{p:"The Gatekeepers",f:4,s:null},
+  "Spies in the House":{p:"House Deneith",f:5,s:null},
+  "Stealing from Sorcere":{p:"Battlehammer Expedition",f:5,s:null},
+  "Stolen Power":{p:"The Twelve",f:9,s:null},
+  "Storm the Beaches":{p:"House Deneith",f:4,s:null},
+  "Strike Back":{p:"The Harpers",f:5,s:null},
+  "Subversion":{p:"The Gatekeepers",f:6,s:null},
+  "Sunrise":{p:"Keepers of Barovia",f:6,s:null},
+  "Swim at Your Own Risk":{p:"The Gatekeepers",f:2,s:null},
+  "Taken in Hand":{p:"Morgrave University",f:6,s:null},
+  "Tavern Brawl":{p:"The Gatekeepers",f:4,s:null},
+  "The Age of Rage":{p:"House Jorasco",f:5,s:null},
+  "The Archons' Trial":{p:"The Gatekeepers",f:6,s:null},
+  "The Bark and the Blade":{p:"Morgrave University",f:7,s:null},
+  "The Battle for Eveningstar":{p:"Purple Dragon Knights",f:8,s:null},
+  "The Black Loch":{p:"House Deneith",f:4,s:null},
+  "The Body Snatchers":{p:"Keepers of Lamordia",f:4,s:null},
+  "The Bugbear Bandits":{p:"The Gatekeepers",f:2,s:null},
+  "The Covered Culvert":{p:"The Free Agents",f:3,s:null},
+  "The Crucible":{p:"Agents of Argonnessen",f:8,s:null},
+  "The Curse and the Captive Crustacean":{p:"The Gatekeepers",f:4,s:null},
+  "The Darkness and the Light":{p:"The Harpers",f:4,s:null},
+  "The Deal and the Demon":{p:"Purple Dragon Knights",f:8,s:null},
+  "The Devil's Details":{p:"The Gatekeepers",f:6,s:null},
+  "The Devils to Pay":{p:"Morgrave University",f:5,s:null},
+  "The Druid's Curse":{p:"The Harpers",f:7,s:null},
+  "The End of the Road":{p:"The Harpers",f:7,s:null},
+  "The Endless Revels":{p:"The Summer Court",f:3,s:null},
+  "The Evil We Know":{p:"Morgrave University",f:6,s:null},
+  "The Fetid Wedding":{p:"Battlehammer Expedition",f:6,s:null},
+  "The Final Draw":{p:"Agents of Argonnessen",f:4,s:null},
+  "The Final Enemy":{p:"The Gatekeepers",f:4,s:null},
+  "The Final Vintage":{p:"Keepers of Barovia",f:4,s:null},
+  "The Hand and the Eyes":{p:"Morgrave University",f:7,s:null},
+  "The Haunting of Saltmarsh":{p:"The Gatekeepers",f:3,s:null},
+  "The Hijacked Haul":{p:"The Gatekeepers",f:3,s:null},
+  "The Hobgoblin Horde":{p:"The Gatekeepers",f:3,s:null},
+  "The Home of Memory":{p:"The Gatekeepers",f:3,s:null},
+  "The House of Broken Chains":{p:"Purple Dragon Knights",f:8,s:null},
+  "The House of Death Undone":{p:"Purple Dragon Knights",f:8,s:null},
+  "The House of Gems":{p:"Cormanthor Elves",f:5,s:null},
+  "The House of Rusted Blades":{p:"Purple Dragon Knights",f:8,s:null},
+  "The Icemount Curse":{p:"The Summer Court",f:5,s:null},
+  "The Key to the Mythal":{p:"Cormanthor Elves",f:7,s:null},
+  "The Knife's Edge":{p:"The Harpers",f:3,s:null},
+  "The Knight Who Cried Windmill":{p:"The Summer Court",f:3,s:null},
+  "The Legend of Two-Toed Tobias":{p:"The Free Agents",f:4,s:"A Legend Revisited"},
+  "The Legend of the Lost Locket":{p:"The Summer Court",f:3,s:null},
+  "The Lords of Dust":{p:"The Silver Flame",f:7,s:null},
+  "The Lost Thread":{p:"Purple Dragon Knights",f:8,s:null},
+  "The Madness of Crowds":{p:"House Jorasco",f:5,s:null},
+  "The Magma Must Flow":{p:"Sharn City Council",f:5,s:null},
+  "The Mask of Deception":{p:"The Harpers",f:6,s:null},
+  "The Maze of Madness":{p:"Agents of Argonnessen",f:6,s:null},
+  "The Newcomers":{p:"Agents of Argonnessen",f:5,s:null},
+  "The Offshore Account":{p:"Sharn City Council",f:6,s:null},
+  "The Portal Opens":{p:"Purple Dragon Knights",f:8,s:null},
+  "The Price of an Egg":{p:"Battlehammer Expedition",f:5,s:null},
+  "The Prison of the Planes":{p:"Agents of Argonnessen",f:6,s:"Return to Prison of the Planes"},
+  "The Proper Authorities":{p:"Keepers of Lamordia",f:4,s:null},
+  "The Riddle":{p:"Purple Dragon Knights",f:7,s:null},
+  "The Sacred Bounty":{p:"The Gatekeepers",f:2,s:null},
+  "The Safehold":{p:"Cormanthor Elves",f:5,s:null},
+  "The Same Old Song":{p:"Sharn City Council",f:5,s:null},
+  "The Snitch":{p:"House Phiarlan",f:4,s:null},
+  "The Spinner of Shadows":{p:"The Silver Flame",f:7,s:null},
+  "The Stone Crypt Chronicle":{p:"The Gatekeepers",f:5,s:null},
+  "The Thornwright":{p:"The Summer Court",f:3,s:null},
+  "The Thrill of the Hunt":{p:"Purple Dragon Knights",f:6,s:null},
+  "The Tide Turns":{p:"House Deneith",f:5,s:null},
+  "The Tracker's Trap":{p:"The Harpers",f:6,s:null},
+  "The Troglodytes' Get":{p:"The Free Agents",f:4,s:null},
+  "The Trouble with Tar Pits":{p:"The Gatekeepers",f:4,s:null},
+  "The Underlane Assignment":{p:"Sharn City Council",f:6,s:null},
+  "The Unquiet Graves":{p:"Purple Dragon Knights",f:7,s:null},
+  "The Wish":{p:"Keepers of Lamordia",f:5,s:null},
+  "The Wizard's Labyrinth":{p:"The Harpers",f:3,s:null},
+  "The Wraithcallers":{p:"Sharn City Council",f:4,s:null},
+  "The Zulkir's Plan":{p:"Cormanthor Elves",f:6,s:null},
+  "Third Time's a Charm":{p:"The Harpers",f:5,s:null},
+  "This Old Haunt":{p:"Morgrave University",f:6,s:null},
+  "Thorn and Paw":{p:"The Harpers",f:6,s:null},
+  "Thrall of Duty":{p:"Agents of Argonnessen",f:5,s:null},
+  "Thralls of the Fungus Lord":{p:"Sharn City Council",f:5,s:null},
+  "Three Paths to Battle":{p:"Morgrave University",f:7,s:null},
+  "Through a Mirror Darkly":{p:"Purple Dragon Knights",f:7,s:null},
+  "Through the Tulgey Wood":{p:"The Summer Court",f:5,s:null},
+  "Time Flies":{p:null,f:null,s:null},
+  "Times Long Past":{p:"Cormanthor Elves",f:7,s:null},
+  "To Curse the Sky":{p:"House Deneith",f:6,s:null},
+  "ToEE: Air Node":{p:"The Gatekeepers",f:5,s:null},
+  "ToEE: Depths of the Temple":{p:"The Gatekeepers",f:4,s:null},
+  "ToEE: Earth Node":{p:"The Gatekeepers",f:5,s:null},
+  "ToEE: Fire Node":{p:"The Gatekeepers",f:5,s:null},
+  "ToEE: First Level and Earth Temple":{p:"The Gatekeepers",f:5,s:null},
+  "ToEE: Lower Temple Complex":{p:"The Gatekeepers",f:6,s:null},
+  "ToEE: Water Node":{p:"The Gatekeepers",f:5,s:null},
+  "Too Many Cooks":{p:"Morgrave University",f:6,s:null},
+  "Total Chaos":{p:"The Gatekeepers",f:3,s:null},
+  "Tower of Vengeance":{p:"Battlehammer Expedition",f:5,s:null},
+  "Toxic Treatment":{p:"House Jorasco",f:6,s:null},
+  "Treasure Hunt":{p:"The Gatekeepers",f:2,s:null},
+  "Trial by Fire":{p:"Agents of Argonnessen",f:6,s:null},
+  "Trial by Fury":{p:"Purple Dragon Knights",f:8,s:null},
+  "Trials of the Triceratops":{p:"The Gatekeepers",f:4,s:null},
+  "Turn the Page":{p:null,f:null,s:null},
+  "Under the Big Top":{p:"House Phiarlan",f:4,s:null},
+  "Under the Cover of Darkness":{p:"The Gatekeepers",f:2,s:null},
+  "Undermine":{p:"The Coin Lords",f:6,s:null},
+  "Vecna Denied":{p:"Morgrave University",f:7,s:null},
+  "Vecna Unleashed":{p:null,f:null,s:null},
+  "Violent Delights":{p:"The Gatekeepers",f:2,s:null},
+  "Voices of the Dead":{p:"Cormanthor Elves",f:5,s:null},
+  "Wake Me Up Inside":{p:"The Summer Court",f:3,s:null},
+  "Watch Your Step":{p:"The Gatekeepers",f:2,s:null},
+  "What Dreams May Come":{p:"Morgrave University",f:5,s:null},
+  "What Goes Up":{p:"The Harpers",f:7,s:null},
+  "What Sleeps Below":{p:"The Gatekeepers",f:3,s:null},
+  "Whispers of Return":{p:"The Gatekeepers",f:4,s:null},
+  "White Plume Mountain":{p:"The Gatekeepers",f:5,s:null},
+  "Wild Thing":{p:"The Gatekeepers",f:3,s:null},
+  "Wish Upon a Card":{p:"Agents of Argonnessen",f:4,s:null},
+  "Witch Hunt":{p:"The Summer Court",f:3,s:null},
+  "Wrath of the Earth":{p:"Keepers of Barovia",f:5,s:null},
+  "Zoo Creeper":{p:"Keepers of Lamordia",f:4,s:null}
+};
+
+// PATRON_TIERS — per-patron favor reward tiers, transcribed from ddowiki.com/page/Favor 2026-07-27.
+// Shape: patron -> [ [favorThreshold, rankName, rewardText, benefitTag], ... ] ascending.
+// benefitTag (4th) seeds the Pass-2 BENEFIT_INDEX cross-index; unused in Pass 1.
+const PATRON_TIERS = {
+  "Agents of Argonnessen":[[75,"Noted","One choice of: Collapsed Portable Hole, Siberys Dragonshards, 2 Blood of Dragons, or 10 Velah Cookies","item"], [150,"Commended","Draconic Vitality: free feat granting +10 Hit Points","hp"], [400,"Honored","+2 to saves vs. Dragons","saves"], [700,"Renowned","Currently unreachable","none"]],
+  "House Deneith":[[75,"Noted","+2 to Intimidate and Search skills; access to Tarvin d'Deneith's ammunition shop","skills"], [150,"Commended","+5 Hit Points; sturdy (75% returning) ammunition","hp"], [400,"Honored","Currently unreachable","none"]],
+  "House Jorasco":[[75,"Noted","+2 to Heal and Diplomacy skills; weak divine buffs from Annabelle d'Jorasco","skills"], [150,"Commended","+5 Hit Points; moderate divine buffs","hp"], [400,"Honored","Currently unreachable","none"]],
+  "House Kundarak":[[75,"Noted","An additional bank tab of 20 spaces (2,000pp)","bank"], [150,"Commended","A second additional bank tab of 20 spaces (8,000pp)","bank"], [400,"Honored","Currently unreachable","none"]],
+  "House Phiarlan":[[75,"Noted","+2 to Hide and Perform skills; 1h arcane buffs from Fingalar","skills"], [150,"Commended","Phiarlan Pendant of Time: +50% run speed in-town clicky","movement"], [400,"Honored","Currently unreachable","none"]],
+  "The Twelve":[[0,"Untrusted","Small Ingredients Bag","bag"], [40,"Suspicious","Access to the crafting altar and shard vendor in Meridia","crafting"], [100,"Friend of the Twelve","Large Ingredients Bag","bag"], [400,"Honorary Member","+2 saves versus spells","saves"], [700,"Champion","Currently unreachable","none"]],
+  "The Coin Lords":[[75,"Reliable","An extra inventory tab","inventory"], [150,"Trustworthy","Option to purchase another inventory tab","inventory"], [400,"Loyal","+2 stacking bonus to Diplomacy and Intimidate","skills"], [700,"Steadfast","Currently unreachable","none"]],
+  "The Free Agents":[[75,"Well-Known","Access to Free Agent Vendor (+2 tools/kits)","vendor"], [150,"Famous","Vendor sells up to +4 quality tools/kits","vendor"], [400,"Hero of the People","Repair damaged gear with lower chance of permanent damage","utility"], [700,"Champion of Stormreach","Access to the Falconry enhancement tree","enhancement"], [1000,"Protector of Xen'drik","Currently unreachable","none"]],
+  "The Silver Flame":[[75,"Reclaimed","Spirit Binders sell healing spells at half price","utility"], [150,"Pious","Blessing of the Silver Flame: improved town/tavern regeneration (4HP+8SP)","regen"], [400,"Devout","Access to Silver Flame Armorer (silver ammo, healing potions)","vendor"], [700,"Consecrated","Currently unreachable","none"]],
+  "The Yugoloth":[[75,"Unfriendly","Yugoloth Favor Potions vendor (15-min stat buffs)","vendor"], [300,"Suspicious","Currently unachievable","none"]],
+  "House Cannith":[[50,"Noted","Access to patron shop (Mark of House Cannith, crafting boosters)","vendor"], [150,"Respected","Unlocks the Artificer class on that server","class"], [400,"Renowned","Currently unreachable","none"]],
+  "Purple Dragon Knights":[[125,"Blade","Key to the City - Eveningstar (teleport clicky)","movement"], [250,"Swordcaptain","Spotted Wolf pup companion and +5 Hit Points feat","hp"], [375,"Oversword","Access to Mikrom Sum, PDK favor vendor (set-bonus completion)","vendor"], [500,"Greater Oversword","Purple Dragon Knights Save Bonus (+2 saves)","saves"], [800,"Battlemaster","Currently unreachable","none"]],
+  "The Harpers":[[125,"Friend","Lesser Harper Pin and Harpers Skill Bonus feat","skills"], [250,"Scout","Greater Harper Pin and +5 Hit Points feat","hp"], [310,"Harper Agent","Access to Harper Agent enhancements (per server)","enhancement"], [500,"Master Harper","Currently unreachable","none"]],
+  "The Gatekeepers":[[75,"Noted","+2 Concentration and Spot skills","skills"], [150,"Respected","+5 Hit Points","hp"], [400,"Renowned","Horizon Walker universal enhancement tree","enhancement"], [700,"Exalted","+2 Saves versus Extraplanar Creatures","saves"], [1000,"Champion","Currently unreachable","none"]],
+  "Keepers of Barovia":[[60,"Seen","+2 Saves against Undead (Blessings of a Feather)","saves"], [120,"Esteemed","A Small Augment Bag (15 slots, BtC)","bag"], [180,"Famed","Vistani Knife Fighter universal enhancement tree","enhancement"], [240,"August","+2 to Listen and Hide skills","skills"], [400,"Exalted","Currently unreachable","none"]],
+  "Sharn City Council":[[75,"Well-Known","+2 to Bluff and Haggle skills","skills"], [150,"Noted","+5 Hit Points","hp"], [225,"Famous","Unlock Inquisitive (per character)","enhancement"], [450,"Renowned","Currently unreachable","none"]],
+  "Morgrave University":[[75,"Prefect","+2 to Search and Spellcraft skills","skills"], [150,"Teaching Assistant","+5 Hit Points","hp"], [400,"Research Assistant","+2 saves versus Magical Beasts","saves"], [450,"Honorary Professor","+2 to Use Magic Device skill","skills"]],
+  "The Summer Court":[[45,"Friendly","+2 saves versus Fey Creatures","saves"], [90,"Trusted","+5 Hit Points","hp"], [135,"Knight","Unlock Feydark Illusionist","enhancement"], [180,"Baronet","+2 to Diplomacy and Perform skills","skills"], [400,"Coronet","Currently unreachable","none"]],
+  "Cormanthor Elves":[[75,"Sha","+1 to Saving Throws versus Spells","saves"], [150,"Aegisess","+5 Hit Points","hp"], [400,"Adoness","Currently unreachable","none"]],
+  "Keepers of Lamordia":[[75,"Noted","+5% Fortification Bypass feat","fortification"], [150,"Esteemed","+5 Hit Points","hp"], [400,"Famed","Currently unachievable","none"]],
+  "Battlehammer Expedition":[[75,"Noted","+10% Fortification","fortification"], [150,"Commended","+5 Maximum Hit Points","hp"], [400,"(Unknown)","Currently unachievable","none"]]
+};
+const PATRON_FAVOR_EPOCH = 1; // bump when a content drop adds quests/patrons/reward tiers
+
+// ── Build 07272026.1 — PATRON FAVOR (feature: Patrons tab). Data wiki-sourced
+//    2026-07-27; derivation is a pure function of the STATIC tables above plus a
+//    character's this-life sagaDone map (KTD1/KTD2: precompute once, no runtime
+//    invalidation, computed only on Patrons-tab render). Adds NO save state and
+//    NO SCHEMA_VERSION bump (KTD6) — favor is derived, never stored.
+
+// Favor-group index: union quests linked by `shares favor` (KTD3). Each group's
+// Elite favor counts ONCE (dedup across Heroic/Epic/Legendary). Built once.
+function buildFavorIndex() {
+  const parent = {};
+  const find = x => { if (parent[x] === undefined) parent[x] = x; while (parent[x] !== x) { parent[x] = parent[parent[x]]; x = parent[x]; } return x; };
+  const union = (a, b) => { const ra = find(a), rb = find(b); if (ra !== rb) parent[ra] = rb; };
+  const names = Object.keys(QUEST_FAVOR);
+  names.forEach(q => { find(q); const s = QUEST_FAVOR[q].s; if (s && QUEST_FAVOR[s]) union(q, s); });
+  const groups = {};           // groupId -> { patron, favor, members[] }
+  const slotToGroup = {};      // questName -> groupId
+  names.forEach(q => {
+    const g = find(q); slotToGroup[q] = g;
+    const rec = QUEST_FAVOR[q];
+    if (!groups[g]) groups[g] = { patron: null, favor: 0, members: [] };
+    groups[g].members.push(q);
+    // patron/favor are consistent within a shares-favor group; take the first non-null.
+    if (rec.p && !groups[g].patron) { groups[g].patron = rec.p; groups[g].favor = rec.f || 0; }
+  });
+  return { groups, slotToGroup };
+}
+const FAVOR_INDEX = buildFavorIndex();
+
+// Inverted benefit-type index (Pass 2 cross-index): benefitTag -> [{patron,threshold,rank,reward}].
+function buildBenefitIndex() {
+  const idx = {};
+  for (const pat in PATRON_TIERS) {
+    PATRON_TIERS[pat].forEach(t => {
+      const bt = t[3]; if (!bt || bt === "none") return;
+      (idx[bt] = idx[bt] || []).push({ patron: pat, threshold: t[0], rank: t[1], reward: t[2] });
+    });
+  }
+  for (const bt in idx) idx[bt].sort((a, b) => a.threshold - b.threshold);
+  return idx;
+}
+const BENEFIT_INDEX = buildBenefitIndex();
+
+// Derive this-life per-patron favor for one character's progress map. Sealed =
+// truthy sagaDone[quest] (the per-life green seal). Each favor-group counted once
+// (Elite value, assume-Elite KTD4). Pure: no DOM, no writes. O(#sealed).
+function computeCharacterFavor(progress) {
+  const perPatron = {};           // patron -> total favor
+  const counted = new Set();      // favor-group ids already counted
+  if (!progress) return perPatron;
+  for (const sagaId in progress) {
+    const ss = progress[sagaId];
+    const sd = ss && ss.sagaDone;
+    if (!sd) continue;
+    for (const q in sd) {
+      if (!sd[q]) continue;
+      const g = FAVOR_INDEX.slotToGroup[q];
+      if (!g || counted.has(g)) continue;
+      const grp = FAVOR_INDEX.groups[g];
+      if (!grp || !grp.patron || !grp.favor) continue;
+      counted.add(g);
+      perPatron[grp.patron] = (perPatron[grp.patron] || 0) + grp.favor;
+    }
+  }
+  return perPatron;
+}
+
+// Given a patron's current favor, return { current, nextTier|null, maxed }.
+function patronTierState(patron, favor) {
+  const tiers = PATRON_TIERS[patron] || [];
+  let reached = null, next = null;
+  for (const t of tiers) {
+    if (favor >= t[0]) reached = t;
+    else { next = t; break; }
+  }
+  return { current: reached, next: next, maxed: next === null, tiers };
+}
+
+
 // ── Wave 8 (Build 06072026.2) — wiki-sourced dungeon-entrance (doorLocation)
 //    backfill for Non-Saga Legendary. ONLY quests whose ddowiki Overview
 //    EXPLICITLY documents the public entrance are filled; the rest stay
@@ -17463,6 +17934,10 @@ function renderAll() {
   renderSagaList();
   syncAudioChecks();   // Build 07122026.1 — audio toggles follow the active character
   syncAutoCompleteControls();   // Build 07142026.1 — autocomplete setting follows the active character
+  // Build 07272026.1 — if the Patrons tab is showing, refresh favor for the (possibly
+  // switched) active character. Gated so favor NEVER computes on the Saga tab or the
+  // 15s live tick (KTD2).
+  if (document.body.classList.contains("patrons-active")) renderPatronsView();
 }
 
 /* ── Build 06022026.7 — data integrity self-check. Runs once on load over
@@ -17497,7 +17972,36 @@ function runDataSelfCheck() {
     const g = QUEST_GIVERS[s.id];
     if (g) Object.values(g).forEach(name => { giverRefs++; if (!NPC_LOCATIONS[name]) giverMissingLoc++; });
   });
-  return { errors, info: { sagas: SAGAS.length, totalQuests, withDetails, giverRefs, giverMissingLoc, sagasNoStory } };
+  // ── Build 07272026.1 — patron-favor data integrity (U5). Structural errors
+  //    surface in the footer badge; coverage is informational.
+  let favorQuests = 0, favorNull = 0, favorGroups = Object.keys(FAVOR_INDEX.groups).length;
+  const patronsWithFavor = new Set();
+  Object.keys(QUEST_FAVOR).forEach(q => {
+    const rec = QUEST_FAVOR[q];
+    if (rec.p == null || rec.f == null) { favorNull++; }
+    else { favorQuests++; patronsWithFavor.add(rec.p);
+      // every quest with a patron must resolve to a PATRON_TIERS entry (else it
+      // would show favor on the dashboard with no tier detail, or be dropped).
+      if (!PATRON_TIERS[rec.p]) errors.push(`QUEST_FAVOR: "${q}" patron "${rec.p}" has no PATRON_TIERS entry`);
+    }
+    // shares-favor target must exist
+    if (rec.s && !QUEST_FAVOR[rec.s]) errors.push(`QUEST_FAVOR: "${q}" shares favor with missing quest "${rec.s}"`);
+  });
+  // no favor-group may span two patrons; thresholds must ascend with non-empty reward text
+  Object.values(FAVOR_INDEX.groups).forEach(g => {
+    const pats = new Set(g.members.map(m => QUEST_FAVOR[m].p).filter(Boolean));
+    if (pats.size > 1) errors.push(`Favor-group [${g.members.join(", ")}] spans multiple patrons`);
+  });
+  Object.keys(PATRON_TIERS).forEach(pat => {
+    let prev = -1;
+    PATRON_TIERS[pat].forEach(t => {
+      if (t[0] < prev) errors.push(`PATRON_TIERS "${pat}" thresholds not ascending at ${t[0]}`);
+      if (!t[2]) errors.push(`PATRON_TIERS "${pat}" tier ${t[0]} has empty reward text`);
+      prev = t[0];
+    });
+  });
+  return { errors, info: { sagas: SAGAS.length, totalQuests, withDetails, giverRefs, giverMissingLoc, sagasNoStory,
+                           favorQuests, favorNull, favorGroups, favorPatrons: patronsWithFavor.size } };
 }
 
 function renderSelfCheck() {
@@ -17574,6 +18078,85 @@ function _applySuggestedDefaultMigration() {
     _writeAppMeta({ suggestedDefaultApplied: true });
   } catch (e) { /* never block boot */ }
 }
+// ── Build 07272026.1 — Patrons tab: tab shell (U3) + favor dashboard/detail (U4).
+//    Favor is computed ONLY here (Patrons-tab render), never on renderAll's hot
+//    path or the 15s live tick (KTD2). Detail expands inline per patron.
+const _patronExpanded = new Set();   // patrons whose tier detail is open (ephemeral)
+
+function setActiveTab(tab) {
+  const isPatrons = tab === "patrons";
+  const saga = document.getElementById("sagaList");
+  const patrons = document.getElementById("patronsView");
+  const tabSaga = document.getElementById("tabSaga");
+  const tabPatrons = document.getElementById("tabPatrons");
+  if (saga) saga.hidden = isPatrons;
+  if (patrons) patrons.hidden = !isPatrons;
+  if (tabSaga) { tabSaga.classList.toggle("is-active", !isPatrons); tabSaga.setAttribute("aria-selected", String(!isPatrons)); }
+  if (tabPatrons) { tabPatrons.classList.toggle("is-active", isPatrons); tabPatrons.setAttribute("aria-selected", String(isPatrons)); }
+  document.body.classList.toggle("patrons-active", isPatrons);   // dims the inert Filters panel
+  if (isPatrons) renderPatronsView();
+}
+
+function bindTabBar() {
+  const tabs = [document.getElementById("tabSaga"), document.getElementById("tabPatrons")].filter(Boolean);
+  tabs.forEach((t, i) => {
+    t.addEventListener("click", () => setActiveTab(t.getAttribute("data-tab")));
+    t.addEventListener("keydown", e => {
+      if (e.key !== "ArrowRight" && e.key !== "ArrowLeft") return;
+      e.preventDefault();
+      const n = tabs[(i + (e.key === "ArrowRight" ? 1 : tabs.length - 1)) % tabs.length];
+      n.focus(); setActiveTab(n.getAttribute("data-tab"));
+    });
+  });
+}
+
+// sort key: favor-to-next-tier ascending (closest first); maxed patrons sink to bottom.
+function _favorSortKey(patron, favor) {
+  const st = patronTierState(patron, favor);
+  return st.maxed ? Infinity : (st.next[0] - favor);
+}
+
+function renderPatronsView() {
+  const el = document.getElementById("patronsView");
+  if (!el) return;
+  const char = state.activeChar;
+  if (!char || !state.progress || !state.progress[char]) {
+    el.innerHTML = `<div class="patrons-empty">Select or add a character to see patron favor.</div>`;
+    return;
+  }
+  const fav = computeCharacterFavor(state.progress[char]);
+  const patrons = Object.keys(fav).filter(p => fav[p] > 0);
+  if (!patrons.length) {
+    el.innerHTML = `<div class="patrons-empty">No patron favor earned this life yet — seal a quest on the Saga tab to start earning.</div>`;
+    return;
+  }
+  patrons.sort((a, b) => _favorSortKey(a, fav[a]) - _favorSortKey(b, fav[b]) || a.localeCompare(b));
+  const rows = patrons.map(p => {
+    const f = fav[p];
+    const st = patronTierState(p, f);
+    const nextThresh = st.maxed ? f : st.next[0];
+    const pct = st.maxed ? 100 : Math.max(2, Math.min(100, Math.round(100 * f / nextThresh)));
+    const nextLabel = st.maxed ? "MAX" : `${f} / ${st.next[0]} &rarr; ${escapeHtml(st.next[1])}`;
+    const isOpen = _patronExpanded.has(p);
+    const detail = isOpen ? `<div class="patron-detail">` + st.tiers.map(t => {
+      const done = f >= t[0];
+      return `<div class="ptier ${done ? "ptier-done" : ""}"><span class="ptier-thresh">${t[0]}</span><span class="ptier-rank">${escapeHtml(t[1])}</span><span class="ptier-reward">${escapeHtml(t[2])}</span></div>`;
+    }).join("") + `</div>` : "";
+    return `<div class="patron-card ${st.maxed ? "patron-maxed" : ""}">`
+      + `<button class="patron-head" type="button" data-patron="${escapeHtml(p)}" aria-expanded="${isOpen}">`
+      + `<span class="patron-name">${escapeHtml(p)}</span>`
+      + `<span class="patron-bar"><span class="patron-fill" style="width:${pct}%"></span></span>`
+      + `<span class="patron-next">${nextLabel}</span></button>${detail}</div>`;
+  }).join("");
+  el.innerHTML = `<div class="patrons-wrap"><h2 class="patrons-title">Patron Favor &mdash; ${escapeHtml(char)} <span class="patrons-sub">(this life)</span></h2><div class="patrons-list">${rows}</div>`
+    + `<p class="patrons-foot">Favor assumes Elite completion of every sealed quest; resets on True Reincarnation.</p></div>`;
+  el.querySelectorAll(".patron-head").forEach(btn => btn.addEventListener("click", () => {
+    const p = btn.getAttribute("data-patron");
+    if (_patronExpanded.has(p)) _patronExpanded.delete(p); else _patronExpanded.add(p);
+    renderPatronsView();
+  }));
+}
+
 _applySuggestedDefaultMigration();
 
 renderAll();
@@ -17581,6 +18164,7 @@ bindControls();
 bindAudioChecks();   // Build 07112026.6 — Audio Alerts checkboxes ↔ META key
 bindAutoCompleteControls();   // Build 07142026.1 — Quest Autocomplete controls ↔ per-character state (v14)
 bindViewToggles();   // Build 07262026.5 — Focus View + Switch prompt toggles ↔ app-meta
+bindTabBar();        // Build 07272026.1 — Saga | Patrons two-tab shell
 bindControlsFold();  // Build 07142026.1 — filter-panel roll-up bar ↔ META key (controlsFolded)
 refreshBonusBanner(); // Build 07112026.15 — Bonus Days banner from the user's gist (every load)
 renderSelfCheck();
