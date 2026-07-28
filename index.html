@@ -4504,8 +4504,12 @@
 .patrons-empty { text-align: center; padding: 60px 20px; font-family: 'EB Garamond', Georgia, serif;
   font-style: italic; font-size: 1.1rem; color: var(--ink-faded); }
 .patrons-wrap { padding-top: 18px; }
-.patrons-title { font-family: 'Cinzel', serif; color: var(--wax-red); font-size: 1.35rem; margin: 0 0 4px; }
-.patrons-sub { color: var(--ink-faded); font-weight: 400; font-size: 0.95rem; }
+/* Build 07272026.6 — Patron header reuses the .tier-header treatment (centered,
+   --font-display, flanking rule lines); the character name sits below as a
+   centered subtitle, mirroring the tier flourish. */
+.patrons-header { margin: 4px 0 6px; }   /* tighter than tier-header's default 18px */
+.patrons-charline { text-align: center; font-family: 'EB Garamond', Georgia, serif; color: var(--ink-secondary); font-size: 1.02rem; margin: 0 0 8px; }
+.patrons-sub { color: var(--ink-faded); font-weight: 400; font-style: italic; font-size: 0.9rem; }
 .patrons-foot { color: var(--ink-faded); font-style: italic; font-size: 0.82rem; margin: 14px 2px 0; }
 /* U7 — "chase a benefit" cross-index */
 .chase-wrap { margin: 14px 0 6px; padding: 10px 12px; border: 1px solid var(--parchment-edge);
@@ -4784,7 +4788,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07272026.5</div>
+      <div class="build">Build 07272026.6</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -18318,7 +18322,9 @@ function renderPatronsView() {
       + `<span class="patron-bar"><span class="patron-fill" style="transform:scaleX(${(pct / 100).toFixed(3)})"></span></span>`
       + `<span class="patron-next">${nextLabel}</span></button>${detail}</div>`;
   }).join("");
-  el.innerHTML = `<div class="patrons-wrap"><h2 class="patrons-title">Patron Favor &mdash; ${escapeHtml(char)} <span class="patrons-sub">(this life)</span></h2>`
+  el.innerHTML = `<div class="patrons-wrap">`
+    + `<div class="tier-header patrons-header"><h2>Patron Favor</h2></div>`
+    + `<div class="patrons-charline">${escapeHtml(char)} <span class="patrons-sub">&middot; this life</span></div>`
     + renderBenefitCrossIndex(fav)
     + `<div class="patrons-list">${rows}</div>`
     + `<p class="patrons-foot">Favor assumes Elite completion of every sealed quest; resets on True Reincarnation.</p></div>`;

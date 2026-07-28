@@ -2,13 +2,13 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07272026-5.html` — Build
-> `07272026.5` (2026-07-27). Retain set is **3 files**: the 2 most recent
-> overall (`-07272026-5` + `-07272026-4`, both 07-27) PLUS the most-recent
+> **Currently parked:** `sooks-saga-scroll-07272026-6.html` — Build
+> `07272026.6` (2026-07-27). Retain set is **3 files**: the 2 most recent
+> overall (`-07272026-6` + `-07272026-5`, both 07-27) PLUS the most-recent
 > previous-day build (`-07262026-8`, 07-26) as the cross-day rollback anchor.
-> Pruned this park: `-07272026-3`.
-> Latest: polished segmented tabs (active tab is a lifted gold-edged pill — clear
-> selection) over the 3-tab shell (Saga | Patrons | Filters). Earlier: patron-favor tracking (Patrons
+> Pruned this park: `-07272026-4`.
+> Latest: Patron header now reuses the tier-header treatment (centered display
+> font + flanking rule lines). Earlier: polished segmented tabs; patron-favor tracking (Patrons
 > tab) + code-review hardening — full
 > changelog in the Files and Resume-prompt sections below. (This is the line the
 > Pages deploy workflow reads to pick which build to publish — keep its filename
@@ -279,12 +279,19 @@ Non-urgent items to fold into a later build:
   feature needs a user-facing off switch.
 
 ## Files
-- `sooks-saga-scroll-07272026-5.html` — the live build. Open in any
+- `sooks-saga-scroll-07272026-6.html` — the live build. Open in any
   browser; no server or build step. Progress auto-saves to browser
   storage (key `sooksSagaScroll`, **schema v14** as of Build
   07142026.1 — see notes below). See **Data Schema & Import/Export
   Contract** below for the durable shape and the rules every future
   build must follow.
+
+  **Build 07272026.6 — Patron header matches the tier headers.** The Patrons
+  tab's "Patron Favor" header now reuses the `.tier-header` treatment — centered
+  display font (`--font-display`, 2rem, wide tracking) with the gradient rule
+  lines flanking it left and right, exactly like the Saga tier headers (HEROIC /
+  EPIC / …). The character name sits below as a centered subtitle. CSS/markup
+  only, no schema change (still v14).
 
   **Build 07272026.5 — Polished tab selection.** The tab bar is now a segmented
   control: the active tab is a lifted, gold-edged parchment pill (with a gold
