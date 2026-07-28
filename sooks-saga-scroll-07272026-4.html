@@ -4460,26 +4460,29 @@
     .char-medallion { max-width: 100%; }
   }
 /* ── Build 07272026.1 — two-tab shell (Saga | Patrons) + favor dashboard ── */
-#sagaList[hidden], #patronsView[hidden] { display: none; }
+#sagaList[hidden], #patronsView[hidden], #filtersView[hidden] { display: none; }
+/* Build 07272026.4 — slim underline tabs (was chunky raised parchment tabs) */
 .tab-bar {
-  display: flex; gap: 6px; justify-content: center;
-  max-width: 1180px; margin: 14px auto 0; padding: 0 12px;
+  display: flex; gap: 2px; justify-content: center;
+  max-width: 1180px; margin: 12px auto 0; padding: 0 12px;
+  border-bottom: 1px solid var(--parchment-edge);
 }
 .tab-btn {
-  font-family: 'Cinzel', 'EB Garamond', Georgia, serif; font-size: 0.98rem; font-weight: 600;
-  letter-spacing: 0.03em; cursor: pointer; padding: 8px 22px;
-  color: var(--ink-faded); background: var(--parchment-shadow);
-  border: 1px solid var(--parchment-edge); border-bottom: none;
-  border-radius: 9px 9px 0 0; transition: color .15s ease, background .15s ease;
+  font-family: 'Cinzel', 'EB Garamond', Georgia, serif; font-size: 0.9rem; font-weight: 600;
+  letter-spacing: 0.04em; cursor: pointer; padding: 7px 18px;
+  color: var(--ink-faded); background: transparent;
+  border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .15s ease, border-color .15s ease;
 }
 .tab-btn:hover { color: var(--ink-primary); }
-.tab-btn.is-active {
-  color: var(--wax-red); background: var(--parchment-base);
-  box-shadow: inset 0 3px 0 var(--gold);
-}
-.tab-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-/* dim the inert Filters panel while the Patrons tab is active */
-body.patrons-active .controls { opacity: 0.45; pointer-events: none; filter: saturate(0.6); transition: opacity .2s ease; }
+.tab-btn.is-active { color: var(--wax-red); border-bottom-color: var(--gold); }
+.tab-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 3px; }
+/* sweep-in when the Patrons / Filters panel becomes active (Saga list stays static) */
+@keyframes tabSweepIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+#patronsView, #filtersView { animation: tabSweepIn .22s ease; }
+#filtersView { max-width: 1180px; margin: 0 auto; }
+#filtersView .ctl-fold { display: none; }   /* fold bar redundant — the tab owns show/hide */
+@media (prefers-reduced-motion: reduce) { #patronsView, #filtersView { animation: none; } }
 
 #patronsView { max-width: 1180px; margin: 0 auto; padding: 0 12px 40px; }
 .patrons-empty { text-align: center; padding: 60px 20px; font-family: 'EB Garamond', Georgia, serif;
@@ -4524,9 +4527,9 @@ body.patrons-active .controls { opacity: 0.45; pointer-events: none; filter: sat
 .patron-head:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
 .patron-name { font-weight: 600; font-size: 1.02rem; }
 .patron-bar { position: relative; height: 12px; border-radius: 6px; background: var(--parchment-deep); overflow: hidden; }
-.patron-fill { position: absolute; inset: 0 auto 0 0; border-radius: 6px;
+.patron-fill { position: absolute; inset: 0; width: 100%; border-radius: 6px;
   background: linear-gradient(90deg, var(--wax-red-light), var(--wax-red));
-  transform-origin: left center; transition: width .3s ease; }
+  transform-origin: left center; transition: transform .3s ease; }   /* GPU-friendly: scaleX, not width (KTD8) */
 @media (prefers-reduced-motion: reduce) { .patron-fill { transition: none; } }
 .patron-maxed .patron-fill { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
 .patron-next { font-size: 0.9rem; color: var(--ink-secondary); white-space: nowrap; text-align: right; }
@@ -4733,10 +4736,15 @@ body.patrons-active .controls { opacity: 0.45; pointer-events: none; filter: sat
   <nav class="tab-bar" role="tablist" aria-label="Views">
     <button class="tab-btn is-active" id="tabSaga"    role="tab" aria-selected="true"  aria-controls="sagaList"    type="button" data-tab="saga">📜 Saga</button>
     <button class="tab-btn"           id="tabPatrons" role="tab" aria-selected="false" aria-controls="patronsView" type="button" data-tab="patrons">⚜ Patrons</button>
+    <button class="tab-btn"           id="tabFilters" role="tab" aria-selected="false" aria-controls="filtersView" type="button" data-tab="filters">⚙ Filters</button>
   </nav>
 
   <main id="sagaList"></main>
   <section id="patronsView" role="tabpanel" aria-labelledby="tabPatrons" hidden></section>
+  <!-- Build 07272026.4 — the Filters & Alerts panel (#controlsPanel) is relocated
+       here from the header at init (see relocateFiltersToTab); it sweeps in as the
+       3rd tab instead of sitting always-visible above the content. -->
+  <section id="filtersView" role="tabpanel" aria-labelledby="tabFilters" hidden></section>
 
   <footer>
     <div class="credit">Created by Sook &amp; Claude</div>
@@ -4760,7 +4768,7 @@ body.patrons-active .controls { opacity: 0.45; pointer-events: none; filter: sat
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07272026.2</div>
+      <div class="build">Build 07272026.4</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -13599,7 +13607,54 @@ const QUEST_FAVOR = {
   "Wish Upon a Card":{p:"Agents of Argonnessen",f:4,s:null},
   "Witch Hunt":{p:"The Summer Court",f:3,s:null},
   "Wrath of the Earth":{p:"Keepers of Barovia",f:5,s:null},
-  "Zoo Creeper":{p:"Keepers of Lamordia",f:4,s:null}
+  "Zoo Creeper":{p:"Keepers of Lamordia",f:4,s:null},
+  "Against the Demon Queen":{p:null,f:null,s:null},
+  "An Explosive Situation":{p:"The Coin Lords",f:2,s:null},
+  "An Offering of Blood":{p:"The Free Agents",f:8,s:null},
+  "Another Man's Treasure":{p:"The Twelve",f:5,s:null},
+  "Arachnophobia":{p:"The Coin Lords",f:2,s:null},
+  "Bringing the Light":{p:"The Silver Flame",f:2,s:null},
+  "Chains of Flame":{p:"The Free Agents",f:7,s:null},
+  "Dinosaur Crisis":{p:"The Free Agents",f:5,s:null},
+  "Durk's Got A Secret":{p:"The Free Agents",f:4,s:null},
+  "Fathom the Depths":{p:"House Kundarak",f:5,s:null},
+  "Fear Factory":{p:"The Free Agents",f:5,s:null},
+  "Garrison's Missing Pack":{p:"The Coin Lords",f:4,s:null},
+  "Haverdasher":{p:"House Kundarak",f:2,s:null},
+  "Haywire Foundry":{p:"House Kundarak",f:6,s:null},
+  "Hiding in Plain Sight":{p:"The Free Agents",f:5,s:null},
+  "Home Sweet Sewer":{p:"The Coin Lords",f:2,s:null},
+  "In The Flesh":{p:"The Free Agents",f:6,s:null},
+  "Information is Key":{p:"House Phiarlan",f:4,s:null},
+  "Into the Deep":{p:"House Kundarak",f:5,s:null},
+  "Invaders!":{p:"The Coin Lords",f:7,s:null},
+  "Kind of a Big Deal":{p:"The Twelve",f:4,s:null},
+  "Kobold Assault":{p:"The Coin Lords",f:3,s:null},
+  "Memory Lapse":{p:"The Twelve",f:4,s:null},
+  "Missing":{p:"The Free Agents",f:6,s:null},
+  "Protect Baudry's Interests":{p:"The Free Agents",f:2,s:null},
+  "Recovering the Lost Tome":{p:"The Coin Lords",f:3,s:null},
+  "Retrieve the Stolen Goods":{p:"The Free Agents",f:3,s:null},
+  "Sinister Storage":{p:"The Free Agents",f:5,s:null},
+  "Stealthy Repossession":{p:"The Free Agents",f:3,s:null},
+  "Stop Hazadill's Shipment":{p:"The Free Agents",f:2,s:null},
+  "Tharashk Arena":{p:"House Kundarak",f:5,s:null},
+  "The Captives":{p:"The Free Agents",f:3,s:null},
+  "The Chamber of Raiyum":{p:"The Free Agents",f:8,s:null},
+  "The Claw of Vulkoor":{p:"House Kundarak",f:4,s:null},
+  "The Jungle of Khyber":{p:"House Kundarak",f:9,s:null},
+  "The Kobold's Den: Clan Gnashtooth":{p:"The Coin Lords",f:4,s:null},
+  "The Kobold's Den: Rescuing Arlos":{p:"The Coin Lords",f:4,s:null},
+  "The Kobolds' New Ringleader":{p:"The Coin Lords",f:4,s:null},
+  "The Last Stand":{p:"House Kundarak",f:4,s:null},
+  "The Miller's Debt":{p:"The Coin Lords",f:2,s:null},
+  "The Price of Freedom":{p:"The Twelve",f:5,s:null},
+  "The Prisoner":{p:"House Kundarak",f:5,s:null},
+  "The Smuggler's Warehouse":{p:"The Free Agents",f:3,s:null},
+  "The Vault of Night":{p:"House Kundarak",f:9,s:null},
+  "Venn's Trail: Clan Tunnelworm":{p:"The Coin Lords",f:4,s:null},
+  "Venn's Trail: Venn's Fate":{p:"The Coin Lords",f:3,s:null},
+  "Walk the Butcher's Path":{p:"The Free Agents",f:4,s:null}
 };
 
 // PATRON_TIERS — per-patron favor reward tiers, transcribed from ddowiki.com/page/Favor 2026-07-27.
@@ -13628,7 +13683,11 @@ const PATRON_TIERS = {
   "Keepers of Lamordia":[[75,"Noted","+5% Fortification Bypass feat","fortification"], [150,"Esteemed","+5 Hit Points","hp"], [400,"Famed","Currently unachievable","none"]],
   "Battlehammer Expedition":[[75,"Noted","+10% Fortification","fortification"], [150,"Commended","+5 Maximum Hit Points","hp"], [400,"(Unknown)","Currently unachievable","none"]]
 };
-const PATRON_FAVOR_EPOCH = 1; // bump when a content drop adds quests/patrons/reward tiers
+// Version stamp for the embedded favor data (QUEST_FAVOR / PATRON_TIERS). Documentation
+// only, NO runtime effect: unlike DDO_REF_EPOCH (which busts a localStorage cache) favor is
+// DERIVED from live state and never cached, so there is nothing to invalidate. Bump this when
+// re-harvesting after a content drop, purely as a human-facing marker of the data version.
+const PATRON_FAVOR_EPOCH = 1;
 
 // ── Build 07272026.1 — PATRON FAVOR (feature: Patrons tab). Data wiki-sourced
 //    2026-07-27; derivation is a pure function of the STATIC tables above plus a
@@ -18010,11 +18069,24 @@ function runDataSelfCheck() {
     // shares-favor target must exist
     if (rec.s && !QUEST_FAVOR[rec.s]) errors.push(`QUEST_FAVOR: "${q}" shares favor with missing quest "${rec.s}"`);
   });
-  // no favor-group may span two patrons; thresholds must ascend with non-empty reward text
+  // no favor-group may span two patrons, and every member must agree on the
+  // favor value (a shares-favor pair with mismatched numbers is a transcription
+  // typo — the group would silently adopt whichever member sorts first).
   Object.values(FAVOR_INDEX.groups).forEach(g => {
     const pats = new Set(g.members.map(m => QUEST_FAVOR[m].p).filter(Boolean));
     if (pats.size > 1) errors.push(`Favor-group [${g.members.join(", ")}] spans multiple patrons`);
+    const favs = new Set(g.members.map(m => QUEST_FAVOR[m].f).filter(v => v != null));
+    if (favs.size > 1) errors.push(`Favor-group [${g.members.join(", ")}] has mismatched favor values [${[...favs].join(", ")}]`);
   });
+  // Coverage (the primary favor safety net, plan U5): every quest name in SAGAS
+  // must resolve to a FAVOR_INDEX group. A quest present in SAGAS but missing
+  // from QUEST_FAVOR (rename, apostrophe/colon drift, or a new content drop not
+  // yet harvested) would otherwise silently contribute 0 favor with a green badge.
+  const _favSeen = new Set();
+  SAGAS.forEach(s => (s.quests || []).forEach(q => {
+    if (_favSeen.has(q)) return; _favSeen.add(q);
+    if (!FAVOR_INDEX.slotToGroup[q]) errors.push(`SAGAS quest "${q}" (${s.id}) has no QUEST_FAVOR entry`);
+  }));
   Object.keys(PATRON_TIERS).forEach(pat => {
     let prev = -1;
     PATRON_TIERS[pat].forEach(t => {
@@ -18133,10 +18205,12 @@ function renderBenefitCrossIndex(fav) {
     body = `<p class="chase-hint">Pick a benefit to see which patrons grant it and how close you are.</p>`;
   } else {
     const entries = BENEFIT_INDEX[_chasedBenefit].slice()
-      .map(e => { const cur = fav[e.patron] || 0; return { ...e, cur, reached: cur >= e.threshold, toGo: Math.max(0, e.threshold - cur) }; })
+      // a 0-threshold tier counts as earned only once the character actually has favor with
+      // that patron (else the cross-index would show "earned" for a patron the dashboard hides).
+      .map(e => { const cur = fav[e.patron] || 0; return { ...e, cur, reached: e.threshold > 0 ? cur >= e.threshold : cur > 0, toGo: Math.max(0, e.threshold - cur) }; })
       .sort((a, b) => (a.reached === b.reached ? a.toGo - b.toGo : (a.reached ? -1 : 1)));
     body = `<div class="chase-list">` + entries.map(e => {
-      const status = e.reached ? `<span class="chase-got">&check; earned</span>` : `<span class="chase-togo">${e.toGo} favor to go</span>`;
+      const status = e.reached ? `<span class="chase-got">&check; earned</span>` : `<span class="chase-togo">${e.toGo > 0 ? e.toGo + " favor to go" : "not yet"}</span>`;
       return `<div class="chase-row ${e.reached ? "chase-row-done" : ""}">`
         + `<span class="chase-patron">${escapeHtml(e.patron)}</span>`
         + `<span class="chase-tier">${e.threshold} &middot; ${escapeHtml(e.rank)}</span>`
@@ -18147,22 +18221,38 @@ function renderBenefitCrossIndex(fav) {
   return `<div class="chase-wrap">${sel}${body}</div>`;
 }
 
+// Build 07272026.4 — three-tab shell: saga | patrons | filters. Each maps to a
+// content panel and a tab button; only the active one shows.
+const TAB_VIEWS = { saga: "sagaList", patrons: "patronsView", filters: "filtersView" };
+const TAB_BUTTONS = { saga: "tabSaga", patrons: "tabPatrons", filters: "tabFilters" };
+
+// Relocate the Filters & Alerts panel out of the header into the Filters tab.
+// Moving the node (not recreating it) preserves every child id, listener, and the
+// fold bar, so bindControls/bindControlsFold/etc. keep working unchanged.
+function relocateFiltersToTab() {
+  const fv = document.getElementById("filtersView");
+  const panel = document.getElementById("controlsPanel");
+  if (fv && panel && panel.parentElement !== fv) fv.appendChild(panel);
+}
+
 function setActiveTab(tab) {
-  const isPatrons = tab === "patrons";
-  const saga = document.getElementById("sagaList");
-  const patrons = document.getElementById("patronsView");
-  const tabSaga = document.getElementById("tabSaga");
-  const tabPatrons = document.getElementById("tabPatrons");
-  if (saga) saga.hidden = isPatrons;
-  if (patrons) patrons.hidden = !isPatrons;
-  if (tabSaga) { tabSaga.classList.toggle("is-active", !isPatrons); tabSaga.setAttribute("aria-selected", String(!isPatrons)); }
-  if (tabPatrons) { tabPatrons.classList.toggle("is-active", isPatrons); tabPatrons.setAttribute("aria-selected", String(isPatrons)); }
-  document.body.classList.toggle("patrons-active", isPatrons);   // dims the inert Filters panel
-  if (isPatrons) renderPatronsView();
+  if (!TAB_VIEWS[tab]) tab = "saga";
+  Object.keys(TAB_VIEWS).forEach(k => {
+    const view = document.getElementById(TAB_VIEWS[k]);
+    if (view) view.hidden = (k !== tab);
+    const btn = document.getElementById(TAB_BUTTONS[k]);
+    if (btn) { btn.classList.toggle("is-active", k === tab); btn.setAttribute("aria-selected", String(k === tab)); }
+  });
+  document.body.classList.toggle("patrons-active", tab === "patrons");   // read by the renderAll favor guard
+  if (tab === "patrons") renderPatronsView();
+  // The Filters panel is now its own tab, so the old roll-up fold is redundant —
+  // always show it expanded when the tab opens (the fold bar itself is hidden via CSS).
+  if (tab === "filters" && typeof _applyControlsFold === "function") { _controlsFolded = false; _applyControlsFold(); }
 }
 
 function bindTabBar() {
-  const tabs = [document.getElementById("tabSaga"), document.getElementById("tabPatrons")].filter(Boolean);
+  relocateFiltersToTab();
+  const tabs = [document.getElementById("tabSaga"), document.getElementById("tabPatrons"), document.getElementById("tabFilters")].filter(Boolean);
   tabs.forEach((t, i) => {
     t.addEventListener("click", () => setActiveTab(t.getAttribute("data-tab")));
     t.addEventListener("keydown", e => {
@@ -18209,7 +18299,7 @@ function renderPatronsView() {
     return `<div class="patron-card ${st.maxed ? "patron-maxed" : ""}">`
       + `<button class="patron-head" type="button" data-patron="${escapeHtml(p)}" aria-expanded="${isOpen}">`
       + `<span class="patron-name">${escapeHtml(p)}</span>`
-      + `<span class="patron-bar"><span class="patron-fill" style="width:${pct}%"></span></span>`
+      + `<span class="patron-bar"><span class="patron-fill" style="transform:scaleX(${(pct / 100).toFixed(3)})"></span></span>`
       + `<span class="patron-next">${nextLabel}</span></button>${detail}</div>`;
   }).join("");
   el.innerHTML = `<div class="patrons-wrap"><h2 class="patrons-title">Patron Favor &mdash; ${escapeHtml(char)} <span class="patrons-sub">(this life)</span></h2>`

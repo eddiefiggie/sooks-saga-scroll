@@ -4460,26 +4460,29 @@
     .char-medallion { max-width: 100%; }
   }
 /* ── Build 07272026.1 — two-tab shell (Saga | Patrons) + favor dashboard ── */
-#sagaList[hidden], #patronsView[hidden] { display: none; }
+#sagaList[hidden], #patronsView[hidden], #filtersView[hidden] { display: none; }
+/* Build 07272026.4 — slim underline tabs (was chunky raised parchment tabs) */
 .tab-bar {
-  display: flex; gap: 6px; justify-content: center;
-  max-width: 1180px; margin: 14px auto 0; padding: 0 12px;
+  display: flex; gap: 2px; justify-content: center;
+  max-width: 1180px; margin: 12px auto 0; padding: 0 12px;
+  border-bottom: 1px solid var(--parchment-edge);
 }
 .tab-btn {
-  font-family: 'Cinzel', 'EB Garamond', Georgia, serif; font-size: 0.98rem; font-weight: 600;
-  letter-spacing: 0.03em; cursor: pointer; padding: 8px 22px;
-  color: var(--ink-faded); background: var(--parchment-shadow);
-  border: 1px solid var(--parchment-edge); border-bottom: none;
-  border-radius: 9px 9px 0 0; transition: color .15s ease, background .15s ease;
+  font-family: 'Cinzel', 'EB Garamond', Georgia, serif; font-size: 0.9rem; font-weight: 600;
+  letter-spacing: 0.04em; cursor: pointer; padding: 7px 18px;
+  color: var(--ink-faded); background: transparent;
+  border: none; border-bottom: 2px solid transparent; margin-bottom: -1px;
+  transition: color .15s ease, border-color .15s ease;
 }
 .tab-btn:hover { color: var(--ink-primary); }
-.tab-btn.is-active {
-  color: var(--wax-red); background: var(--parchment-base);
-  box-shadow: inset 0 3px 0 var(--gold);
-}
-.tab-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
-/* dim the inert Filters panel while the Patrons tab is active */
-body.patrons-active .controls { opacity: 0.45; pointer-events: none; filter: saturate(0.6); transition: opacity .2s ease; }
+.tab-btn.is-active { color: var(--wax-red); border-bottom-color: var(--gold); }
+.tab-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 3px; border-radius: 3px; }
+/* sweep-in when the Patrons / Filters panel becomes active (Saga list stays static) */
+@keyframes tabSweepIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+#patronsView, #filtersView { animation: tabSweepIn .22s ease; }
+#filtersView { max-width: 1180px; margin: 0 auto; }
+#filtersView .ctl-fold { display: none; }   /* fold bar redundant — the tab owns show/hide */
+@media (prefers-reduced-motion: reduce) { #patronsView, #filtersView { animation: none; } }
 
 #patronsView { max-width: 1180px; margin: 0 auto; padding: 0 12px 40px; }
 .patrons-empty { text-align: center; padding: 60px 20px; font-family: 'EB Garamond', Georgia, serif;
@@ -4733,10 +4736,15 @@ body.patrons-active .controls { opacity: 0.45; pointer-events: none; filter: sat
   <nav class="tab-bar" role="tablist" aria-label="Views">
     <button class="tab-btn is-active" id="tabSaga"    role="tab" aria-selected="true"  aria-controls="sagaList"    type="button" data-tab="saga">📜 Saga</button>
     <button class="tab-btn"           id="tabPatrons" role="tab" aria-selected="false" aria-controls="patronsView" type="button" data-tab="patrons">⚜ Patrons</button>
+    <button class="tab-btn"           id="tabFilters" role="tab" aria-selected="false" aria-controls="filtersView" type="button" data-tab="filters">⚙ Filters</button>
   </nav>
 
   <main id="sagaList"></main>
   <section id="patronsView" role="tabpanel" aria-labelledby="tabPatrons" hidden></section>
+  <!-- Build 07272026.4 — the Filters & Alerts panel (#controlsPanel) is relocated
+       here from the header at init (see relocateFiltersToTab); it sweeps in as the
+       3rd tab instead of sitting always-visible above the content. -->
+  <section id="filtersView" role="tabpanel" aria-labelledby="tabFilters" hidden></section>
 
   <footer>
     <div class="credit">Created by Sook &amp; Claude</div>
@@ -4760,7 +4768,7 @@ body.patrons-active .controls { opacity: 0.45; pointer-events: none; filter: sat
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07272026.3</div>
+      <div class="build">Build 07272026.4</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -18213,22 +18221,38 @@ function renderBenefitCrossIndex(fav) {
   return `<div class="chase-wrap">${sel}${body}</div>`;
 }
 
+// Build 07272026.4 — three-tab shell: saga | patrons | filters. Each maps to a
+// content panel and a tab button; only the active one shows.
+const TAB_VIEWS = { saga: "sagaList", patrons: "patronsView", filters: "filtersView" };
+const TAB_BUTTONS = { saga: "tabSaga", patrons: "tabPatrons", filters: "tabFilters" };
+
+// Relocate the Filters & Alerts panel out of the header into the Filters tab.
+// Moving the node (not recreating it) preserves every child id, listener, and the
+// fold bar, so bindControls/bindControlsFold/etc. keep working unchanged.
+function relocateFiltersToTab() {
+  const fv = document.getElementById("filtersView");
+  const panel = document.getElementById("controlsPanel");
+  if (fv && panel && panel.parentElement !== fv) fv.appendChild(panel);
+}
+
 function setActiveTab(tab) {
-  const isPatrons = tab === "patrons";
-  const saga = document.getElementById("sagaList");
-  const patrons = document.getElementById("patronsView");
-  const tabSaga = document.getElementById("tabSaga");
-  const tabPatrons = document.getElementById("tabPatrons");
-  if (saga) saga.hidden = isPatrons;
-  if (patrons) patrons.hidden = !isPatrons;
-  if (tabSaga) { tabSaga.classList.toggle("is-active", !isPatrons); tabSaga.setAttribute("aria-selected", String(!isPatrons)); }
-  if (tabPatrons) { tabPatrons.classList.toggle("is-active", isPatrons); tabPatrons.setAttribute("aria-selected", String(isPatrons)); }
-  document.body.classList.toggle("patrons-active", isPatrons);   // dims the inert Filters panel
-  if (isPatrons) renderPatronsView();
+  if (!TAB_VIEWS[tab]) tab = "saga";
+  Object.keys(TAB_VIEWS).forEach(k => {
+    const view = document.getElementById(TAB_VIEWS[k]);
+    if (view) view.hidden = (k !== tab);
+    const btn = document.getElementById(TAB_BUTTONS[k]);
+    if (btn) { btn.classList.toggle("is-active", k === tab); btn.setAttribute("aria-selected", String(k === tab)); }
+  });
+  document.body.classList.toggle("patrons-active", tab === "patrons");   // read by the renderAll favor guard
+  if (tab === "patrons") renderPatronsView();
+  // The Filters panel is now its own tab, so the old roll-up fold is redundant —
+  // always show it expanded when the tab opens (the fold bar itself is hidden via CSS).
+  if (tab === "filters" && typeof _applyControlsFold === "function") { _controlsFolded = false; _applyControlsFold(); }
 }
 
 function bindTabBar() {
-  const tabs = [document.getElementById("tabSaga"), document.getElementById("tabPatrons")].filter(Boolean);
+  relocateFiltersToTab();
+  const tabs = [document.getElementById("tabSaga"), document.getElementById("tabPatrons"), document.getElementById("tabFilters")].filter(Boolean);
   tabs.forEach((t, i) => {
     t.addEventListener("click", () => setActiveTab(t.getAttribute("data-tab")));
     t.addEventListener("keydown", e => {

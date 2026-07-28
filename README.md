@@ -2,12 +2,14 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07272026-3.html` — Build
-> `07272026.3` (2026-07-27). Retain set is **3 files**: the 2 most recent
-> overall (`-07272026-3` + `-07272026-2`, both 07-27) PLUS the most-recent
+> **Currently parked:** `sooks-saga-scroll-07272026-4.html` — Build
+> `07272026.4` (2026-07-27). Retain set is **3 files**: the 2 most recent
+> overall (`-07272026-4` + `-07272026-3`, both 07-27) PLUS the most-recent
 > previous-day build (`-07262026-8`, 07-26) as the cross-day rollback anchor.
-> Pruned across the favor builds: `-07262026-7`, `-07252026-4`, `-07272026-1`.
-> Latest: patron-favor tracking (new Patrons tab) + code-review hardening — full
+> Pruned this park: `-07272026-2`.
+> Latest: slim underline tabs + a 3rd "Filters" tab (the Filters & Alerts panel
+> relocated out of the header, sweeps in). Earlier: patron-favor tracking (Patrons
+> tab) + code-review hardening — full
 > changelog in the Files and Resume-prompt sections below. (This is the line the
 > Pages deploy workflow reads to pick which build to publish — keep its filename
 > current every park.) The older note that follows is retained for history.
@@ -277,12 +279,20 @@ Non-urgent items to fold into a later build:
   feature needs a user-facing off switch.
 
 ## Files
-- `sooks-saga-scroll-07272026-3.html` — the live build. Open in any
+- `sooks-saga-scroll-07272026-4.html` — the live build. Open in any
   browser; no server or build step. Progress auto-saves to browser
   storage (key `sooksSagaScroll`, **schema v14** as of Build
   07142026.1 — see notes below). See **Data Schema & Import/Export
   Contract** below for the durable shape and the rules every future
   build must follow.
+
+  **Build 07272026.4 — Cleaner tabs + Filters tab.** Slim underline tab bar
+  (was chunky raised parchment tabs). Added a 3rd tab, **⚙ Filters**: the
+  Filters & Alerts panel (`#controlsPanel`) is relocated out of the header into
+  the tab at init (`relocateFiltersToTab` — moves the DOM node, preserving all
+  wiring) and sweeps in; the now-redundant roll-up fold bar is hidden and the
+  panel shows expanded. Three-tab shell (`setActiveTab` saga|patrons|filters).
+  No schema change (still v14).
 
   **Build 07272026.3 — Patron favor: code-review fixes + harvest completeness.**
   Applied five `/ce-code-review` findings. The new `runDataSelfCheck` SAGAS→`QUEST_FAVOR`
