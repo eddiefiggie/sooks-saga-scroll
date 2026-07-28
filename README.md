@@ -272,12 +272,20 @@ Non-urgent items to fold into a later build:
   feature needs a user-facing off switch.
 
 ## Files
-- `sooks-saga-scroll-07272026-2.html` — the live build. Open in any
+- `sooks-saga-scroll-07272026-3.html` — the live build. Open in any
   browser; no server or build step. Progress auto-saves to browser
   storage (key `sooksSagaScroll`, **schema v14** as of Build
   07142026.1 — see notes below). See **Data Schema & Import/Export
   Contract** below for the durable shape and the rules every future
   build must follow.
+
+  **Build 07272026.3 — Patron favor: code-review fixes + harvest completeness.**
+  Applied five `/ce-code-review` findings. The new `runDataSelfCheck` SAGAS→`QUEST_FAVOR`
+  coverage assertion caught that the Pass-1 harvest had silently missed 47 quests
+  (the quest-name extraction truncated the `SAGAS` source at 400KB); those 47 were
+  harvested and merged, so `QUEST_FAVOR` now covers the true **333** quests (was 286),
+  19 patrons. Also: GPU-friendly `scaleX` bar, 0-threshold cross-index gating, and a
+  corrected `PATRON_FAVOR_EPOCH` comment. No schema change (still v14).
 
   **Build 07272026.2 — Patron favor: benefit cross-index (Pass 2, U7).**
   The Patrons tab's "chase a benefit" control: pick a benefit type (+HP,
@@ -290,9 +298,10 @@ Non-urgent items to fold into a later build:
   (Saga | Patrons).** New `Patrons` tab shows character-level, this-life patron
   favor: an all-patron dashboard (bars sorted closest-to-next-tier, inline
   reward-tier detail) derived from saga-seal completions (Elite assumed, deduped
-  per `shares favor` group). Wiki-sourced `QUEST_FAVOR` (286 quests) + `PATRON_TIERS`
-  (21 patrons). Favor is DERIVED — `SCHEMA_VERSION` stays 14, no new persisted
-  state (fully backwards compatible). Data provenance in `data/`.
+  per `shares favor` group). Wiki-sourced `QUEST_FAVOR` (286 quests at Pass 1;
+  corrected to 333 in Build .3) + `PATRON_TIERS` (21 patrons). Favor is DERIVED —
+  `SCHEMA_VERSION` stays 14, no new persisted state (fully backwards compatible).
+  Data provenance in `data/`.
 
   **Build 07262026.8 — Slimmer saga-header LFM pill: off row one,
   reordered, quest wiki-linked (CSS + JS, no schema change, still v14).**
@@ -4341,7 +4350,7 @@ Adding a new piece of user data (e.g. a per-saga colored flag)?
 > change): `computeCharacterFavor(progress)` sums the Elite `favor` of each
 > quest whose per-life saga seal (`sagaDone`) is set, deduped per `shares favor`
 > group via `FAVOR_INDEX` (Heroic/Epic/Legendary count once), grouped by patron;
-> assume-Elite, resets on TR. Data lives in code constants `QUEST_FAVOR` (286
+> assume-Elite, resets on TR. Data lives in code constants `QUEST_FAVOR` (333
 > wiki-sourced quests: patron/favor/shares-favor), `PATRON_TIERS` (21 patrons:
 > thresholds/ranks/reward text + a benefit tag), `BENEFIT_INDEX` (inverted, for
 > the cross-index), `PATRON_FAVOR_EPOCH` — all sourced critically from ddowiki
@@ -4361,7 +4370,7 @@ Adding a new piece of user data (e.g. a per-saga colored flag)?
 > `SAGA_STORIES`, `QUEST_DETAILS`, `QUEST_GIVERS`; never fabricate — use
 > Chrome MCP against `ddowiki.com` (direct `web_fetch` is blocked by the
 > proxy). Footer uses `Build ` prefix with `mmddyyyy.x` format,
-> currently `Build 07272026.2`. **Live-data note (important for future content
+> currently `Build 07272026.3`. **Live-data note (important for future content
 > drops): the guild-roster location line, live LFM badges, and quest Autocomplete
 > all resolve against the DDO Audit `areas`/`quests` reference tables, cached 7
 > days in `localStorage` key `sooksSagaScrollRef` (NOT `state`; NOT the hand-coded
@@ -4370,6 +4379,23 @@ Adding a new piece of user data (e.g. a per-saga colored flag)?
 > the TTL lapses. Guard with the reference-cache epoch: bump the `DDO_REF_EPOCH`
 > constant (currently `2`) whenever an expansion/patch adds quests or areas — it
 > forces every stale cache to refetch once.**
+> **Build 07272026.3 (still v14; JS + CSS, no schema change): patron favor —
+> /ce-code-review fixes + harvest completeness.** Applied five review findings; the
+> first caught a real Pass-1 data bug. `runDataSelfCheck` now asserts every `SAGAS`
+> quest resolves to a `QUEST_FAVOR` group (plan U5) and that every shares-favor group
+> agrees on its favor value. That coverage assertion fired: the Pass-1 harvest had
+> silently missed **47** quests because the quest-name extraction truncated the
+> `SAGAS` source at 400KB (dropping tail Non-Saga Epic + low-level Heroic packs).
+> Those 47 were harvested and merged — `QUEST_FAVOR` now covers the true **333**
+> unique quests (was 286), **19** patrons (House Kundarak joins), **4** null-patron.
+> Also: favor bar animates `transform: scaleX` not layout `width` (KTD8); the benefit
+> cross-index treats a 0-threshold tier as earned only when the char has favor with
+> that patron (shows "not yet"); `PATRON_FAVOR_EPOCH` comment corrected to
+> documentation-only (no runtime effect — favor is derived, never cached). Self-check
+> 0 errors (329 favor + 4 null = 333, 325 groups, 19 patrons); 0 console errors.
+> **DATA-HARVEST GOTCHA for future content drops: do NOT slice the `SAGAS` source by
+> a fixed char budget when extracting quest names — parse the whole array (or trust
+> the new self-check to flag any SAGAS→QUEST_FAVOR gap).**
 > **Build 07272026.2 (still v14; CSS + JS, no schema change): patron favor —
 > benefit cross-index (Pass 2, U7).** Adds the "chase a benefit" control to the
 > Patrons tab: `renderBenefitCrossIndex(fav)` + `BENEFIT_LABELS`, wired into
