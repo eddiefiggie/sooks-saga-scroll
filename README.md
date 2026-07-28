@@ -2,13 +2,13 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07272026-4.html` — Build
-> `07272026.4` (2026-07-27). Retain set is **3 files**: the 2 most recent
-> overall (`-07272026-4` + `-07272026-3`, both 07-27) PLUS the most-recent
+> **Currently parked:** `sooks-saga-scroll-07272026-5.html` — Build
+> `07272026.5` (2026-07-27). Retain set is **3 files**: the 2 most recent
+> overall (`-07272026-5` + `-07272026-4`, both 07-27) PLUS the most-recent
 > previous-day build (`-07262026-8`, 07-26) as the cross-day rollback anchor.
-> Pruned this park: `-07272026-2`.
-> Latest: slim underline tabs + a 3rd "Filters" tab (the Filters & Alerts panel
-> relocated out of the header, sweeps in). Earlier: patron-favor tracking (Patrons
+> Pruned this park: `-07272026-3`.
+> Latest: polished segmented tabs (active tab is a lifted gold-edged pill — clear
+> selection) over the 3-tab shell (Saga | Patrons | Filters). Earlier: patron-favor tracking (Patrons
 > tab) + code-review hardening — full
 > changelog in the Files and Resume-prompt sections below. (This is the line the
 > Pages deploy workflow reads to pick which build to publish — keep its filename
@@ -279,12 +279,18 @@ Non-urgent items to fold into a later build:
   feature needs a user-facing off switch.
 
 ## Files
-- `sooks-saga-scroll-07272026-4.html` — the live build. Open in any
+- `sooks-saga-scroll-07272026-5.html` — the live build. Open in any
   browser; no server or build step. Progress auto-saves to browser
   storage (key `sooksSagaScroll`, **schema v14** as of Build
   07142026.1 — see notes below). See **Data Schema & Import/Export
   Contract** below for the durable shape and the rules every future
   build must follow.
+
+  **Build 07272026.5 — Polished tab selection.** The tab bar is now a segmented
+  control: the active tab is a lifted, gold-edged parchment pill (with a gold
+  underline accent + bold wax-red text) on a recessed track, so the selected tab
+  reads clearly (the .4 underline-only style was too subtle). Theme-safe via CSS
+  vars. CSS-only, no schema change (still v14).
 
   **Build 07272026.4 — Cleaner tabs + Filters tab.** Slim underline tab bar
   (was chunky raised parchment tabs). Added a 3rd tab, **⚙ Filters**: the
