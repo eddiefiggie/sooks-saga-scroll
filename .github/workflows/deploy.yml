@@ -33,9 +33,12 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p _site
-          LIVE=$(grep -m1 -oE 'sooks-saga-scroll-[0-9]{8}-[0-9]+\.html' README.md)
+          # Read the build filename from the canonical "Currently parked:" line ONLY,
+          # so an earlier stray filename mention elsewhere in the README can't hijack
+          # the publish (that bug shipped 3 favor builds that never went live).
+          LIVE=$(grep -m1 'Currently parked:' README.md | grep -oE 'sooks-saga-scroll-[0-9]{8}-[0-9]+\.html' | head -1)
           if [ -z "$LIVE" ] || [ ! -f "$LIVE" ]; then
-            echo "::error::Could not resolve the parked build from README.md (got '$LIVE')"
+            echo "::error::Could not resolve the parked build from the README 'Currently parked:' line (got '$LIVE')"
             exit 1
           fi
           echo "Publishing $LIVE as index.html"

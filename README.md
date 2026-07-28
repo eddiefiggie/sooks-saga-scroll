@@ -2,11 +2,16 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07262026-8.html` — Build
-> `07262026.8` (2026-07-26). Retain set is **3 files**: the 2 most recent
-> overall (`-07262026-8` + `-07262026-7`, both 07-26) PLUS the most-recent
-> previous-day build (`-07252026-4`, 07-25) as the cross-day rollback anchor.
-> Pruned this park: `sooks-saga-scroll-07262026-6.html`. **Slimmer saga-header
+> **Currently parked:** `sooks-saga-scroll-07272026-3.html` — Build
+> `07272026.3` (2026-07-27). Retain set is **3 files**: the 2 most recent
+> overall (`-07272026-3` + `-07272026-2`, both 07-27) PLUS the most-recent
+> previous-day build (`-07262026-8`, 07-26) as the cross-day rollback anchor.
+> Pruned across the favor builds: `-07262026-7`, `-07252026-4`, `-07272026-1`.
+> Latest: patron-favor tracking (new Patrons tab) + code-review hardening — full
+> changelog in the Files and Resume-prompt sections below. (This is the line the
+> Pages deploy workflow reads to pick which build to publish — keep its filename
+> current every park.) The older note that follows is retained for history.
+> **Slimmer saga-header
 > LFM pill — off row one, reordered, quest wiki-linked (Build 07262026.8, CSS +
 > JS, still v14, no schema change):** the single live-LFM pill in a saga header
 > was too bulky and squeezed long saga titles. Now: (1) the header grid puts the
