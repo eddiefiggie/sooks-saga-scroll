@@ -2,13 +2,14 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07272026-6.html` — Build
-> `07272026.6` (2026-07-27). Retain set is **3 files**: the 2 most recent
-> overall (`-07272026-6` + `-07272026-5`, both 07-27) PLUS the most-recent
+> **Currently parked:** `sooks-saga-scroll-07272026-7.html` — Build
+> `07272026.7` (2026-07-27). Retain set is **3 files**: the 2 most recent
+> overall (`-07272026-7` + `-07272026-6`, both 07-27) PLUS the most-recent
 > previous-day build (`-07262026-8`, 07-26) as the cross-day rollback anchor.
-> Pruned this park: `-07272026-4`.
-> Latest: Patron header now reuses the tier-header treatment (centered display
-> font + flanking rule lines). Earlier: polished segmented tabs; patron-favor tracking (Patrons
+> Pruned this park: `-07272026-5`.
+> Latest: Patron header now aligns exactly with the Saga tier headers (same
+> width/center/vertical gap; the sweep-in is vertical so it no longer slides the
+> header sideways). Earlier: Patron header reuses the tier-header treatment; polished segmented tabs; patron-favor tracking (Patrons
 > tab) + code-review hardening — full
 > changelog in the Files and Resume-prompt sections below. (This is the line the
 > Pages deploy workflow reads to pick which build to publish — keep its filename
@@ -279,12 +280,24 @@ Non-urgent items to fold into a later build:
   feature needs a user-facing off switch.
 
 ## Files
-- `sooks-saga-scroll-07272026-6.html` — the live build. Open in any
+- `sooks-saga-scroll-07272026-7.html` — the live build. Open in any
   browser; no server or build step. Progress auto-saves to browser
   storage (key `sooksSagaScroll`, **schema v14** as of Build
   07142026.1 — see notes below). See **Data Schema & Import/Export
   Contract** below for the durable shape and the rules every future
   build must follow.
+
+  **Build 07272026.7 — Patron header perfectly aligned with the Saga tier
+  headers.** Three fixes so the big centered header sits in the exact same spot
+  across tabs: (1) `#patronsView` is a plain block like `<main id="sagaList">`
+  (no max-width/auto-margin/side-padding) so the tier-header spans the same width
+  and its flanking rule lines match; (2) `.patrons-wrap` top padding bumped to
+  match the Saga header's ~40px gap below the tabs; (3) the tab sweep-in changed
+  from a horizontal `translateX(16px)` to a vertical `translateY` fade — the
+  horizontal slide was making the header *look* 16px off during the animation
+  even though it was aligned at rest. `html { overflow-y: scroll }` reserves the
+  scrollbar gutter so a short tab doesn't shift centered content. CSS-only, no
+  schema change (still v14).
 
   **Build 07272026.6 — Patron header matches the tier headers.** The Patrons
   tab's "Patron Favor" header now reuses the `.tier-header` treatment — centered

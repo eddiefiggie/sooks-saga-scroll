@@ -4494,16 +4494,28 @@
 .tab-btn:active { transform: translateY(1px); }
 .tab-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 /* sweep-in when the Patrons / Filters panel becomes active (Saga list stays static) */
-@keyframes tabSweepIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
+/* Build .7 — vertical fade-in, not a horizontal slide. The old translateX(16px)
+   made the Patron header appear ~16px off the Saga tier header during the sweep
+   (they're identical at rest); a translateY keeps the header horizontally aligned
+   throughout. */
+@keyframes tabSweepIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
 #patronsView, #filtersView { animation: tabSweepIn .22s ease; }
 #filtersView { max-width: 1180px; margin: 0 auto; }
 #filtersView .ctl-fold { display: none; }   /* fold bar redundant — the tab owns show/hide */
 @media (prefers-reduced-motion: reduce) { #patronsView, #filtersView { animation: none; } }
 
-#patronsView { max-width: 1180px; margin: 0 auto; padding: 0 12px 40px; }
+/* Build 07272026.7 — reserve the scrollbar gutter always, so switching to a short
+   tab (Patrons/Filters with no scrollbar) doesn't shift the centered content ~15px
+   relative to the long Saga list (which does scroll). Keeps the Patron header and
+   Saga tier header horizontally aligned across tabs. */
+html { overflow-y: scroll; }   /* always reserve the scrollbar gutter — a short tab (Patrons/Filters) must not shift centered content vs the scrolling Saga list */
+/* Build .7 — #patronsView must be a plain block like <main id="sagaList"> (no
+   max-width/auto-margin/side-padding) so its centered tier-header lands on the
+   exact same axis as the Saga tier headers. */
+#patronsView { padding-bottom: 40px; }
 .patrons-empty { text-align: center; padding: 60px 20px; font-family: 'EB Garamond', Georgia, serif;
   font-style: italic; font-size: 1.1rem; color: var(--ink-faded); }
-.patrons-wrap { padding-top: 18px; }
+.patrons-wrap { padding-top: 30px; }   /* Build .7 — match the Saga tier header's ~40px gap below the tabs */
 /* Build 07272026.6 — Patron header reuses the .tier-header treatment (centered,
    --font-display, flanking rule lines); the character name sits below as a
    centered subtitle, mirroring the tier flourish. */
@@ -4788,7 +4800,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07272026.6</div>
+      <div class="build">Build 07272026.7</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
