@@ -4,9 +4,16 @@ Sourced from the DDO Wiki 2026-07-27 via same-origin MediaWiki API (`action=quer
 
 ## Coverage
 
-- **286 / 286** unique tracked quest names resolved, **0 missing**.
-- **18 distinct patrons** appear across tracked quests (of 21 total factions; untracked factions like House Kundarak have no quests in the tracked sagas).
-- **3 null-patron quests** (no patron / no favor): `Time Flies`, `Turn the Page`, `Vecna Unleashed`.
+- **333 / 333** unique tracked quest names resolved, **0 missing**.
+- **19 distinct patrons** appear across tracked quests (of 21 total factions; House Kundarak joins via the Vault of Night pack).
+- **4 null-patron quests** (no patron / no favor): `Time Flies`, `Turn the Page`, `Vecna Unleashed`, `Against the Demon Queen`.
+
+> **Correction (Build 07272026.3):** the initial Pass-1 harvest covered only **286** unique quests
+> because the quest-name extraction sliced the `SAGAS` source at 400KB and truncated the tail
+> containers (Non-Saga Epic packs — Red Fens, Vault of Night, Zawabi's Refuge — plus several low-level
+> Heroic packs). The `runDataSelfCheck` SAGAS→`QUEST_FAVOR` coverage assertion added in Build .3
+> caught the 47-quest gap; those 47 were then harvested the same way and merged, bringing coverage to
+> the true **333 / 333**.
 
 ### Redirects (app quest name → wiki page title)
 

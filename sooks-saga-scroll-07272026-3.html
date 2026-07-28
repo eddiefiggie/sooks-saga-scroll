@@ -4488,6 +4488,29 @@ body.patrons-active .controls { opacity: 0.45; pointer-events: none; filter: sat
 .patrons-title { font-family: 'Cinzel', serif; color: var(--wax-red); font-size: 1.35rem; margin: 0 0 4px; }
 .patrons-sub { color: var(--ink-faded); font-weight: 400; font-size: 0.95rem; }
 .patrons-foot { color: var(--ink-faded); font-style: italic; font-size: 0.82rem; margin: 14px 2px 0; }
+/* U7 — "chase a benefit" cross-index */
+.chase-wrap { margin: 14px 0 6px; padding: 10px 12px; border: 1px solid var(--parchment-edge);
+  border-radius: 8px; background: var(--parchment-shadow); }
+.chase-label { font-family: 'Cinzel', serif; font-size: 0.9rem; color: var(--wax-red); margin-right: 8px; }
+.chase-select { font-family: 'EB Garamond', Georgia, serif; font-size: 0.95rem; padding: 4px 8px;
+  border: 1px solid var(--parchment-edge); border-radius: 6px; background: var(--parchment-base); color: var(--ink-primary); }
+.chase-select:focus-visible { outline: 2px solid var(--gold); outline-offset: 1px; }
+.chase-hint { color: var(--ink-faded); font-style: italic; font-size: 0.9rem; margin: 8px 2px 0; }
+.chase-list { margin-top: 10px; display: flex; flex-direction: column; gap: 4px; }
+.chase-row { display: grid; grid-template-columns: minmax(120px, 180px) minmax(110px, 150px) 1fr minmax(90px, auto);
+  gap: 12px; align-items: baseline; padding: 5px 4px; border-bottom: 1px solid var(--parchment-edge); font-size: 0.9rem; }
+.chase-row:last-child { border-bottom: none; }
+.chase-row-done { opacity: 0.6; }
+.chase-patron { font-weight: 600; color: var(--ink-primary); }
+.chase-tier { color: var(--wax-red); font-variant-numeric: tabular-nums; }
+.chase-reward { color: var(--ink-secondary); }
+.chase-status { text-align: right; white-space: nowrap; }
+.chase-got { color: #2e7d32; font-weight: 600; }
+.chase-togo { color: var(--ink-faded); }
+@media (max-width: 640px) {
+  .chase-row { grid-template-columns: 1fr auto; }
+  .chase-reward { grid-column: 1 / -1; color: var(--ink-faded); }
+}
 .patrons-list { display: flex; flex-direction: column; gap: 8px; margin-top: 12px; }
 .patron-card { border: 1px solid var(--parchment-edge); border-radius: 8px; background: var(--parchment-mid); overflow: hidden; }
 .patron-maxed { opacity: 0.82; }
@@ -4501,9 +4524,9 @@ body.patrons-active .controls { opacity: 0.45; pointer-events: none; filter: sat
 .patron-head:focus-visible { outline: 2px solid var(--gold); outline-offset: -2px; }
 .patron-name { font-weight: 600; font-size: 1.02rem; }
 .patron-bar { position: relative; height: 12px; border-radius: 6px; background: var(--parchment-deep); overflow: hidden; }
-.patron-fill { position: absolute; inset: 0 auto 0 0; border-radius: 6px;
+.patron-fill { position: absolute; inset: 0; width: 100%; border-radius: 6px;
   background: linear-gradient(90deg, var(--wax-red-light), var(--wax-red));
-  transform-origin: left center; transition: width .3s ease; }
+  transform-origin: left center; transition: transform .3s ease; }   /* GPU-friendly: scaleX, not width (KTD8) */
 @media (prefers-reduced-motion: reduce) { .patron-fill { transition: none; } }
 .patron-maxed .patron-fill { background: linear-gradient(90deg, var(--gold), var(--gold-light)); }
 .patron-next { font-size: 0.9rem; color: var(--ink-secondary); white-space: nowrap; text-align: right; }
@@ -4737,7 +4760,7 @@ body.patrons-active .controls { opacity: 0.45; pointer-events: none; filter: sat
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07272026.1</div>
+      <div class="build">Build 07272026.3</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -13576,7 +13599,54 @@ const QUEST_FAVOR = {
   "Wish Upon a Card":{p:"Agents of Argonnessen",f:4,s:null},
   "Witch Hunt":{p:"The Summer Court",f:3,s:null},
   "Wrath of the Earth":{p:"Keepers of Barovia",f:5,s:null},
-  "Zoo Creeper":{p:"Keepers of Lamordia",f:4,s:null}
+  "Zoo Creeper":{p:"Keepers of Lamordia",f:4,s:null},
+  "Against the Demon Queen":{p:null,f:null,s:null},
+  "An Explosive Situation":{p:"The Coin Lords",f:2,s:null},
+  "An Offering of Blood":{p:"The Free Agents",f:8,s:null},
+  "Another Man's Treasure":{p:"The Twelve",f:5,s:null},
+  "Arachnophobia":{p:"The Coin Lords",f:2,s:null},
+  "Bringing the Light":{p:"The Silver Flame",f:2,s:null},
+  "Chains of Flame":{p:"The Free Agents",f:7,s:null},
+  "Dinosaur Crisis":{p:"The Free Agents",f:5,s:null},
+  "Durk's Got A Secret":{p:"The Free Agents",f:4,s:null},
+  "Fathom the Depths":{p:"House Kundarak",f:5,s:null},
+  "Fear Factory":{p:"The Free Agents",f:5,s:null},
+  "Garrison's Missing Pack":{p:"The Coin Lords",f:4,s:null},
+  "Haverdasher":{p:"House Kundarak",f:2,s:null},
+  "Haywire Foundry":{p:"House Kundarak",f:6,s:null},
+  "Hiding in Plain Sight":{p:"The Free Agents",f:5,s:null},
+  "Home Sweet Sewer":{p:"The Coin Lords",f:2,s:null},
+  "In The Flesh":{p:"The Free Agents",f:6,s:null},
+  "Information is Key":{p:"House Phiarlan",f:4,s:null},
+  "Into the Deep":{p:"House Kundarak",f:5,s:null},
+  "Invaders!":{p:"The Coin Lords",f:7,s:null},
+  "Kind of a Big Deal":{p:"The Twelve",f:4,s:null},
+  "Kobold Assault":{p:"The Coin Lords",f:3,s:null},
+  "Memory Lapse":{p:"The Twelve",f:4,s:null},
+  "Missing":{p:"The Free Agents",f:6,s:null},
+  "Protect Baudry's Interests":{p:"The Free Agents",f:2,s:null},
+  "Recovering the Lost Tome":{p:"The Coin Lords",f:3,s:null},
+  "Retrieve the Stolen Goods":{p:"The Free Agents",f:3,s:null},
+  "Sinister Storage":{p:"The Free Agents",f:5,s:null},
+  "Stealthy Repossession":{p:"The Free Agents",f:3,s:null},
+  "Stop Hazadill's Shipment":{p:"The Free Agents",f:2,s:null},
+  "Tharashk Arena":{p:"House Kundarak",f:5,s:null},
+  "The Captives":{p:"The Free Agents",f:3,s:null},
+  "The Chamber of Raiyum":{p:"The Free Agents",f:8,s:null},
+  "The Claw of Vulkoor":{p:"House Kundarak",f:4,s:null},
+  "The Jungle of Khyber":{p:"House Kundarak",f:9,s:null},
+  "The Kobold's Den: Clan Gnashtooth":{p:"The Coin Lords",f:4,s:null},
+  "The Kobold's Den: Rescuing Arlos":{p:"The Coin Lords",f:4,s:null},
+  "The Kobolds' New Ringleader":{p:"The Coin Lords",f:4,s:null},
+  "The Last Stand":{p:"House Kundarak",f:4,s:null},
+  "The Miller's Debt":{p:"The Coin Lords",f:2,s:null},
+  "The Price of Freedom":{p:"The Twelve",f:5,s:null},
+  "The Prisoner":{p:"House Kundarak",f:5,s:null},
+  "The Smuggler's Warehouse":{p:"The Free Agents",f:3,s:null},
+  "The Vault of Night":{p:"House Kundarak",f:9,s:null},
+  "Venn's Trail: Clan Tunnelworm":{p:"The Coin Lords",f:4,s:null},
+  "Venn's Trail: Venn's Fate":{p:"The Coin Lords",f:3,s:null},
+  "Walk the Butcher's Path":{p:"The Free Agents",f:4,s:null}
 };
 
 // PATRON_TIERS — per-patron favor reward tiers, transcribed from ddowiki.com/page/Favor 2026-07-27.
@@ -13605,7 +13675,11 @@ const PATRON_TIERS = {
   "Keepers of Lamordia":[[75,"Noted","+5% Fortification Bypass feat","fortification"], [150,"Esteemed","+5 Hit Points","hp"], [400,"Famed","Currently unachievable","none"]],
   "Battlehammer Expedition":[[75,"Noted","+10% Fortification","fortification"], [150,"Commended","+5 Maximum Hit Points","hp"], [400,"(Unknown)","Currently unachievable","none"]]
 };
-const PATRON_FAVOR_EPOCH = 1; // bump when a content drop adds quests/patrons/reward tiers
+// Version stamp for the embedded favor data (QUEST_FAVOR / PATRON_TIERS). Documentation
+// only, NO runtime effect: unlike DDO_REF_EPOCH (which busts a localStorage cache) favor is
+// DERIVED from live state and never cached, so there is nothing to invalidate. Bump this when
+// re-harvesting after a content drop, purely as a human-facing marker of the data version.
+const PATRON_FAVOR_EPOCH = 1;
 
 // ── Build 07272026.1 — PATRON FAVOR (feature: Patrons tab). Data wiki-sourced
 //    2026-07-27; derivation is a pure function of the STATIC tables above plus a
@@ -17987,16 +18061,32 @@ function runDataSelfCheck() {
     // shares-favor target must exist
     if (rec.s && !QUEST_FAVOR[rec.s]) errors.push(`QUEST_FAVOR: "${q}" shares favor with missing quest "${rec.s}"`);
   });
-  // no favor-group may span two patrons; thresholds must ascend with non-empty reward text
+  // no favor-group may span two patrons, and every member must agree on the
+  // favor value (a shares-favor pair with mismatched numbers is a transcription
+  // typo — the group would silently adopt whichever member sorts first).
   Object.values(FAVOR_INDEX.groups).forEach(g => {
     const pats = new Set(g.members.map(m => QUEST_FAVOR[m].p).filter(Boolean));
     if (pats.size > 1) errors.push(`Favor-group [${g.members.join(", ")}] spans multiple patrons`);
+    const favs = new Set(g.members.map(m => QUEST_FAVOR[m].f).filter(v => v != null));
+    if (favs.size > 1) errors.push(`Favor-group [${g.members.join(", ")}] has mismatched favor values [${[...favs].join(", ")}]`);
   });
+  // Coverage (the primary favor safety net, plan U5): every quest name in SAGAS
+  // must resolve to a FAVOR_INDEX group. A quest present in SAGAS but missing
+  // from QUEST_FAVOR (rename, apostrophe/colon drift, or a new content drop not
+  // yet harvested) would otherwise silently contribute 0 favor with a green badge.
+  const _favSeen = new Set();
+  SAGAS.forEach(s => (s.quests || []).forEach(q => {
+    if (_favSeen.has(q)) return; _favSeen.add(q);
+    if (!FAVOR_INDEX.slotToGroup[q]) errors.push(`SAGAS quest "${q}" (${s.id}) has no QUEST_FAVOR entry`);
+  }));
   Object.keys(PATRON_TIERS).forEach(pat => {
     let prev = -1;
     PATRON_TIERS[pat].forEach(t => {
       if (t[0] < prev) errors.push(`PATRON_TIERS "${pat}" thresholds not ascending at ${t[0]}`);
       if (!t[2]) errors.push(`PATRON_TIERS "${pat}" tier ${t[0]} has empty reward text`);
+      // U6: a benefit tag must be "none" or have a friendly label (else the
+      // cross-index selector would show a raw tag).
+      if (t[3] && t[3] !== "none" && !BENEFIT_LABELS[t[3]]) errors.push(`PATRON_TIERS "${pat}" tier ${t[0]} has unlabeled benefit tag "${t[3]}"`);
       prev = t[0];
     });
   });
@@ -18082,6 +18172,46 @@ function _applySuggestedDefaultMigration() {
 //    Favor is computed ONLY here (Patrons-tab render), never on renderAll's hot
 //    path or the 15s live tick (KTD2). Detail expands inline per patron.
 const _patronExpanded = new Set();   // patrons whose tier detail is open (ephemeral)
+let _chasedBenefit = "";              // U7 cross-index selection (ephemeral, not persisted)
+
+// Friendly labels for the benefit-type tags carried on PATRON_TIERS (U7 cross-index).
+const BENEFIT_LABELS = {
+  hp: "+HP (Hit Points)", saves: "+Saving Throws", skills: "+Skills",
+  fortification: "Fortification", bank: "Bank space", inventory: "Inventory space",
+  bag: "Ingredient / Augment bag", enhancement: "Enhancement tree", class: "Class unlock",
+  vendor: "Patron vendor", movement: "Movement / Teleport", crafting: "Crafting access",
+  regen: "Tavern regeneration", item: "Item reward", utility: "Utility"
+};
+
+// U7 — "chase a benefit": given the active char's per-patron favor, show which
+// patrons grant the chosen benefit type and the character's progress toward each.
+function renderBenefitCrossIndex(fav) {
+  const opts = Object.keys(BENEFIT_INDEX).sort((a, b) => (BENEFIT_LABELS[a] || a).localeCompare(BENEFIT_LABELS[b] || b));
+  const sel = `<label class="chase-label" for="chaseBenefit">Chase a benefit:</label>`
+    + `<select id="chaseBenefit" class="chase-select">`
+    + `<option value="">Pick a benefit&hellip;</option>`
+    + opts.map(k => `<option value="${k}"${k === _chasedBenefit ? " selected" : ""}>${escapeHtml(BENEFIT_LABELS[k] || k)}</option>`).join("")
+    + `</select>`;
+  let body;
+  if (!_chasedBenefit || !BENEFIT_INDEX[_chasedBenefit]) {
+    body = `<p class="chase-hint">Pick a benefit to see which patrons grant it and how close you are.</p>`;
+  } else {
+    const entries = BENEFIT_INDEX[_chasedBenefit].slice()
+      // a 0-threshold tier counts as earned only once the character actually has favor with
+      // that patron (else the cross-index would show "earned" for a patron the dashboard hides).
+      .map(e => { const cur = fav[e.patron] || 0; return { ...e, cur, reached: e.threshold > 0 ? cur >= e.threshold : cur > 0, toGo: Math.max(0, e.threshold - cur) }; })
+      .sort((a, b) => (a.reached === b.reached ? a.toGo - b.toGo : (a.reached ? -1 : 1)));
+    body = `<div class="chase-list">` + entries.map(e => {
+      const status = e.reached ? `<span class="chase-got">&check; earned</span>` : `<span class="chase-togo">${e.toGo > 0 ? e.toGo + " favor to go" : "not yet"}</span>`;
+      return `<div class="chase-row ${e.reached ? "chase-row-done" : ""}">`
+        + `<span class="chase-patron">${escapeHtml(e.patron)}</span>`
+        + `<span class="chase-tier">${e.threshold} &middot; ${escapeHtml(e.rank)}</span>`
+        + `<span class="chase-reward">${escapeHtml(e.reward)}</span>`
+        + `<span class="chase-status">${status}</span></div>`;
+    }).join("") + `</div>`;
+  }
+  return `<div class="chase-wrap">${sel}${body}</div>`;
+}
 
 function setActiveTab(tab) {
   const isPatrons = tab === "patrons";
@@ -18145,16 +18275,20 @@ function renderPatronsView() {
     return `<div class="patron-card ${st.maxed ? "patron-maxed" : ""}">`
       + `<button class="patron-head" type="button" data-patron="${escapeHtml(p)}" aria-expanded="${isOpen}">`
       + `<span class="patron-name">${escapeHtml(p)}</span>`
-      + `<span class="patron-bar"><span class="patron-fill" style="width:${pct}%"></span></span>`
+      + `<span class="patron-bar"><span class="patron-fill" style="transform:scaleX(${(pct / 100).toFixed(3)})"></span></span>`
       + `<span class="patron-next">${nextLabel}</span></button>${detail}</div>`;
   }).join("");
-  el.innerHTML = `<div class="patrons-wrap"><h2 class="patrons-title">Patron Favor &mdash; ${escapeHtml(char)} <span class="patrons-sub">(this life)</span></h2><div class="patrons-list">${rows}</div>`
+  el.innerHTML = `<div class="patrons-wrap"><h2 class="patrons-title">Patron Favor &mdash; ${escapeHtml(char)} <span class="patrons-sub">(this life)</span></h2>`
+    + renderBenefitCrossIndex(fav)
+    + `<div class="patrons-list">${rows}</div>`
     + `<p class="patrons-foot">Favor assumes Elite completion of every sealed quest; resets on True Reincarnation.</p></div>`;
   el.querySelectorAll(".patron-head").forEach(btn => btn.addEventListener("click", () => {
     const p = btn.getAttribute("data-patron");
     if (_patronExpanded.has(p)) _patronExpanded.delete(p); else _patronExpanded.add(p);
     renderPatronsView();
   }));
+  const chase = el.querySelector("#chaseBenefit");
+  if (chase) chase.addEventListener("change", () => { _chasedBenefit = chase.value; renderPatronsView(); });
 }
 
 _applySuggestedDefaultMigration();

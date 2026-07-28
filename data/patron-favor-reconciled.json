@@ -1429,6 +1429,241 @@
    "patron": "Keepers of Lamordia",
    "favor": 4,
    "sharesFavor": null
+  },
+  "Venn's Trail: Venn's Fate": {
+   "patron": "The Coin Lords",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Durk's Got A Secret": {
+   "patron": "The Free Agents",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Information is Key": {
+   "patron": "House Phiarlan",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Walk the Butcher's Path": {
+   "patron": "The Free Agents",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Stealthy Repossession": {
+   "patron": "The Free Agents",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The Kobolds' New Ringleader": {
+   "patron": "The Coin Lords",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Miller's Debt": {
+   "patron": "The Coin Lords",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "The Smuggler's Warehouse": {
+   "patron": "The Free Agents",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Haverdasher": {
+   "patron": "House Kundarak",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "Recovering the Lost Tome": {
+   "patron": "The Coin Lords",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "Bringing the Light": {
+   "patron": "The Silver Flame",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "Garrison's Missing Pack": {
+   "patron": "The Coin Lords",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Hiding in Plain Sight": {
+   "patron": "The Free Agents",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Protect Baudry's Interests": {
+   "patron": "The Free Agents",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "Stop Hazadill's Shipment": {
+   "patron": "The Free Agents",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "Retrieve the Stolen Goods": {
+   "patron": "The Free Agents",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "An Explosive Situation": {
+   "patron": "The Coin Lords",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "Arachnophobia": {
+   "patron": "The Coin Lords",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "Home Sweet Sewer": {
+   "patron": "The Coin Lords",
+   "favor": 2,
+   "sharesFavor": null
+  },
+  "The Kobold's Den: Clan Gnashtooth": {
+   "patron": "The Coin Lords",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Kobold's Den: Rescuing Arlos": {
+   "patron": "The Coin Lords",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Venn's Trail: Clan Tunnelworm": {
+   "patron": "The Coin Lords",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Haywire Foundry": {
+   "patron": "House Kundarak",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "The Jungle of Khyber": {
+   "patron": "House Kundarak",
+   "favor": 9,
+   "sharesFavor": null
+  },
+  "The Prisoner": {
+   "patron": "House Kundarak",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Tharashk Arena": {
+   "patron": "House Kundarak",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Chamber of Raiyum": {
+   "patron": "The Free Agents",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "Chains of Flame": {
+   "patron": "The Free Agents",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "The Vault of Night": {
+   "patron": "House Kundarak",
+   "favor": 9,
+   "sharesFavor": null
+  },
+  "Invaders!": {
+   "patron": "The Coin Lords",
+   "favor": 7,
+   "sharesFavor": null
+  },
+  "An Offering of Blood": {
+   "patron": "The Free Agents",
+   "favor": 8,
+   "sharesFavor": null
+  },
+  "Kobold Assault": {
+   "patron": "The Coin Lords",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The Captives": {
+   "patron": "The Free Agents",
+   "favor": 3,
+   "sharesFavor": null
+  },
+  "The Claw of Vulkoor": {
+   "patron": "House Kundarak",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Fathom the Depths": {
+   "patron": "House Kundarak",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Into the Deep": {
+   "patron": "House Kundarak",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "The Last Stand": {
+   "patron": "House Kundarak",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Missing": {
+   "patron": "The Free Agents",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Fear Factory": {
+   "patron": "The Free Agents",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Sinister Storage": {
+   "patron": "The Free Agents",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "In The Flesh": {
+   "patron": "The Free Agents",
+   "favor": 6,
+   "sharesFavor": null
+  },
+  "Against the Demon Queen": {
+   "patron": null,
+   "favor": null,
+   "sharesFavor": null
+  },
+  "Another Man's Treasure": {
+   "patron": "The Twelve",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Memory Lapse": {
+   "patron": "The Twelve",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "Kind of a Big Deal": {
+   "patron": "The Twelve",
+   "favor": 4,
+   "sharesFavor": null
+  },
+  "The Price of Freedom": {
+   "patron": "The Twelve",
+   "favor": 5,
+   "sharesFavor": null
+  },
+  "Dinosaur Crisis": {
+   "patron": "The Free Agents",
+   "favor": 5,
+   "sharesFavor": null
   }
  },
  "patrons": [
@@ -1437,6 +1672,7 @@
   "Cormanthor Elves",
   "House Deneith",
   "House Jorasco",
+  "House Kundarak",
   "House Phiarlan",
   "Keepers of Barovia",
   "Keepers of Lamordia",
@@ -1486,6 +1722,7 @@
   ]
  ],
  "nullPatron": [
+  "Against the Demon Queen",
   "Time Flies",
   "Turn the Page",
   "Vecna Unleashed"
