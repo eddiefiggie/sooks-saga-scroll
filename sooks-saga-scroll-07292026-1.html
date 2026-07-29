@@ -18242,14 +18242,18 @@ function runDataSelfCheck() {
     const rq = r.raidQuests || [];
     if (!rq.length) errors.push(`Raid "${r.id}" has no raidQuests (the raid-instance row)`);
     rq.forEach(q => { if (!(r.quests || []).includes(q)) errors.push(`Raid "${r.id}" raidQuests entry "${q}" is not in its quests list`); });
-    // Shared-identity: every prereq that also lives in a non-raid container must
-    // resolve to the SAME within-tier SHARED_QUESTS group (proves the cascade links
-    // them — catches a harvest name/tier typo that would silently double-track).
+    // Shared-identity: a prereq that ALSO appears in a non-raid Saga-tab container
+    // must resolve to the SAME within-tier group so the cascade links them. A prereq
+    // tracked nowhere else is legitimately raid-only (fine). But a prereq whose NAME
+    // is tracked in the Saga tab at a DIFFERENT tier means the cascade silently
+    // misses — that's a harvest tier/spelling drift, so flag it.
     const prereqs = (r.quests || []).filter(q => !rq.includes(q));
     prereqs.forEach(q => {
       const group = SHARED_QUESTS[sharedKey(r.tier, q)] || [];
-      const nonRaidTwin = group.some(id => { const c = SAGA_BY_ID.get(id); return c && !c.isRaid; });
-      if (!nonRaidTwin) errors.push(`Raid "${r.id}" prereq "${q}" (tier ${r.tier}) has no Saga-tab twin — cascade will not link (name/tier mismatch?)`);
+      const hasExactTwin = group.some(id => { const c = SAGA_BY_ID.get(id); return c && !c.isRaid; });
+      if (hasExactTwin) return;   // cascades correctly
+      const twinTiers = (SAGAS_BY_NORM_QUEST.get(normalizeQuestName(q)) || []).filter(c => !c.isRaid).map(c => c.tier);
+      if (twinTiers.length) errors.push(`Raid "${r.id}" prereq "${q}" is tracked in the Saga tab at tier(s) [${[...new Set(twinTiers)].join(", ")}] but the raid's tier is "${r.tier}" — cascade will not link (fix the raid's tier or the quest name)`);
     });
   });
   const raidCount = raids.length;
