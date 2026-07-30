@@ -15,6 +15,17 @@ The top-level classification of a container that determines both the section it 
 
 Containers render grouped by tier in that fixed section sequence; within a tier they are ordered by character level (ascending by the low end of each container's level range). That within-tier level ordering is maintained by hand in the container list — nothing re-sorts it at display time — so a new container has to be placed at its level-correct spot rather than appended to its tier.
 
+### Quest Completed seal
+The master "have I completed this quest" marker, per quest per character, per life
+(`sagaDone` in stored state). Set by a quest row's left checkbox and auto-filled by the
+Reaper / Skip / Saga-Reward controls; it drives saga-reward auto-banking and is the field
+every *derived* per-character status reads — [Patron Favor](#patron-favor) sums it, a raid's
+[Keyed](#keyed) status counts it. It **cascades** across same-tier containers that share a
+quest (so checking a quest once marks it everywhere it appears), and it is **per-cycle** —
+cleared when a saga reward is redeemed and the saga is re-run. Distinct from the raw
+"how it was marked" state (Reaper / Skip / plain), which is tracked separately; a derivation
+that reads that raw state instead of this seal silently misses the checkbox's completions.
+
 ### First-Time Reaper (FTR)
 The state of having completed a quest on Reaper difficulty for the first time. Tracked per quest and rolled up per container as the count of reaper-eligible quests still unreaped; a container is "sealed" when none remain. FTR is independent of ordinary quest completion — completing a quest on non-Reaper difficulty never advances it.
 
