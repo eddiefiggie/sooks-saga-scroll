@@ -2,11 +2,17 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07292026-1.html` — Build
-> `07292026.1` (2026-07-29). Retain set is **2 files**: the 2 most recent
-> overall (`-07292026-1` (07-29) + `-07272026-7` (07-27)); `-07272026-7` also
-> serves as the most-recent-previous-day cross-day rollback anchor.
-> Pruned this park (moved to `_to_delete/`): `-07272026-6`, `-07262026-8`.
+> **Currently parked:** `sooks-saga-scroll-07292026-2.html` — Build
+> `07292026.2` (2026-07-29). Retain set is **3 files**: the 2 most recent
+> overall (`-07292026-2` + `-07292026-1`, both 07-29) PLUS the most-recent
+> previous-day build (`-07272026-7`, 07-27) as the cross-day rollback anchor.
+> Pruned this park: none.
+> **Build .2 fix:** a raid card's header "group forming" LFM pill now reflects the
+> RAID forming (its `raidQuests`), not its flagging/prereq quests — a prereq
+> quest's LFM is not a raid LFM and never appears in the right-side raid-alert
+> corner, so lighting the raid card's headline badge for one made the card and
+> corner look inconsistent. Prereq quest rows still show their own row-level LFM
+> state; only the raid card's headline pill is scoped to the raid.
 > Latest: **NEW Raids tab** (Saga | Raids | Patrons) — a per-character tracker
 > for all 40 permanent Heroic/Epic/Legendary raids, modeled like saga content,
 > with derived "keyed" status (from each raid's wiki-sourced flagging chain),
