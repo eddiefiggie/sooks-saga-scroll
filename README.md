@@ -2,17 +2,19 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07292026-2.html` — Build
-> `07292026.2` (2026-07-29). Retain set is **3 files**: the 2 most recent
-> overall (`-07292026-2` + `-07292026-1`, both 07-29) PLUS the most-recent
+> **Currently parked:** `sooks-saga-scroll-07292026-3.html` — Build
+> `07292026.3` (2026-07-29). Retain set is **3 files**: the 2 most recent
+> overall (`-07292026-3` + `-07292026-2`, both 07-29) PLUS the most-recent
 > previous-day build (`-07272026-7`, 07-27) as the cross-day rollback anchor.
-> Pruned this park: none.
-> **Build .2 fix:** a raid card's header "group forming" LFM pill now reflects the
-> RAID forming (its `raidQuests`), not its flagging/prereq quests — a prereq
-> quest's LFM is not a raid LFM and never appears in the right-side raid-alert
-> corner, so lighting the raid card's headline badge for one made the card and
-> corner look inconsistent. Prereq quest rows still show their own row-level LFM
-> state; only the raid card's headline pill is scoped to the raid.
+> Pruned this park (moved to `_to_delete/`): `-07292026-1`.
+> **Build .3 — raids reuse the proven quest/container card.** Removed the custom
+> keyed badge ("Not keyed · N left"); raid cards now render the standard reward
+> pill + **First-Time Reaper bar** (FTR tracker, per-quest reaper buttons) +
+> **Complete bar** + standard quest rows, exactly like quests. A **Flagging bar**
+> shows only when the raid actually has flagging (prereq) quests; no-flagging
+> raids show just the two standard bars. Completion is the standard sagaDone
+> mechanism. (.2 fix retained: a raid card's header LFM pill is scoped to the raid
+> instance, not its prereq quests.)
 > Latest: **NEW Raids tab** (Saga | Raids | Patrons) — a per-character tracker
 > for all 40 permanent Heroic/Epic/Legendary raids, modeled like saga content,
 > with derived "keyed" status (from each raid's wiki-sourced flagging chain),
