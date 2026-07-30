@@ -4824,7 +4824,7 @@ html { overflow-y: scroll; }   /* always reserve the scrollbar gutter — a shor
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07292026.7</div>
+      <div class="build">Build 07292026.8</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -18072,7 +18072,21 @@ function renderRaidCorner() {
   try {
     const active = state.activeChar;
     const server = serverOf(active);
-    if (!active || !server) { corner.innerHTML = ""; return; }   // no live lookup → hide
+    if (!active) { corner.innerHTML = ""; return; }   // no character selected → nothing to show
+    // Build 07292026.8 — a character with no DDO server assigned can't have a
+    // live lookup (refreshLfmIndex('') early-returns), so the raid list would
+    // otherwise go silently blank — indistinguishable from "no raids up right
+    // now." Show an inline cue pointing at the fix instead of nothing. This also
+    // replaces any stale index carried over from the previous (server-set)
+    // character, so a serverless char never shows the prior char's raid data.
+    if (!server) {
+      corner.innerHTML =
+        `<table class="guild-table" title="No DDO server is set for ${escapeHtml(active)} — live raid groups can't be fetched until one is chosen">` +
+          `<thead><tr><th class="gm-fold"><span class="gm-caret">⚔</span> Raids</th></tr></thead>` +
+          `<tbody><tr><td class="gm-empty">Set a server for ${escapeHtml(active)} to see live raids</td></tr></tbody>` +
+        `</table>`;
+      return;
+    }
     // Build 07112026.2 — relevance shares _lvlRelevant with the audio cues
     // (level unknown → show all; no posted range → show).
     const lvl = _activeCharLevel();

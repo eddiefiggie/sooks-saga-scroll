@@ -76,6 +76,21 @@ One of the three priority groups a saga container header or quest row is compose
 
 ## Live data
 
+### LFM (Looking For More)
+A live, player-posted advertisement for an open group on a particular DDO server —
+the raw signal the scroll polls from DDO Audit to drive its live features (group
+badges, the raid and reaper corner lists, and quest tints). Each posting carries the
+quest being run (or none), a posted level range, a difficulty, the leader, and how
+full the party is; the scroll matches it to a known quest identity through the
+[Reference cache](#reference-cache). A *raid LFM* is one whose quest is a raid — these
+populate the raids corner, kept distinct from the reaper-skull LFMs that populate the
+reaper corners.
+
+A live corner is gated on the active character having a **server** on record (set per
+character, independent of whether the character is logged into the game): with no
+server, the LFM fetch has nothing to query, so the surface must show a "set a server"
+cue rather than a silent blank that reads as "no groups right now."
+
 ### Reference cache
 The locally cached copy of DDO Audit's static lookup tables — the `areas` table
 (area id → name/region) and the `quests` table (quest id → name, area id, raid

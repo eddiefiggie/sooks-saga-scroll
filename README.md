@@ -2,11 +2,18 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07292026-7.html` — Build
-> `07292026.7` (2026-07-29). Retain set is **3 files**: the 2 most recent
-> overall (`-07292026-7` + `-07292026-6`, both 07-29) PLUS the most-recent
+> **Currently parked:** `sooks-saga-scroll-07292026-8.html` — Build
+> `07292026.8` (2026-07-29). Retain set is **3 files**: the 2 most recent
+> overall (`-07292026-8` + `-07292026-7`, both 07-29) PLUS the most-recent
 > previous-day build (`-07272026-7`, 07-27) as the cross-day rollback anchor.
-> Pruned this park (moved to `_to_delete/`): `-07292026-5`.
+> Pruned this park (moved to `_to_delete/`): `-07292026-6`.
+> **Build .8 — serverless characters get an inline "set a server" cue.** The raid-LFM
+> corner used to render a silent blank for a character with no DDO server assigned —
+> indistinguishable from "no raids up right now." It now shows "Set a server for
+> &lt;char&gt; to see live raids" (and the cue replaces any stale raid rows carried over
+> from the previous character). Learning captured in
+> `docs/solutions/design-patterns/config-gated-live-surface-shows-cue-not-blank.md`;
+> `CONCEPTS.md` gained an **LFM** entry.
 > **Build .7 — raids now reward patron favor.** A completed raid awards favor to its
 > own patron on the Patrons tab, from a wiki-sourced base (`RAID_FAVOR`, the Elite
 > value). Because difficulty isn't tracked, a plain **Complete** is assumed run on
