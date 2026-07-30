@@ -4824,7 +4824,7 @@ html { overflow-y: scroll; }   /* always reserve the scrollbar gutter — a shor
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07292026.8</div>
+      <div class="build">Build 07302026.1</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -18667,8 +18667,10 @@ function renderRaidsView() {
 
   const wrap = document.createElement("div");
   wrap.className = "patrons-wrap raids-wrap";
+  // Build 07302026.1 — drop the redundant "⚔ Raids" section header. The per-band
+  // tier headers ("Heroic Raids", etc.) already label the sections, mirroring how the
+  // Saga tab goes straight from the tab bar into its tier bands (no "Saga" title).
   wrap.innerHTML = `
-    <div class="tier-header raids-header"><h2>⚔ Raids</h2></div>
     <div class="patrons-charline">Keying &amp; completion for <strong>${escapeHtml(char)}</strong>
       <span class="patrons-sub">— keyed is derived from each raid's flagging quests</span></div>`;
   el.appendChild(wrap);
