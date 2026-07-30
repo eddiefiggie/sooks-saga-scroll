@@ -2690,7 +2690,8 @@
      Sized big (32px) with a 2.5px border, a double-ring glow when
      sealed (inner gold seal-ring + outer emerald halo), and a chunky
      26px checkmark — meant to dominate the row as the master state. */
-  .quest input[type="checkbox"] {
+  .quest input[type="checkbox"],
+  .raid-controls input[type="checkbox"] {   /* Build 07292026.5 — raid Complete reuses the saga quest-completion seal */
     appearance: none;
     width: var(--q-check);
     height: var(--q-check);
@@ -2706,17 +2707,20 @@
     transition: background 140ms, border-color 140ms, box-shadow 140ms, transform 80ms;
   }
 
-  .quest input[type="checkbox"]:hover {
+  .quest input[type="checkbox"]:hover,
+  .raid-controls input[type="checkbox"]:hover {
     border-color: #2f4523;
     background: rgba(110,138,90,0.22);
     transform: scale(1.08);
   }
 
-  .quest input[type="checkbox"]:active {
+  .quest input[type="checkbox"]:active,
+  .raid-controls input[type="checkbox"]:active {
     transform: scale(0.96);
   }
 
-  .quest input[type="checkbox"]:checked {
+  .quest input[type="checkbox"]:checked,
+  .raid-controls input[type="checkbox"]:checked {
     background:
       radial-gradient(circle at 30% 28%, #a8c190 0%, #6e8a5a 45%, #3d5b28 100%);
     border-color: #1f3014;
@@ -2728,7 +2732,8 @@
       0 2px 6px rgba(31,48,20,0.5);
   }
 
-  .quest input[type="checkbox"]:checked::after {
+  .quest input[type="checkbox"]:checked::after,
+  .raid-controls input[type="checkbox"]:checked::after {
     content: "✓";
     position: absolute;
     top: 50%;
@@ -4520,12 +4525,18 @@ html { overflow-y: scroll; }   /* always reserve the scrollbar gutter — a shor
    (The keyed-badge styles from .1/.2 were removed — raids now use the proven
    reward-pill + Reaper + Complete bars, plus a Flagging bar only when flagging.) */
 .raids-wrap .raids-header { margin: 4px 0 6px; }
-/* Build 07292026.4 — raid header controls: Complete checkbox + Reaper button, in
-   place of the container bars (a raid is a single item, tracked with two booleans). */
-.raid-controls { display: flex; align-items: center; gap: 14px; justify-content: flex-end; flex-wrap: wrap; }
-.raid-controls .raid-complete { display: inline-flex; align-items: center; gap: 6px; font-family: 'Cinzel', 'EB Garamond', Georgia, serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.02em; text-transform: uppercase; color: var(--ink-secondary); cursor: pointer; white-space: nowrap; }
-.raid-controls .raid-complete input { cursor: pointer; width: 15px; height: 15px; }
+/* Build 07292026.4/.5 — raid header controls: the Complete seal (reuses the saga
+   quest-completion circular checkbox) + the Reaper button, in place of the
+   container bars (a raid is a single item, tracked with two booleans). */
+.raid-controls { --q-check: 28px; display: flex; align-items: center; gap: 14px; justify-content: flex-end; flex-wrap: wrap; }   /* --q-check feeds the shared quest-completion seal (scoped to .quest otherwise) */
+.raid-controls .raid-complete { display: inline-flex; align-items: center; gap: 8px; font-family: 'Cinzel', 'EB Garamond', Georgia, serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-secondary); cursor: pointer; white-space: nowrap; }
+.raid-controls .raid-complete input { cursor: pointer; }   /* size/shape come from the shared quest-completion seal */
 .raid-controls .raid-complete.done { color: #21400f; }
+/* Build 07292026.5 — a completed raid does NOT show the saga "✦ BANKED" corner
+   ribbon (that's saga-reward language; a raid is simply run or not). Keep the
+   completed wash, drop the banner. */
+.saga.raid-card.banked::after,
+.saga.raid-card.complete::after { content: none; display: none; }
 /* Build 07272026.6 — Patron header reuses the .tier-header treatment (centered,
    --font-display, flanking rule lines); the character name sits below as a
    centered subtitle, mirroring the tier flourish. */
@@ -4813,7 +4824,7 @@ html { overflow-y: scroll; }   /* always reserve the scrollbar gutter — a shor
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07292026.4</div>
+      <div class="build">Build 07292026.5</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -16043,7 +16054,7 @@ function renderSagaCard(saga) {
     let rReaperCls = "ftr-badge tiny" + (rReaper ? " sealed" : (rDone ? " standby" : ""));
     if (rReaper && reaperPopQueue.has(raidInstance)) { rReaperCls += " reaper-pop"; reaperPopQueue.delete(raidInstance); }
     raidHdrControls = `<div class="hdr-tier hdr-t2 raid-controls">
-        <label class="raid-complete${rDone ? " done" : ""}" title="Completed the raid (Complete) — click to toggle"><input type="checkbox" data-quest="${escapeHtml(raidInstance)}" ${rDone ? "checked" : ""}> Complete</label>
+        <label class="raid-complete${rDone ? " done" : ""}" title="RAID COMPLETED — the raid variant of the saga Quest Completed seal. Mark it when you've completed the raid (auto-fills when you mark Reaper). Click to toggle."><input type="checkbox" data-quest="${escapeHtml(raidInstance)}" ${rDone ? "checked" : ""}> Complete</label>
         <button type="button" class="${rReaperCls}" data-reaper="${escapeHtml(raidInstance)}" title="${rReaper ? "Raid completed on Reaper — click to clear" : "Mark the raid completed on Reaper"}"><span class="ftr-tag">${rReaper ? "Completed" : "First Time"}</span><span class="ftr-main"><span class="skull">☠</span> REAPER <span class="skull">☠</span></span></button>
       </div>`;
   }

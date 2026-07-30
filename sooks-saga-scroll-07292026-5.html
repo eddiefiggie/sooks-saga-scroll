@@ -2690,7 +2690,8 @@
      Sized big (32px) with a 2.5px border, a double-ring glow when
      sealed (inner gold seal-ring + outer emerald halo), and a chunky
      26px checkmark — meant to dominate the row as the master state. */
-  .quest input[type="checkbox"] {
+  .quest input[type="checkbox"],
+  .raid-controls input[type="checkbox"] {   /* Build 07292026.5 — raid Complete reuses the saga quest-completion seal */
     appearance: none;
     width: var(--q-check);
     height: var(--q-check);
@@ -2706,17 +2707,20 @@
     transition: background 140ms, border-color 140ms, box-shadow 140ms, transform 80ms;
   }
 
-  .quest input[type="checkbox"]:hover {
+  .quest input[type="checkbox"]:hover,
+  .raid-controls input[type="checkbox"]:hover {
     border-color: #2f4523;
     background: rgba(110,138,90,0.22);
     transform: scale(1.08);
   }
 
-  .quest input[type="checkbox"]:active {
+  .quest input[type="checkbox"]:active,
+  .raid-controls input[type="checkbox"]:active {
     transform: scale(0.96);
   }
 
-  .quest input[type="checkbox"]:checked {
+  .quest input[type="checkbox"]:checked,
+  .raid-controls input[type="checkbox"]:checked {
     background:
       radial-gradient(circle at 30% 28%, #a8c190 0%, #6e8a5a 45%, #3d5b28 100%);
     border-color: #1f3014;
@@ -2728,7 +2732,8 @@
       0 2px 6px rgba(31,48,20,0.5);
   }
 
-  .quest input[type="checkbox"]:checked::after {
+  .quest input[type="checkbox"]:checked::after,
+  .raid-controls input[type="checkbox"]:checked::after {
     content: "✓";
     position: absolute;
     top: 50%;
@@ -4520,6 +4525,18 @@ html { overflow-y: scroll; }   /* always reserve the scrollbar gutter — a shor
    (The keyed-badge styles from .1/.2 were removed — raids now use the proven
    reward-pill + Reaper + Complete bars, plus a Flagging bar only when flagging.) */
 .raids-wrap .raids-header { margin: 4px 0 6px; }
+/* Build 07292026.4/.5 — raid header controls: the Complete seal (reuses the saga
+   quest-completion circular checkbox) + the Reaper button, in place of the
+   container bars (a raid is a single item, tracked with two booleans). */
+.raid-controls { --q-check: 28px; display: flex; align-items: center; gap: 14px; justify-content: flex-end; flex-wrap: wrap; }   /* --q-check feeds the shared quest-completion seal (scoped to .quest otherwise) */
+.raid-controls .raid-complete { display: inline-flex; align-items: center; gap: 8px; font-family: 'Cinzel', 'EB Garamond', Georgia, serif; font-size: 0.82rem; font-weight: 700; letter-spacing: 0.03em; text-transform: uppercase; color: var(--ink-secondary); cursor: pointer; white-space: nowrap; }
+.raid-controls .raid-complete input { cursor: pointer; }   /* size/shape come from the shared quest-completion seal */
+.raid-controls .raid-complete.done { color: #21400f; }
+/* Build 07292026.5 — a completed raid does NOT show the saga "✦ BANKED" corner
+   ribbon (that's saga-reward language; a raid is simply run or not). Keep the
+   completed wash, drop the banner. */
+.saga.raid-card.banked::after,
+.saga.raid-card.complete::after { content: none; display: none; }
 /* Build 07272026.6 — Patron header reuses the .tier-header treatment (centered,
    --font-display, flanking rule lines); the character name sits below as a
    centered subtitle, mirroring the tier flourish. */
@@ -4807,7 +4824,7 @@ html { overflow-y: scroll; }   /* always reserve the scrollbar gutter — a shor
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07292026.3</div>
+      <div class="build">Build 07292026.5</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -13466,6 +13483,21 @@ SAGAS.push({ id:"raid-caught-in-the-web", isRaid:true, tier:"Epic", raidBand:"Ep
   storyArcs:[{ name:"Flag by completing the Menace of the Underdark story arc (King's Forest + Underdark). Tracked here via the arc entry, The Battle for Eveningstar — complete the full MotU arc to flag.", giver:"", giverLocation:"Eveningstar.", quests:["The Battle for Eveningstar","Caught in the Web"] }] });
 /* ═══════════════════════════ end RAIDS (all permanent raids harvested) ══════ */
 
+// Build 07292026.4 — the Raids tab tracks ONLY the raid itself (Complete + Reaper
+// booleans). Its flagging quests are already tracked in the Saga tab, so we do NOT
+// duplicate them as rows here. Move the prereqs (everything except the raid instance)
+// into a descriptive `flagging` field, and scope the container's quests to the raid
+// instance so all completion/reaper state is about the raid alone. Raid entries above
+// keep listing [..prereqs, raid] for readability; this derives the split once.
+SAGAS.forEach(r => {
+  if (!r.isRaid) return;
+  const inst = (r.raidQuests && r.raidQuests.length) ? r.raidQuests.slice() : [r.quests[r.quests.length - 1]];
+  r.flagging = (r.quests || []).filter(q => !inst.includes(q));   // prereqs — sourced from the Saga tab, not tracked here
+  r.quests = inst.slice();
+  r.raidQuests = inst.slice();
+  (r.storyArcs || []).forEach(a => { a.quests = inst.slice(); });   // keep the descriptive name text; scope tracked quests to the raid
+});
+
 const NO_REAPER = new Set(["Protect Baudry's Interests","Stop Hazadill's Shipment","Arachnophobia","Home Sweet Sewer","The Miller's Debt"]); // DDO wiki: Reaper difficulty -> Non-reaper quests (solo-only)
 const SHARED_QUESTS = buildSharedQuestMap();
 
@@ -15901,13 +15933,14 @@ function renderSagaCard(saga) {
   const char = state.activeChar;
   const st = sagaStatus(char, saga);
   const isExpanded = expanded.has(saga.id);   // Build 07192026.2 — Expand-all removed
-  // Build 07292026.3 (U3) — raid containers reuse the proven container card as-is:
-  // standard reward pill + Reaper (FTR) bar + Complete bar + standard quest rows.
-  // No keyed badge. The only raid-specific addition is a Flagging bar, shown only
-  // when the raid actually has flagging (prereq) quests. rk gives that prereq count.
+  // Build 07292026.4 (U3) — the Raids tab tracks ONLY the raid itself: two booleans
+  // (Complete checkbox + Reaper button) shown in the always-visible header, no bars,
+  // no prereq quest rows (those live in the Saga tab). Flagging is shown as a
+  // read-only note sourced from the raid's `flagging` field.
   const isRaid = !!saga.isRaid;
-  const rk = isRaid ? raidKeyed(char, saga) : null;
-  const raidHasFlagging = !!(rk && rk.total > 0);
+  const raidInstance = isRaid ? ((saga.raidQuests && saga.raidQuests[0]) || saga.quests[0]) : null;
+  const raidFlagging = isRaid ? (saga.flagging || []) : [];
+  const raidHasFlagging = raidFlagging.length > 0;
 
   const card = document.createElement("div");
   let cls = "saga";
@@ -16009,18 +16042,22 @@ function renderSagaCard(saga) {
   const toggleNext = st.reward === "banked" ? "incomplete" : "banked";
   const rewardOnLabel = isNotSagaContainer ? "Completed" : "Banked";
 
-  // Build 07292026.3 (U3) — raids reuse the proven container header (reward pill +
-  // Reaper bar + Complete bar + quest rows) unchanged. The ONLY raid-specific
-  // element is a Flagging bar, and only when the raid has flagging (prereq) quests;
-  // a no-flagging raid shows exactly the standard two bars, like any quest container.
-  const raidFlaggingBar = (isRaid && raidHasFlagging) ? `
-          <div class="saga-barwrap">
-            <span class="saga-bar-cap">Flagging</span>
-            <div class="saga-progress-bar${rk.done > 0 ? " has-progress" : ""}${rk.done >= rk.total ? " all-done" : ""}" title="Flagging: ${rk.done} of ${rk.total} prereq quest${rk.total === 1 ? "" : "s"} complete">
-              <div class="saga-progress-fill" style="width: ${Math.round((rk.done / rk.total) * 100)}%"></div>
-              <span class="saga-progress-text">${rk.done} / ${rk.total}</span>
-            </div>
-          </div>` : "";
+  // Build 07292026.4 — raid header controls: Complete (checkbox → sagaDone) + Reaper
+  // (button → quests[q]==="reaper"), two booleans for the raid instance, always
+  // visible (not behind the fold). wireCard wires them via the standard data-quest /
+  // data-reaper hooks, so completion + reaper behave exactly like a single quest.
+  let raidHdrControls = "";
+  if (isRaid) {
+    const _rss = (state.progress[char] && state.progress[char][saga.id]) || null;
+    const rDone = !!(_rss && _rss.sagaDone && _rss.sagaDone[raidInstance]);
+    const rReaper = !!(_rss && _rss.quests && _rss.quests[raidInstance] === "reaper");
+    let rReaperCls = "ftr-badge tiny" + (rReaper ? " sealed" : (rDone ? " standby" : ""));
+    if (rReaper && reaperPopQueue.has(raidInstance)) { rReaperCls += " reaper-pop"; reaperPopQueue.delete(raidInstance); }
+    raidHdrControls = `<div class="hdr-tier hdr-t2 raid-controls">
+        <label class="raid-complete${rDone ? " done" : ""}" title="RAID COMPLETED — the raid variant of the saga Quest Completed seal. Mark it when you've completed the raid (auto-fills when you mark Reaper). Click to toggle."><input type="checkbox" data-quest="${escapeHtml(raidInstance)}" ${rDone ? "checked" : ""}> Complete</label>
+        <button type="button" class="${rReaperCls}" data-reaper="${escapeHtml(raidInstance)}" title="${rReaper ? "Raid completed on Reaper — click to clear" : "Mark the raid completed on Reaper"}"><span class="ftr-tag">${rReaper ? "Completed" : "First Time"}</span><span class="ftr-main"><span class="skull">☠</span> REAPER <span class="skull">☠</span></span></button>
+      </div>`;
+  }
 
   card.innerHTML = `
     <div class="saga-header${lfmSkullTag ? " has-lfm" : ""}" data-saga="${saga.id}">
@@ -16029,11 +16066,10 @@ function renderSagaCard(saga) {
         <div class="saga-level">Lvl ${saga.levels}</div>
         <div class="saga-title">${escapeHtml(saga.name)}</div>
       </div>
-      <div class="hdr-tier hdr-t2">
+      ${isRaid ? raidHdrControls : `<div class="hdr-tier hdr-t2">
         <button class="reward-pill ${rewardCls}" data-reward="${toggleNext}" type="button"
                 title="Click to toggle ${toggleNext === 'banked' ? 'ON (' + rewardOnLabel + ')' : 'OFF (Incomplete) — clears Quest Completed marks; Reaper' + (isNotSagaContainer ? '' : ' / Skip') + ' preserved'}">${rewardLabel}</button>
         <div class="saga-bars">
-          ${raidFlaggingBar}
           <div class="saga-barwrap">
             <span class="saga-bar-cap"><span class="skull">☠</span> Reaper</span>
             <div class="saga-progress-bar reaper${st.reaperDone > 0 ? " has-progress" : ""}${reaperSealed ? " sealed" : ""}${reaperMuted ? " muted" : ""}" title="First-Time Reaper: ${st.reaperDone} of ${reaperTotal} reaper-eligible quest${reaperTotal === 1 ? "" : "s"}${reaperMuted ? " — none in this container" : ""}">
@@ -16049,14 +16085,14 @@ function renderSagaCard(saga) {
             </div>
           </div>
         </div>
-      </div>
+      </div>`}
       ${lfmSkullTag ? `<div class="hdr-tier hdr-t3">${lfmSkullTag}</div>` : ""}
     </div>
     <div class="saga-body">
       ${renderSagaStory(saga)}
       <div class="saga-info">
         ${isRaid
-          ? `<div class="row not-a-saga-row"><span class="key">Raid</span><span class="val"><em>${raidHasFlagging ? `Flag by completing the ${rk.total} flagging quest${rk.total === 1 ? "" : "s"} below — they share their completion with the Saga tab.` : "No flagging required — directly accessible."}</em></span></div>
+          ? `<div class="row not-a-saga-row"><span class="key">Flagging</span><span class="val"><em>${raidHasFlagging ? `Complete ${raidFlagging.map(q => escapeHtml(q)).join(", ")} — track these in the Saga tab.` : "No flagging required — directly accessible."}</em></span></div>
         <div class="row"><span class="key">Region</span><span class="val">${escapeHtml(saga.region || "")}</span></div>`
           : saga.isNotSaga
           ? `<div class="row not-a-saga-row"><span class="key">Note</span><span class="val"><em>Not a saga — these quests are not part of any saga chain. Container exists to group standalone ${saga.tier === "Non-Saga Epic" ? "Epic level-20" : "Legendary"} quests for leveling / FTR tracking.</em></span></div>`
@@ -16066,16 +16102,17 @@ function renderSagaCard(saga) {
         <div class="row"><span class="key">Patron</span><span class="val">${escapeHtml(saga.patron || "")}</span></div>
       </div>
 
-      <!-- Build 07192026.2 — the in-body "End Reward" control (.reward-controls
-           label + .reward-btn pill) was removed; the header reward pill is the
-           single banked/incomplete toggle now. -->
-      <div class="quest-list-wrap">
+      <!-- Build 07192026.2 — the in-body "End Reward" control was removed; the header
+           reward pill is the single banked/incomplete toggle now.
+           Build 07292026.4 — raids track only the raid itself (Complete + Reaper in the
+           header), so they render no quest list; their flagging quests live in the Saga tab. -->
+      ${isRaid ? "" : `<div class="quest-list-wrap">
         <div class="quest-list-title">
           <span>Quests</span>
           ${saga.partial ? `<span class="partial-flag">(quest list partial — verify on DDO Wiki)</span>` : ""}
         </div>
         ${renderQuestListBody(saga, char)}
-      </div>
+      </div>`}
 
       <div class="notes-wrap">
         <label>Notes <span style="font-weight:normal;text-transform:none;letter-spacing:0;font-style:italic;color:var(--ink-faded);">— things you don't want to forget</span></label>
@@ -18573,10 +18610,10 @@ function renderRaidsView() {
   RAID_BANDS.forEach(band => {
     const inBand = raids.filter(r => (r.raidBand || "") === band);
     if (!inBand.length) return;
-    // keyed-required (has prereqs) first, then no-key; within a group by level then name.
+    // flagging-required raids first, then directly-accessible; within a group by level then name.
     inBand.sort((a, b) => {
-      const ak = (a.raidQuests || []).length < (a.quests || []).length ? 0 : 1;
-      const bk = (b.raidQuests || []).length < (b.quests || []).length ? 0 : 1;
+      const ak = (a.flagging || []).length ? 0 : 1;
+      const bk = (b.flagging || []).length ? 0 : 1;
       if (ak !== bk) return ak - bk;
       const al = parseInt(a.levels, 10) || 0, bl = parseInt(b.levels, 10) || 0;
       return (al - bl) || a.name.localeCompare(b.name);

@@ -2,11 +2,18 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07292026-4.html` — Build
-> `07292026.4` (2026-07-29). Retain set is **3 files**: the 2 most recent
-> overall (`-07292026-4` + `-07292026-3`, both 07-29) PLUS the most-recent
+> **Currently parked:** `sooks-saga-scroll-07292026-5.html` — Build
+> `07292026.5` (2026-07-29). Retain set is **3 files**: the 2 most recent
+> overall (`-07292026-5` + `-07292026-4`, both 07-29) PLUS the most-recent
 > previous-day build (`-07272026-7`, 07-27) as the cross-day rollback anchor.
-> Pruned this park (moved to `_to_delete/`): `-07292026-2`.
+> Pruned this park (moved to `_to_delete/`): `-07292026-3`.
+> **Build .5 — raid Complete uses the saga quest-completion seal.** The raid
+> Complete control now reuses the circular green "quest completed" seal (shared
+> `.quest`/`.raid-controls input[type=checkbox]` styling; `--q-check` fed to
+> `.raid-controls` since it's otherwise scoped to `.quest`), with raid-variant
+> title language. A completed raid no longer shows the "✦ BANKED" corner ribbon
+> (`.raid-card.banked/.complete::after` suppressed) — that's saga-reward wording;
+> the completed wash is kept, the banner dropped.
 > **Build .4 — a raid is tracked as a single item, not a container of quests.**
 > Raid cards no longer duplicate their flagging quests as rows (those are tracked
 > in the Saga tab). Each raid now has two always-visible header booleans —
