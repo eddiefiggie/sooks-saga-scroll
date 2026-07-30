@@ -100,6 +100,22 @@ so a quest that exists under more than one [Tier](#tier) is marked on the tier
 matching the character's current level; because those per-tier copies are tracked
 independently, marking or resetting one never affects the other.
 
+### Keyed
+A raid's flagged/unlocked state for a character, used in the [Raids](#raids-tab) tab.
+Like [Patron Favor](#patron-favor) it is **derived, not stored** — a raid is *keyed*
+when all of its prerequisite (flagging) quests are complete for that character. Raids
+with no prerequisite quests are always keyed. Because a raid's flagging quests are the
+same quest identities that may also live in Saga-tab containers, keyed derivation reads
+the same completion state the Saga tab writes (via the same-tier `SHARED_QUESTS`
+cascade), so the two tabs never disagree.
+
+### Raids Tab
+A per-character tracker for every permanent Heroic/Epic/Legendary raid, modeled like
+Saga-tab content ([Tier](#tier) headers → containers → checkable quest rows). Each raid
+is a container holding its flagging quests plus the raid instance; within a tier,
+[keyed](#keyed)-required raids sort before no-key raids. Seasonal/event raids are out of
+scope, and the reaper seal is a saga concept not applied to raids.
+
 ## Flagged ambiguities
 
 - **"Tier"** is used for two unrelated things: a container's [Tier](#tier) (its Heroic/Epic/Legendary/Non-Saga classification and level band) and a [Roll-over tier](#roll-over-tier) (one of the three responsive-layout priority bands a row stacks into). When unqualified, "tier" means the container classification; the layout sense is always "roll-over tier".

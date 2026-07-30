@@ -4460,7 +4460,7 @@
     .char-medallion { max-width: 100%; }
   }
 /* ── Build 07272026.1 — two-tab shell (Saga | Patrons) + favor dashboard ── */
-#sagaList[hidden], #patronsView[hidden], #filtersView[hidden] { display: none; }
+#sagaList[hidden], #raidsView[hidden], #patronsView[hidden], #filtersView[hidden] { display: none; }
 /* Build 07272026.5 — polished segmented tabs. The active tab is a lifted,
    gold-edged parchment pill on a recessed track, so the selection reads clearly
    (the underline-only style in .4 was too subtle). Theme-safe via CSS vars. */
@@ -4494,16 +4494,38 @@
 .tab-btn:active { transform: translateY(1px); }
 .tab-btn:focus-visible { outline: 2px solid var(--gold); outline-offset: 2px; }
 /* sweep-in when the Patrons / Filters panel becomes active (Saga list stays static) */
-@keyframes tabSweepIn { from { opacity: 0; transform: translateX(16px); } to { opacity: 1; transform: translateX(0); } }
-#patronsView, #filtersView { animation: tabSweepIn .22s ease; }
+/* Build .7 — vertical fade-in, not a horizontal slide. The old translateX(16px)
+   made the Patron header appear ~16px off the Saga tier header during the sweep
+   (they're identical at rest); a translateY keeps the header horizontally aligned
+   throughout. */
+@keyframes tabSweepIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+#raidsView, #patronsView, #filtersView { animation: tabSweepIn .22s ease; }
 #filtersView { max-width: 1180px; margin: 0 auto; }
 #filtersView .ctl-fold { display: none; }   /* fold bar redundant — the tab owns show/hide */
-@media (prefers-reduced-motion: reduce) { #patronsView, #filtersView { animation: none; } }
+@media (prefers-reduced-motion: reduce) { #raidsView, #patronsView, #filtersView { animation: none; } }
 
-#patronsView { max-width: 1180px; margin: 0 auto; padding: 0 12px 40px; }
+/* Build 07272026.7 — reserve the scrollbar gutter always, so switching to a short
+   tab (Patrons/Filters with no scrollbar) doesn't shift the centered content ~15px
+   relative to the long Saga list (which does scroll). Keeps the Patron header and
+   Saga tier header horizontally aligned across tabs. */
+html { overflow-y: scroll; }   /* always reserve the scrollbar gutter — a short tab (Patrons/Filters) must not shift centered content vs the scrolling Saga list */
+/* Build .7 — #patronsView must be a plain block like <main id="sagaList"> (no
+   max-width/auto-margin/side-padding) so its centered tier-header lands on the
+   exact same axis as the Saga tier headers. */
+#raidsView, #patronsView { padding-bottom: 40px; }
 .patrons-empty { text-align: center; padding: 60px 20px; font-family: 'EB Garamond', Georgia, serif;
   font-style: italic; font-size: 1.1rem; color: var(--ink-faded); }
-.patrons-wrap { padding-top: 18px; }
+.patrons-wrap { padding-top: 30px; }   /* Build .7 — match the Saga tier header's ~40px gap below the tabs */
+/* Build 07292026.1 (U3) — Raids tab: derived keyed badge (non-interactive, sits
+   where the saga reward pill sits). Reuses the .saga card + .saga-bars otherwise. */
+.raid-keyed-badge {
+  font-family: 'Cinzel', 'EB Garamond', Georgia, serif; font-size: 0.8rem; font-weight: 700;
+  letter-spacing: 0.03em; padding: 5px 12px; border-radius: 8px; white-space: nowrap;
+  align-self: center; border: 1px solid var(--parchment-edge);
+}
+.raid-keyed-badge.is-keyed { color: #21400f; background: linear-gradient(#d6e6c4, #b8d29a); border-color: var(--gold); box-shadow: inset 0 0 0 1px var(--gold-light); }
+.raid-keyed-badge.not-keyed { color: var(--ink-faded); background: rgba(101,78,40,0.10); font-weight: 600; font-style: italic; }
+.raids-wrap .raids-header { margin: 4px 0 6px; }
 /* Build 07272026.6 — Patron header reuses the .tier-header treatment (centered,
    --font-display, flanking rule lines); the character name sits below as a
    centered subtitle, mirroring the tier flourish. */
@@ -4749,17 +4771,20 @@
        so the narrow column reads Filters -> Characters -> LFM -> Server. -->
   <div id="narrowStack" aria-hidden="false"></div>
 
-  <!-- Build 07272026.1 — top-level two-tab shell (Saga | Patrons). The tab bar
-       toggles ONLY the central content (#sagaList <-> #patronsView); the header
-       (incl. Filters), corner clusters, and footer persist on both tabs (KTD5).
-       ARIA tablist pattern; arrow-key nav wired in bindTabBar(). -->
+  <!-- Build 07272026.1 — top-level tab shell. Build 07292026.1 — Raids tab added
+       between Saga and Patrons. The tab bar toggles ONLY the central content
+       (#sagaList <-> #raidsView <-> #patronsView); the header (incl. Filters),
+       corner clusters, and footer persist on all tabs (KTD5/U1). ARIA tablist
+       pattern; arrow-key nav wired in bindTabBar(). -->
   <nav class="tab-bar" role="tablist" aria-label="Views">
     <button class="tab-btn is-active" id="tabSaga"    role="tab" aria-selected="true"  aria-controls="sagaList"    type="button" data-tab="saga">📜 Saga</button>
+    <button class="tab-btn"           id="tabRaids"   role="tab" aria-selected="false" aria-controls="raidsView"   type="button" data-tab="raids">⚔ Raids</button>
     <button class="tab-btn"           id="tabPatrons" role="tab" aria-selected="false" aria-controls="patronsView" type="button" data-tab="patrons">⚜ Patrons</button>
     <button class="tab-btn"           id="tabFilters" role="tab" aria-selected="false" aria-controls="filtersView" type="button" data-tab="filters">⚙ Filters</button>
   </nav>
 
   <main id="sagaList"></main>
+  <section id="raidsView"   role="tabpanel" aria-labelledby="tabRaids"   hidden></section>
   <section id="patronsView" role="tabpanel" aria-labelledby="tabPatrons" hidden></section>
   <!-- Build 07272026.4 — the Filters & Alerts panel (#controlsPanel) is relocated
        here from the header at init (see relocateFiltersToTab); it sweeps in as the
@@ -4788,7 +4813,7 @@
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07272026.6</div>
+      <div class="build">Build 07292026.1</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -12712,7 +12737,18 @@ const SAGAS = [
 // the migrate() function — old shapes are detected by missing schemaVersion
 // and rewritten in place. NEVER bump this key; bump SCHEMA_VERSION instead.
 const STORAGE_KEY = "sooksSagaScroll";
-const SCHEMA_VERSION = 14;
+const SCHEMA_VERSION = 15;
+// v15 (Build 07292026.1): Raids tab. PURELY ADDITIVE — same shape as the v9
+//     Non-Saga tiers. SAGAS gains raid containers flagged `isRaid: true` on
+//     their base tier (Heroic/Epic/Legendary) with a `raidQuests` subset naming
+//     the raid-instance row(s). Raid completion reuses `progress[char][id].quests[q]`
+//     — NO new persisted field. blankCharState/ensureShape already create/preserve
+//     state for every SAGAS entry; import/export already round-trips quest values
+//     losslessly. "Keyed" is DERIVED (all prereqs complete), never stored. Raids are
+//     excluded from the Saga tab (renderSagaList filters !isRaid) and rendered in the
+//     Raids tab (renderRaidsView). No new tier value, so VALID_TIER_FILTERS is
+//     unchanged. STORAGE_KEY untouched. Older builds loading a v15 save keep their
+//     data intact (raid quests are just extra containers they don't render).
 // v11 (Build 06212026.4): per-character `characterServers` map
 // ({ "<charName>": "<DDO server>" }) powering the optional DDO Audit live
 // status lookup under each medallion. Additive — mirrors characterThemes
@@ -13295,6 +13331,146 @@ SAGAS.push({"id":"ns-h-harbor-standalones","tier":"Non-Saga Heroic","isNotSaga":
   if(!p.storyArcs.some(a=>a.name==="Harbor pre-quest")) p.storyArcs.push({ name:"Harbor pre-quest", giver:"Niles Cage", giverLocation:"The Harbor, Stormreach — far north-east docks (Captain Niles Cage)", quests:["Irestone Inlet"] });
 })();
 /* ===== end Build 06082026.4 patch ===== */
+
+/* ═══════════════ Build 07292026.1 (U2/U4) — RAIDS (Raids tab) ═══════════════
+   Raid containers are additive SAGAS entries flagged `isRaid: true`. Two extra
+   fields vs a normal container:
+     • raidBand  — "Heroic" | "Epic" | "Legendary": the Raids-tab grouping band
+                   AND the keyed-sort band. Display only.
+     • raidQuests — the raid-instance quest name(s) (subset of `quests`). Excluded
+                   from keyed derivation: keyed = every quest in (quests − raidQuests)
+                   is complete. A raid with no prereqs (raidQuests === quests) is
+                   always keyed.
+   `tier` is set to the tier under which this raid's PREREQ quests already live in
+   the Saga tab, so the within-tier SHARED_QUESTS cascade links them to one shared
+   checkbox (e.g. Plane of Night's VoN prereqs live in ns-e-vault-of-night at
+   "Non-Saga Epic"). For a no-prereq raid, `tier` is just its own band. Raids are
+   excluded from renderSagaList (Saga tab) and rendered by renderRaidsView.
+   Wiki-sourced 2026-07-29 via the ddowiki MediaWiki API + page infoboxes (KTD7). */
+SAGAS.push({
+  id:"raid-plane-of-night", isRaid:true, tier:"Non-Saga Epic", raidBand:"Epic",
+  name:"Plane of Night (VoN 6 raid)", levels:"22", region:"House Kundarak",
+  pack:"Vault of Night", patron:"House Kundarak",
+  wiki:"https://ddowiki.com/page/Plane_of_Night",
+  quests:["Haywire Foundry","The Prisoner","The Jungle of Khyber","Tharashk Arena","The Vault of Night","Plane of Night"],
+  raidQuests:["Plane of Night"],
+  storyArcs:[{ name:"Laughing Knives chain — run VoN 1-4 in any order, then The Vault of Night (VoN 5) opens the Plane of Night raid (VoN 6). Flagging persists; no reflag after completions.", giver:"Barrow d'Kundarak", giverLocation:"House Kundarak — the raid is entered via the gate at the end of The Vault of Night (VoN 5); prereqs share one checkbox with the Vault of Night container in the Saga tab.", quests:["Haywire Foundry","The Prisoner","The Jungle of Khyber","Tharashk Arena","The Vault of Night","Plane of Night"] }]
+});
+SAGAS.push({
+  id:"raid-tempests-spine", isRaid:true, tier:"Heroic", raidBand:"Heroic",
+  name:"Tempest's Spine", levels:"10", region:"House Jorasco",
+  pack:"Free to Play", patron:"House Jorasco",
+  wiki:"https://ddowiki.com/page/Tempest%27s_Spine",
+  quests:["Tempest's Spine"],
+  raidQuests:["Tempest's Spine"],
+  storyArcs:[{ name:"No flagging required — the raid is directly accessible (always keyed).", giver:"Chamberlain Cyrese Embree", giverLocation:"House Jorasco.", quests:["Tempest's Spine"] }]
+});
+// ── Heroic raids (Build 07292026.1, U4 batch 1 — wiki-sourced 2026-07-29) ──
+SAGAS.push({ id:"raid-reavers-fate", isRaid:true, tier:"Heroic", raidBand:"Heroic", name:"The Reaver's Fate", levels:"14", region:"Gianthold", pack:"Ruins of Gianthold", patron:"Agents of Argonnessen", wiki:"https://ddowiki.com/page/The_Reaver%27s_Fate",
+  quests:["Madstone Crater","Prison of the Planes","A Cabal for One","Gianthold Tor","The Reaver's Fate"], raidQuests:["The Reaver's Fate"],
+  storyArcs:[{ name:"Flag by completing Madstone Crater, Prison of the Planes, and A Cabal for One, then Gianthold Tor. No reflag except on TR.", giver:"Agon Uruhond", giverLocation:"Gianthold.", quests:["Madstone Crater","Prison of the Planes","A Cabal for One","Gianthold Tor","The Reaver's Fate"] }] });
+SAGAS.push({ id:"raid-zawabis-revenge", isRaid:true, tier:"Heroic", raidBand:"Heroic", name:"Zawabi's Revenge", levels:"12", region:"Zawabi's Refuge", pack:"Demon Sands", patron:"The Free Agents", wiki:"https://ddowiki.com/page/Zawabi%27s_Revenge",
+  quests:["Against the Demon Queen","Zawabi's Revenge"], raidQuests:["Zawabi's Revenge"],
+  storyArcs:[{ name:"Flag by completing Against the Demon Queen (which has its own flagging chain in Demon Sands).", giver:"Zawabi the Elder Djinni", giverLocation:"Zawabi's Refuge.", quests:["Against the Demon Queen","Zawabi's Revenge"] }] });
+SAGAS.push({ id:"raid-titan-awakes", isRaid:true, tier:"Heroic", raidBand:"Heroic", name:"The Titan Awakes", levels:"12", region:"Restless Isles", pack:"The Restless Isles", patron:"The Free Agents", wiki:"https://ddowiki.com/page/The_Titan_Awakes",
+  quests:["The Titan Awakes"], raidQuests:["The Titan Awakes"],
+  storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"Ostler Caulstone", giverLocation:"Restless Isles.", quests:["The Titan Awakes"] }] });
+SAGAS.push({ id:"raid-hound-of-xoriat", isRaid:true, tier:"Heroic", raidBand:"Heroic", name:"Hound of Xoriat", levels:"18", region:"The Marketplace", pack:"The Vale of Twilight", patron:"The Twelve", wiki:"https://ddowiki.com/page/Hound_of_Xoriat",
+  quests:["Hound of Xoriat"], raidQuests:["Hound of Xoriat"],
+  storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"The Twelve", giverLocation:"The Marketplace (portal via the Twelve).", quests:["Hound of Xoriat"] }] });
+SAGAS.push({ id:"raid-vision-of-destruction", isRaid:true, tier:"Heroic", raidBand:"Heroic", name:"A Vision of Destruction", levels:"18", region:"The Marketplace", pack:"The Vale of Twilight", patron:"The Twelve", wiki:"https://ddowiki.com/page/A_Vision_of_Destruction",
+  quests:["A Vision of Destruction"], raidQuests:["A Vision of Destruction"],
+  storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"The Twelve", giverLocation:"The Marketplace (portal via the Twelve).", quests:["A Vision of Destruction"] }] });
+SAGAS.push({ id:"raid-ascension-chamber", isRaid:true, tier:"Heroic", raidBand:"Heroic", name:"Ascension Chamber", levels:"17", region:"The Necropolis", pack:"The Necropolis, Part 4", patron:"The Silver Flame", wiki:"https://ddowiki.com/page/Ascension_Chamber",
+  quests:["The Litany of the Dead","Ascension Chamber"], raidQuests:["Ascension Chamber"],
+  storyArcs:[{ name:"Flag by completing the Litany of the Dead pre-raid quest (all four paths). Reflag once per TR.", giver:"Sir Rohine Stiedra", giverLocation:"The Necropolis.", quests:["The Litany of the Dead","Ascension Chamber"] }] });
+SAGAS.push({ id:"raid-tower-of-despair", isRaid:true, tier:"Heroic", raidBand:"Heroic", name:"Tower of Despair", levels:"20", region:"Amrath", pack:"The Devils of Shavarath", patron:"The Yugoloth", wiki:"https://ddowiki.com/page/Tower_of_Despair",
+  quests:["Tower of Despair"], raidQuests:["Tower of Despair"],
+  storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"Uloth", giverLocation:"Amrath.", quests:["Tower of Despair"] }] });
+SAGAS.push({ id:"raid-chronoscope", isRaid:true, tier:"Heroic", raidBand:"Heroic", name:"The Chronoscope", levels:"6", region:"The Marketplace", pack:"Devil Assault", patron:"The Coin Lords", wiki:"https://ddowiki.com/page/The_Chronoscope",
+  quests:["The Chronoscope"], raidQuests:["The Chronoscope"],
+  storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"Nolan Gann", giverLocation:"The Marketplace.", quests:["The Chronoscope"] }] });
+SAGAS.push({ id:"raid-lord-of-blades", isRaid:true, tier:"Heroic", raidBand:"Heroic", name:"The Lord of Blades", levels:"20", region:"House Cannith", pack:"Secrets of the Artificers", patron:"House Cannith", wiki:"https://ddowiki.com/page/The_Lord_of_Blades",
+  quests:["The Lord of Blades"], raidQuests:["The Lord of Blades"],
+  storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"Kenneth d'Cannith", giverLocation:"House Cannith.", quests:["The Lord of Blades"] }] });
+SAGAS.push({ id:"raid-master-artificer", isRaid:true, tier:"Heroic", raidBand:"Heroic", name:"The Master Artificer", levels:"19", region:"House Cannith", pack:"Secrets of the Artificers", patron:"House Cannith", wiki:"https://ddowiki.com/page/The_Master_Artificer",
+  quests:["The Master Artificer"], raidQuests:["The Master Artificer"],
+  storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"Vesper d'Cannith", giverLocation:"House Cannith.", quests:["The Master Artificer"] }] });
+// ── Legendary raids (Build 07292026.1, U4 batch 2 — wiki-sourced 2026-07-29) ──
+SAGAS.push({ id:"raid-legendary-tempests-spine", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Legendary Tempest's Spine", levels:"32", region:"House Jorasco", pack:"Legendary (base)", patron:"House Jorasco", wiki:"https://ddowiki.com/page/Legendary_Tempest%27s_Spine",
+  quests:["Legendary Tempest's Spine"], raidQuests:["Legendary Tempest's Spine"], storyArcs:[{ name:"No flagging required — directly accessible (always keyed). Note: the Legendary version has a raid timer.", giver:"Dagobard Kell", giverLocation:"House Jorasco.", quests:["Legendary Tempest's Spine"] }] });
+SAGAS.push({ id:"raid-legendary-hound-of-xoriat", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Legendary Hound of Xoriat", levels:"32", region:"The Marketplace", pack:"The Vale of Twilight", patron:"The Twelve", wiki:"https://ddowiki.com/page/Legendary_Hound_of_Xoriat",
+  quests:["Legendary Hound of Xoriat"], raidQuests:["Legendary Hound of Xoriat"], storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"The Twelve", giverLocation:"The Marketplace.", quests:["Legendary Hound of Xoriat"] }] });
+SAGAS.push({ id:"raid-legendary-vision-of-destruction", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Legendary Vision of Destruction", levels:"32", region:"The Marketplace", pack:"The Vale of Twilight", patron:"The Twelve", wiki:"https://ddowiki.com/page/Legendary_Vision_of_Destruction",
+  quests:["Legendary Vision of Destruction"], raidQuests:["Legendary Vision of Destruction"], storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"The Twelve", giverLocation:"The Marketplace.", quests:["Legendary Vision of Destruction"] }] });
+SAGAS.push({ id:"raid-legendary-master-artificer", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Legendary Master Artificer", levels:"32", region:"House Cannith", pack:"Secrets of the Artificers", patron:"House Cannith", wiki:"https://ddowiki.com/page/Legendary_Master_Artificer",
+  quests:["Legendary Master Artificer"], raidQuests:["Legendary Master Artificer"], storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"Vesper d'Cannith", giverLocation:"House Cannith.", quests:["Legendary Master Artificer"] }] });
+SAGAS.push({ id:"raid-legendary-lord-of-blades", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Legendary Lord of Blades", levels:"32", region:"House Cannith", pack:"Secrets of the Artificers", patron:"House Cannith", wiki:"https://ddowiki.com/page/Legendary_Lord_of_Blades",
+  quests:["Legendary Lord of Blades"], raidQuests:["Legendary Lord of Blades"], storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"Kenneth d'Cannith", giverLocation:"House Cannith.", quests:["Legendary Lord of Blades"] }] });
+SAGAS.push({ id:"raid-legendary-chronoscope", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"The Chronoscope (Legendary)", levels:"32", region:"The Marketplace", pack:"Devil Assault", patron:"The Coin Lords", wiki:"https://ddowiki.com/page/The_Chronoscope_(Legendary)",
+  quests:["The Chronoscope (Legendary)"], raidQuests:["The Chronoscope (Legendary)"], storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"Nolan Gann", giverLocation:"The Marketplace.", quests:["The Chronoscope (Legendary)"] }] });
+SAGAS.push({ id:"raid-project-nemesis", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Project Nemesis", levels:"32", region:"Sharn", pack:"Masterminds of Sharn", patron:"Sharn City Council", wiki:"https://ddowiki.com/page/Project_Nemesis",
+  quests:["Project Nemesis"], raidQuests:["Project Nemesis"], storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"", giverLocation:"Alcorin's Forge Staging Area, Sharn.", quests:["Project Nemesis"] }] });
+SAGAS.push({ id:"raid-dryad-and-the-demigod", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"The Dryad and the Demigod", levels:"32", region:"Feywild", pack:"Fables of the Feywild", patron:"The Summer Court", wiki:"https://ddowiki.com/page/The_Dryad_and_the_Demigod",
+  quests:["The Dryad and the Demigod"], raidQuests:["The Dryad and the Demigod"], storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"", giverLocation:"Wynwood Hall, the Feywild.", quests:["The Dryad and the Demigod"] }] });
+SAGAS.push({ id:"raid-threats-old-and-new", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Threats Old and New", levels:"35", region:"Myth Drannor", pack:"Magic of Myth Drannor", patron:"Cormanthor Elves", wiki:"https://ddowiki.com/page/Threats_Old_and_New",
+  quests:["Threats Old and New"], raidQuests:["Threats Old and New"], storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"", giverLocation:"Outskirts of Myth Drannor.", quests:["Threats Old and New"] }] });
+SAGAS.push({ id:"raid-riding-the-storm-out", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Riding the Storm Out", levels:"32", region:"The Marketplace", pack:"Dragonblood Prophecy", patron:"Agents of Argonnessen", wiki:"https://ddowiki.com/page/Riding_the_Storm_Out",
+  quests:["Riding the Storm Out"], raidQuests:["Riding the Storm Out"], storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"", giverLocation:"The Marketplace.", quests:["Riding the Storm Out"] }] });
+SAGAS.push({ id:"raid-mark-of-death", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"The Mark of Death", levels:"30", region:"The Necropolis", pack:"The Necropolis, Part 4", patron:"The Silver Flame", wiki:"https://ddowiki.com/page/The_Mark_of_Death",
+  quests:["Desecrated Temple of Vol (epic)","Ghosts of Perdition (epic)","Inferno of the Damned (epic)","Flesh Maker's Laboratory (epic)","The Mark of Death"], raidQuests:["The Mark of Death"],
+  storyArcs:[{ name:"Flag by completing the four epic Litany of the Dead path quests.", giver:"Hamond Byre", giverLocation:"The Necropolis.", quests:["Desecrated Temple of Vol (epic)","Ghosts of Perdition (epic)","Inferno of the Damned (epic)","Flesh Maker's Laboratory (epic)","The Mark of Death"] }] });
+SAGAS.push({ id:"raid-defiler-of-the-just", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Defiler of the Just", levels:"30", region:"Amrath", pack:"Trials of the Archons", patron:"The Gatekeepers", wiki:"https://ddowiki.com/page/Defiler_of_the_Just",
+  quests:["Demon Assault","The Archons' Trial","The Devil's Details","Defiler of the Just"], raidQuests:["Defiler of the Just"],
+  storyArcs:[{ name:"Flag by completing Demon Assault, The Archons' Trial, and The Devil's Details.", giver:"Melene", giverLocation:"Amrath.", quests:["Demon Assault","The Archons' Trial","The Devil's Details","Defiler of the Just"] }] });
+SAGAS.push({ id:"raid-codex-and-the-shroud", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"The Codex and the Shroud", levels:"32", region:"Meridia", pack:"The Vale of Twilight", patron:"The Gatekeepers", wiki:"https://ddowiki.com/page/The_Codex_and_the_Shroud",
+  quests:["To Curse the Sky","Creeping Death","The Shroud","The Codex and the Shroud"], raidQuests:["The Codex and the Shroud"],
+  storyArcs:[{ name:"Flag by completing To Curse the Sky, Creeping Death, and The Shroud.", giver:"Rael Omastoro", giverLocation:"Meridia.", quests:["To Curse the Sky","Creeping Death","The Shroud","The Codex and the Shroud"] }] });
+SAGAS.push({ id:"raid-curse-of-strahd", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"The Curse of Strahd", levels:"32", region:"Barovia", pack:"Mists of Ravenloft", patron:"Keepers of Barovia", wiki:"https://ddowiki.com/page/The_Curse_of_Strahd",
+  quests:["Death House","Fresh-baked Dreams","An Invitation to Dinner","Oath of Vengeance","A Raven at the Door","Sealed in Amber","The Final Vintage","Wrath of the Earth","Sunrise","Into the Mists","The Curse of Strahd"], raidQuests:["The Curse of Strahd"],
+  storyArcs:[{ name:"Flag by completing the Mists of Ravenloft story arc (Death House through Into the Mists).", giver:"", giverLocation:"Blood on the Vine Tavern, Barovia.", quests:["Death House","Fresh-baked Dreams","An Invitation to Dinner","Oath of Vengeance","A Raven at the Door","Sealed in Amber","The Final Vintage","Wrath of the Earth","Sunrise","Into the Mists","The Curse of Strahd"] }] });
+SAGAS.push({ id:"raid-old-babas-hut", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Old Baba's Hut", levels:"32", region:"Barovia", pack:"Mists of Ravenloft", patron:"Keepers of Barovia", wiki:"https://ddowiki.com/page/Old_Baba%27s_Hut",
+  quests:["Into the Mists","Old Baba's Hut"], raidQuests:["Old Baba's Hut"],
+  storyArcs:[{ name:"Flag by completing Into the Mists (the Ravenloft entry quest).", giver:"", giverLocation:"Blue Water Inn, Barovia.", quests:["Into the Mists","Old Baba's Hut"] }] });
+SAGAS.push({ id:"raid-den-of-vipers", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Den of Vipers", levels:"36", region:"Hall of Heroes", pack:"Vecna Unleashed / Saltmarsh", patron:"The Free Agents", wiki:"https://ddowiki.com/page/Den_of_Vipers",
+  quests:["White Plume Mountain","The Curse of the Five Fangs","Den of Vipers"], raidQuests:["Den of Vipers"],
+  storyArcs:[{ name:"Flag by completing White Plume Mountain and The Curse of the Five Fangs.", giver:"", giverLocation:"Hall of Heroes.", quests:["White Plume Mountain","The Curse of the Five Fangs","Den of Vipers"] }] });
+SAGAS.push({ id:"raid-relentless", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Relentless", levels:"36", region:"Lamordia", pack:"The Chill of Ravenloft", patron:"Keepers of Lamordia", wiki:"https://ddowiki.com/page/Relentless",
+  quests:["The Body Snatchers","The Wish","Relentless"], raidQuests:["Relentless"],
+  storyArcs:[{ name:"Flag by completing The Body Snatchers and The Wish.", giver:"", giverLocation:"Ludendorf City Hall, Lamordia.", quests:["The Body Snatchers","The Wish","Relentless"] }] });
+SAGAS.push({ id:"raid-fire-over-morgrave", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Fire Over Morgrave", levels:"32", region:"Sharn", pack:"Vecna Unleashed", patron:"Morgrave University", wiki:"https://ddowiki.com/page/Fire_Over_Morgrave",
+  quests:["Vecna Unleashed","Fire Over Morgrave"], raidQuests:["Fire Over Morgrave"],
+  storyArcs:[{ name:"Flag by completing Vecna Unleashed.", giver:"", giverLocation:"Morgrave University — Upper Commons, Sharn.", quests:["Vecna Unleashed","Fire Over Morgrave"] }] });
+// ── Batch 3 (Build 07292026.1, U4 — wiki-sourced 2026-07-29): the 5 raids first
+//    mis-excluded as "event" (all verified permanent) + the arc-flagged raids. ──
+SAGAS.push({ id:"raid-fire-on-thunder-peak", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Fire on Thunder Peak", levels:"30", region:"The Thunder Peaks", pack:"Shadow Under Thunderholme", patron:"Purple Dragon Knights", wiki:"https://ddowiki.com/page/Fire_on_Thunder_Peak",
+  quests:["Fire on Thunder Peak"], raidQuests:["Fire on Thunder Peak"], storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"", giverLocation:"The Thunder Peaks.", quests:["Fire on Thunder Peak"] }] });
+SAGAS.push({ id:"raid-killing-time", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Killing Time", levels:"32", region:"The Marketplace", pack:"Dragonblood Prophecy", patron:"Agents of Argonnessen", wiki:"https://ddowiki.com/page/Killing_Time",
+  quests:["Killing Time"], raidQuests:["Killing Time"], storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"", giverLocation:"The Marketplace.", quests:["Killing Time"] }] });
+SAGAS.push({ id:"raid-too-hot-to-handle", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Too Hot to Handle", levels:"32", region:"Sharn", pack:"Masterminds of Sharn", patron:"Sharn City Council", wiki:"https://ddowiki.com/page/Too_Hot_to_Handle",
+  quests:["A Sharn Welcome","Red Rain","Best Laid Plans","The Same Old Song","Just Business","No Refunds","House of Pain","Blown Deadline","Reach for the Sky","Too Hot to Handle"], raidQuests:["Too Hot to Handle"],
+  storyArcs:[{ name:"Flag by completing the Masterminds of Sharn story arc (A Sharn Welcome through Reach for the Sky).", giver:"", giverLocation:"Alcorin's Forge Staging Area, Sharn.", quests:["A Sharn Welcome","Red Rain","Best Laid Plans","The Same Old Song","Just Business","No Refunds","House of Pain","Blown Deadline","Reach for the Sky","Too Hot to Handle"] }] });
+SAGAS.push({ id:"raid-hunt-or-be-hunted", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Hunt or Be Hunted", levels:"32", region:"Court of the Wild Hunt", pack:"Hunter and Hunted", patron:"The Summer Court", wiki:"https://ddowiki.com/page/Hunt_or_Be_Hunted",
+  quests:["Hunt or Be Hunted"], raidQuests:["Hunt or Be Hunted"], storyArcs:[{ name:"No flagging required — directly accessible (always keyed).", giver:"", giverLocation:"Court of the Wild Hunt, the Feywild.", quests:["Hunt or Be Hunted"] }] });
+SAGAS.push({ id:"raid-skeletons-in-the-closet", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Skeletons in the Closet", levels:"34", region:"Isle of Dread", pack:"The Isle of Dread", patron:"The Gatekeepers", wiki:"https://ddowiki.com/page/Skeletons_in_the_Closet",
+  quests:["Captive of the Hidden God","Skeletons in the Closet"], raidQuests:["Skeletons in the Closet"],
+  storyArcs:[{ name:"Flag by completing Captive of the Hidden God.", giver:"", giverLocation:"Village of Tanaroa, the Isle of Dread.", quests:["Captive of the Hidden God","Skeletons in the Closet"] }] });
+SAGAS.push({ id:"raid-temple-of-the-deathwyrm", isRaid:true, tier:"Legendary", raidBand:"Legendary", name:"Temple of the Deathwyrm", levels:"30", region:"The Thunder Peaks", pack:"Shadow Under Thunderholme", patron:"Purple Dragon Knights", wiki:"https://ddowiki.com/page/Temple_of_the_Deathwyrm",
+  quests:["Fire on Thunder Peak","Temple of the Deathwyrm"], raidQuests:["Temple of the Deathwyrm"],
+  storyArcs:[{ name:"Flag by completing Fire on Thunder Peak.", giver:"Thela Bonmar", giverLocation:"The Thunder Peaks.", quests:["Fire on Thunder Peak","Temple of the Deathwyrm"] }] });
+SAGAS.push({ id:"raid-twilight-forge", isRaid:true, tier:"Heroic", raidBand:"Heroic", name:"The Twilight Forge", levels:"11", region:"Restless Isles", pack:"The Restless Isles", patron:"The Free Agents", wiki:"https://ddowiki.com/page/The_Twilight_Forge",
+  quests:["Hiding in Plain Sight","Slavers of the Shrieking Mines","Bring Me the Head of Ghola-Fan!","The Twilight Forge"], raidQuests:["The Twilight Forge"],
+  storyArcs:[{ name:"Flag by gaining Restless Isles access (Hiding in Plain Sight) and completing Slavers of the Shrieking Mines and Bring Me the Head of Ghola-Fan!.", giver:"Ostler Caulstone", giverLocation:"Restless Isles.", quests:["Hiding in Plain Sight","Slavers of the Shrieking Mines","Bring Me the Head of Ghola-Fan!","The Twilight Forge"] }] });
+SAGAS.push({ id:"raid-the-shroud", isRaid:true, tier:"Heroic", raidBand:"Heroic", name:"The Shroud", levels:"17", region:"Meridia", pack:"The Vale of Twilight", patron:"The Twelve", wiki:"https://ddowiki.com/page/The_Shroud",
+  quests:["Let Sleeping Dust Lie","Rainbow in the Dark","Ritual Sacrifice","Running with the Devils","The Coalescence Chamber","The Shroud"], raidQuests:["The Shroud"],
+  storyArcs:[{ name:"Flag by completing the The Thirteenth Eclipse story arc (the five Vale of Twilight quests).", giver:"Aaseamah Screven", giverLocation:"Meridia.", quests:["Let Sleeping Dust Lie","Rainbow in the Dark","Ritual Sacrifice","Running with the Devils","The Coalescence Chamber","The Shroud"] }] });
+SAGAS.push({ id:"raid-fall-of-truth", isRaid:true, tier:"Epic", raidBand:"Epic", name:"The Fall of Truth", levels:"25", region:"Gianthold", pack:"Ruins of Gianthold", patron:"Agents of Argonnessen", wiki:"https://ddowiki.com/page/The_Fall_of_Truth",
+  quests:["Return to Madstone Crater","Return to Prison of the Planes","Return to Cabal for One","Return to Gianthold Tor","The Fall of Truth"], raidQuests:["The Fall of Truth"],
+  storyArcs:[{ name:"Flag by completing Return to Madstone Crater, Return to Prison of the Planes, Return to Cabal for One, and Return to Gianthold Tor (the epic Reaver's Fate raid).", giver:"Draznok ar'Athad", giverLocation:"Gianthold.", quests:["Return to Madstone Crater","Return to Prison of the Planes","Return to Cabal for One","Return to Gianthold Tor","The Fall of Truth"] }] });
+SAGAS.push({ id:"raid-caught-in-the-web", isRaid:true, tier:"Epic", raidBand:"Epic", name:"Caught in the Web", levels:"28", region:"Eveningstar", pack:"Menace of the Underdark", patron:"Purple Dragon Knights", wiki:"https://ddowiki.com/page/Caught_in_the_Web",
+  quests:["The Battle for Eveningstar","Caught in the Web"], raidQuests:["Caught in the Web"],
+  storyArcs:[{ name:"Flag by completing the Menace of the Underdark story arc (King's Forest + Underdark). Tracked here via the arc entry, The Battle for Eveningstar — complete the full MotU arc to flag.", giver:"", giverLocation:"Eveningstar.", quests:["The Battle for Eveningstar","Caught in the Web"] }] });
+/* ═══════════════════════════ end RAIDS (all permanent raids harvested) ══════ */
 
 const NO_REAPER = new Set(["Protect Baudry's Interests","Stop Hazadill's Shipment","Arachnophobia","Home Sweet Sewer","The Miller's Debt"]); // DDO wiki: Reaper difficulty -> Non-reaper quests (solo-only)
 const SHARED_QUESTS = buildSharedQuestMap();
@@ -14150,7 +14326,7 @@ const DDO_REF_TTL = 7 * 24 * 60 * 60 * 1000; // 7 days
 // expansion / content drop that adds quests or areas.
 //   1 = pre-U81 (implicit — caches with no epoch field)
 //   2 = U81 "Terror of Demogorgon" (2026-07-22)
-const DDO_REF_EPOCH = 3;   // Build 07262026.1 → 3: areas cache now carries is_public/is_wilderness (roster zone-type row); forces a one-time refetch of pre-epoch-3 caches
+const DDO_REF_EPOCH = 4;   // Build 07292026.1 → 4 (U5): Raids tab added raid quests/areas; bump forces a one-time refetch so stale caches gain raid quest_id/area_id for live LFM badges + autocomplete on raid cards. (07262026.1 → 3: areas cache carries is_public/is_wilderness for the roster zone-type row.)
 
 // In-memory mirrors of the reference tables once resolved this session.
 let _areasMap = null;      // Map<number, {name, region}>
@@ -15626,7 +15802,7 @@ function renderSagaList() {
   // moved into the tier filter as the "Suggested" button (default).
 
   // filter
-  let sagas = SAGAS.slice();
+  let sagas = SAGAS.filter(s => !s.isRaid);   // Build 07292026.1 (U2) — raids live in the Raids tab, never the Saga list/tier filter
   const searching = !!questSearchTerm;
   // v5+: tier filter — Heroic | Epic | Legendary | all. Applied before
   // grouping so the resulting group order only contains visible tiers.
@@ -15719,16 +15895,29 @@ function renderSagaList() {
   if (list.children.length === 0) {
     list.innerHTML = `<div style="text-align:center; padding:40px; font-style:italic; color:var(--ink-faded);">No sagas match the current filter${questSearchTerm ? ` and search “${escapeHtml(questSearchTerm)}”` : ""}. ${state.ftrOnly ? "This adventurer has cleared the scroll." : ""}</div>`;
   }
+  // Build 07292026.1 (U3) — every saga/raid-card interaction (toggle, expand, reaper)
+  // ends by calling renderSagaList. When the Raids tab is active, refresh it too so a
+  // raid card's keyed badge / expansion / progress update immediately. Gated so it
+  // never renders the hidden raids view from the Saga tab. renderRaidsView does not
+  // call back into renderSagaList, so there is no recursion.
+  if (document.body.classList.contains("raids-active") && typeof renderRaidsView === "function") renderRaidsView();
 }
 
 function renderSagaCard(saga) {
   const char = state.activeChar;
   const st = sagaStatus(char, saga);
   const isExpanded = expanded.has(saga.id);   // Build 07192026.2 — Expand-all removed
+  // Build 07292026.1 (U3) — raid containers reuse this card but swap the saga-reward
+  // /reaper header for a derived keyed badge. Quest rows + wireCard cascade unchanged.
+  const isRaid = !!saga.isRaid;
+  const rk = isRaid ? raidKeyed(char, saga) : null;
 
   const card = document.createElement("div");
   let cls = "saga";
-  if (st.complete && st.reward === "banked") cls += " complete";
+  if (isRaid) {
+    cls += " raid-card";
+    if (rk.keyed) cls += " raid-keyed";
+  } else if (st.complete && st.reward === "banked") cls += " complete";
   else if (st.reward === "banked") cls += " banked";
   else if (st.ftrRemaining > 0) cls += " has-ftr";
   if (isExpanded) cls += " expanded";
@@ -15818,6 +16007,42 @@ function renderSagaCard(saga) {
   const toggleNext = st.reward === "banked" ? "incomplete" : "banked";
   const rewardOnLabel = isNotSagaContainer ? "Completed" : "Banked";
 
+  // Build 07292026.1 (U3) — raid header: derived keyed badge + a Flagging bar
+  // (prereq progress) + a Complete bar (raid-instance completion). Replaces the
+  // saga reward pill + reaper bar. Reuses the .saga-bars / .saga-progress-bar CSS.
+  let raidHdrT2Html = "";
+  if (isRaid) {
+    const ssd = (getSagaState(char, saga.id).sagaDone) || {};
+    let raidDone = 0; const rqArr = saga.raidQuests || [];
+    rqArr.forEach(q => { if (ssd[q]) raidDone++; });   // raid "completed" = master Quest Completed seal (sagaDone), consistent with keyed
+    const raidTotal = rqArr.length;
+    const keyedTitle = rk.keyed
+      ? (rk.requiresKeying ? "Keyed — all flagging quests complete" : "No flagging required — always keyed")
+      : `Not keyed — ${rk.remaining} of ${rk.total} flagging quest${rk.total === 1 ? "" : "s"} left`;
+    const keyedText = rk.keyed
+      ? (rk.requiresKeying ? "⚿ Keyed" : "⚿ No key needed")
+      : `Not keyed · ${rk.remaining} left`;
+    raidHdrT2Html = `<div class="hdr-tier hdr-t2">
+        <span class="raid-keyed-badge ${rk.keyed ? "is-keyed" : "not-keyed"}" title="${keyedTitle}">${keyedText}</span>
+        <div class="saga-bars">
+          <div class="saga-barwrap">
+            <span class="saga-bar-cap">Flagging</span>
+            <div class="saga-progress-bar${rk.done > 0 ? " has-progress" : ""}${rk.total > 0 && rk.done >= rk.total ? " all-done" : ""}${rk.total === 0 ? " muted" : ""}" title="Flagging: ${rk.done} of ${rk.total} prereq quest${rk.total === 1 ? "" : "s"} complete${rk.total === 0 ? " — no flagging required" : ""}">
+              <div class="saga-progress-fill" style="width: ${rk.total > 0 ? Math.round((rk.done / rk.total) * 100) : 100}%"></div>
+              <span class="saga-progress-text">${rk.total > 0 ? `${rk.done} / ${rk.total}` : "no key"}</span>
+            </div>
+          </div>
+          <div class="saga-barwrap">
+            <span class="saga-bar-cap">Complete</span>
+            <div class="saga-progress-bar${raidDone > 0 ? " has-progress" : ""}${raidTotal > 0 && raidDone >= raidTotal ? " all-done" : ""}" title="Raid completed: ${raidDone} of ${raidTotal}${lfmSkullTip}">
+              <div class="saga-progress-fill" style="width: ${raidTotal > 0 ? Math.round((raidDone / raidTotal) * 100) : 0}%"></div>
+              <span class="saga-progress-text">${raidDone} / ${raidTotal}</span>
+            </div>
+          </div>
+        </div>
+      </div>`;
+  }
+
   card.innerHTML = `
     <div class="saga-header${lfmSkullTag ? " has-lfm" : ""}" data-saga="${saga.id}">
       <div class="hdr-tier hdr-t1">
@@ -15825,7 +16050,7 @@ function renderSagaCard(saga) {
         <div class="saga-level">Lvl ${saga.levels}</div>
         <div class="saga-title">${escapeHtml(saga.name)}</div>
       </div>
-      <div class="hdr-tier hdr-t2">
+      ${isRaid ? raidHdrT2Html : `<div class="hdr-tier hdr-t2">
         <button class="reward-pill ${rewardCls}" data-reward="${toggleNext}" type="button"
                 title="Click to toggle ${toggleNext === 'banked' ? 'ON (' + rewardOnLabel + ')' : 'OFF (Incomplete) — clears Quest Completed marks; Reaper' + (isNotSagaContainer ? '' : ' / Skip') + ' preserved'}">${rewardLabel}</button>
         <div class="saga-bars">
@@ -15844,13 +16069,16 @@ function renderSagaCard(saga) {
             </div>
           </div>
         </div>
-      </div>
+      </div>`}
       ${lfmSkullTag ? `<div class="hdr-tier hdr-t3">${lfmSkullTag}</div>` : ""}
     </div>
     <div class="saga-body">
       ${renderSagaStory(saga)}
       <div class="saga-info">
-        ${saga.isNotSaga
+        ${isRaid
+          ? `<div class="row not-a-saga-row"><span class="key">Raid</span><span class="val"><em>${rk.requiresKeying ? `Requires keying — complete the ${rk.total} flagging quest${rk.total === 1 ? "" : "s"} below to unlock the raid.` : "No flagging required — directly accessible (always keyed)."} Flagging quests share their completion with the Saga tab.</em></span></div>
+        <div class="row"><span class="key">Region</span><span class="val">${escapeHtml(saga.region || "")}</span></div>`
+          : saga.isNotSaga
           ? `<div class="row not-a-saga-row"><span class="key">Note</span><span class="val"><em>Not a saga — these quests are not part of any saga chain. Container exists to group standalone ${saga.tier === "Non-Saga Epic" ? "Epic level-20" : "Legendary"} quests for leveling / FTR tracking.</em></span></div>`
           : `<div class="row"><span class="key">Saga Giver</span><span class="val">${renderNpcLink(saga.npc)}</span></div>
         <div class="row"><span class="key">Location</span><span class="val">${escapeHtml(saga.npcLocation || "")} &middot; ${escapeHtml(saga.region || "")}</span></div>`}
@@ -18040,6 +18268,8 @@ function renderAll() {
   // switched) active character. Gated so favor NEVER computes on the Saga tab or the
   // 15s live tick (KTD2).
   if (document.body.classList.contains("patrons-active")) renderPatronsView();
+  // Build 07292026.1 — the Raids tab refreshes via renderSagaList's tail (renderAll
+  // calls renderSagaList above), so no separate raids call is needed here.
 }
 
 /* ── Build 06022026.7 — data integrity self-check. Runs once on load over
@@ -18103,10 +18333,30 @@ function runDataSelfCheck() {
   // from QUEST_FAVOR (rename, apostrophe/colon drift, or a new content drop not
   // yet harvested) would otherwise silently contribute 0 favor with a green badge.
   const _favSeen = new Set();
-  SAGAS.forEach(s => (s.quests || []).forEach(q => {
-    if (_favSeen.has(q)) return; _favSeen.add(q);
-    if (!FAVOR_INDEX.slotToGroup[q]) errors.push(`SAGAS quest "${q}" (${s.id}) has no QUEST_FAVOR entry`);
-  }));
+  SAGAS.forEach(s => {
+    if (s.isRaid) return;   // Build 07292026.1 (U6) — raids are outside patron-favor tracking (v1); their prereqs are covered via their non-raid twin container.
+    (s.quests || []).forEach(q => {
+      if (_favSeen.has(q)) return; _favSeen.add(q);
+      if (!FAVOR_INDEX.slotToGroup[q]) errors.push(`SAGAS quest "${q}" (${s.id}) has no QUEST_FAVOR entry`);
+    });
+  });
+  // ── Build 07292026.1 (U6) — RAIDS integrity (plan U6). ──────────────────────
+  const raids = SAGAS.filter(s => s.isRaid);
+  raids.forEach(r => {
+    if (!RAID_BANDS.includes(r.raidBand)) errors.push(`Raid "${r.id}" has invalid/absent raidBand "${r.raidBand}"`);
+    const rq = r.raidQuests || [];
+    if (!rq.length) errors.push(`Raid "${r.id}" has no raidQuests (the raid-instance row)`);
+    rq.forEach(q => { if (!(r.quests || []).includes(q)) errors.push(`Raid "${r.id}" raidQuests entry "${q}" is not in its quests list`); });
+    // Shared-identity cascade is opportunistic: when a raid prereq shares its exact
+    // (tier, name) with a non-raid container, buildSharedQuestMap links them and a
+    // toggle cascades both ways (verified for the VoN seed). When it doesn't match,
+    // the prereq is raid-only — which is correct for most raids and for a raid whose
+    // same-named prereq lives at a different BAND (e.g. a Heroic raid's "Against the
+    // Demon Queen" vs the Epic one), since those are genuinely distinct instances.
+    // We intentionally do NOT error on unmatched prereqs (it false-positived on those
+    // legitimate cross-band cases); cascade linkage is spot-verified per raid instead.
+  });
+  const raidCount = raids.length;
   Object.keys(PATRON_TIERS).forEach(pat => {
     let prev = -1;
     PATRON_TIERS[pat].forEach(t => {
@@ -18118,7 +18368,7 @@ function runDataSelfCheck() {
       prev = t[0];
     });
   });
-  return { errors, info: { sagas: SAGAS.length, totalQuests, withDetails, giverRefs, giverMissingLoc, sagasNoStory,
+  return { errors, info: { sagas: SAGAS.length, raidCount, totalQuests, withDetails, giverRefs, giverMissingLoc, sagasNoStory,
                            favorQuests, favorNull, favorGroups, favorPatrons: patronsWithFavor.size } };
 }
 
@@ -18130,7 +18380,7 @@ function renderSelfCheck() {
   const i = r.info;
   const coverage = i.totalQuests ? Math.round(100 * i.withDetails / i.totalQuests) : 0;
   if (r.errors.length === 0) {
-    el.innerHTML = `<span class="selfcheck-badge ok" id="selfCheckBadge" title="Click for the full data report">✓ Data OK · ${i.sagas} containers · ${i.totalQuests} quests · ${coverage}% detailed</span>`;
+    el.innerHTML = `<span class="selfcheck-badge ok" id="selfCheckBadge" title="Click for the full data report">✓ Data OK · ${i.sagas} containers (${i.raidCount} raids) · ${i.totalQuests} quests · ${coverage}% detailed</span>`;
   } else {
     el.innerHTML = `<span class="selfcheck-badge warn" id="selfCheckBadge" title="Click for the full data report">⚠ ${r.errors.length} data issue${r.errors.length === 1 ? "" : "s"} — click for details</span>`;
     console.warn("Sook's Saga Scroll — data self-check issues:", r.errors);
@@ -18243,8 +18493,8 @@ function renderBenefitCrossIndex(fav) {
 
 // Build 07272026.4 — three-tab shell: saga | patrons | filters. Each maps to a
 // content panel and a tab button; only the active one shows.
-const TAB_VIEWS = { saga: "sagaList", patrons: "patronsView", filters: "filtersView" };
-const TAB_BUTTONS = { saga: "tabSaga", patrons: "tabPatrons", filters: "tabFilters" };
+const TAB_VIEWS = { saga: "sagaList", raids: "raidsView", patrons: "patronsView", filters: "filtersView" };
+const TAB_BUTTONS = { saga: "tabSaga", raids: "tabRaids", patrons: "tabPatrons", filters: "tabFilters" };
 
 // Relocate the Filters & Alerts panel out of the header into the Filters tab.
 // Moving the node (not recreating it) preserves every child id, listener, and the
@@ -18264,7 +18514,9 @@ function setActiveTab(tab) {
     if (btn) { btn.classList.toggle("is-active", k === tab); btn.setAttribute("aria-selected", String(k === tab)); }
   });
   document.body.classList.toggle("patrons-active", tab === "patrons");   // read by the renderAll favor guard
+  document.body.classList.toggle("raids-active", tab === "raids");        // Build 07292026.1 (U1) — read by the renderAll raid-view guard
   if (tab === "patrons") renderPatronsView();
+  if (tab === "raids" && typeof renderRaidsView === "function") renderRaidsView();
   // The Filters panel is now its own tab, so the old roll-up fold is redundant —
   // always show it expanded when the tab opens (the fold bar itself is hidden via CSS).
   if (tab === "filters" && typeof _applyControlsFold === "function") { _controlsFolded = false; _applyControlsFold(); }
@@ -18272,7 +18524,7 @@ function setActiveTab(tab) {
 
 function bindTabBar() {
   relocateFiltersToTab();
-  const tabs = [document.getElementById("tabSaga"), document.getElementById("tabPatrons"), document.getElementById("tabFilters")].filter(Boolean);
+  const tabs = [document.getElementById("tabSaga"), document.getElementById("tabRaids"), document.getElementById("tabPatrons"), document.getElementById("tabFilters")].filter(Boolean);
   tabs.forEach((t, i) => {
     t.addEventListener("click", () => setActiveTab(t.getAttribute("data-tab")));
     t.addEventListener("keydown", e => {
@@ -18288,6 +18540,76 @@ function bindTabBar() {
 function _favorSortKey(patron, favor) {
   const st = patronTierState(patron, favor);
   return st.maxed ? Infinity : (st.next[0] - favor);
+}
+
+// ── Build 07292026.1 (U3) — RAIDS TAB rendering ──────────────────────────────
+// Keyed is DERIVED, never stored (KTD3): a raid is keyed when every prereq quest
+// (all of `quests` except the `raidQuests` instance row[s]) is complete for this
+// character. A raid with no prereqs is always keyed. Computed at render only.
+function raidKeyed(char, raid) {
+  const ss = getSagaState(char, raid.id);
+  // Read sagaDone — the master "Quest Completed" seal the LEFT checkbox writes and
+  // that Reaper/Skip/Saga-Reward auto-fill. It cascades across same-tier SHARED_QUESTS
+  // siblings, so a prereq checked in the Saga tab reflects here (and vice versa).
+  const sd = (ss && ss.sagaDone) || {};
+  const rq = new Set(raid.raidQuests || []);
+  const prereqs = (raid.quests || []).filter(x => !rq.has(x));
+  let done = 0;
+  prereqs.forEach(p => { if (sd[p]) done++; });
+  const total = prereqs.length;
+  return { keyed: done >= total, done, total, remaining: total - done, requiresKeying: total > 0 };
+}
+
+// Render the Raids tab: every isRaid container grouped under Heroic/Epic/Legendary
+// band headers (raidBand), keyed-required raids sorted before no-key raids, then by
+// level then name. Reuses renderSagaCard (so live LFM badges + the shared-quest
+// cascade come for free) — the card's isRaid branch swaps the reward/reaper UI for a
+// keyed badge. Computes only on Raids-tab render (setActiveTab) + the live tick.
+const RAID_BANDS = ["Heroic", "Epic", "Legendary"];
+function renderRaidsView() {
+  const el = document.getElementById("raidsView");
+  if (!el) return;
+  el.innerHTML = "";
+  const char = state.activeChar;
+  if (!char || !state.progress || !state.progress[char]) {
+    el.innerHTML = `<div class="patrons-empty">Select or add a character to track raids.</div>`;
+    return;
+  }
+  // Keep the LFM index warm so raid cards show live badges (renderSagaList also does
+  // this on renderAll, but render the Raids tab standalone too).
+  const activeServer = (typeof serverOf === "function") ? serverOf(char) : null;
+  if (activeServer && typeof refreshLfmIndex === "function") refreshLfmIndex(activeServer);
+
+  const wrap = document.createElement("div");
+  wrap.className = "patrons-wrap raids-wrap";
+  wrap.innerHTML = `
+    <div class="tier-header raids-header"><h2>⚔ Raids</h2></div>
+    <div class="patrons-charline">Keying &amp; completion for <strong>${escapeHtml(char)}</strong>
+      <span class="patrons-sub">— keyed is derived from each raid's flagging quests</span></div>`;
+  el.appendChild(wrap);
+
+  const raids = SAGAS.filter(s => s.isRaid);
+  let rendered = 0;
+  RAID_BANDS.forEach(band => {
+    const inBand = raids.filter(r => (r.raidBand || "") === band);
+    if (!inBand.length) return;
+    // keyed-required (has prereqs) first, then no-key; within a group by level then name.
+    inBand.sort((a, b) => {
+      const ak = (a.raidQuests || []).length < (a.quests || []).length ? 0 : 1;
+      const bk = (b.raidQuests || []).length < (b.quests || []).length ? 0 : 1;
+      if (ak !== bk) return ak - bk;
+      const al = parseInt(a.levels, 10) || 0, bl = parseInt(b.levels, 10) || 0;
+      return (al - bl) || a.name.localeCompare(b.name);
+    });
+    const sec = document.createElement("section");
+    sec.className = "tier-section";
+    sec.innerHTML = `
+      <div class="tier-header"><h2>${band} Raids</h2></div>
+      <div class="tier-flourish" style="text-align:center;">⚜ ⚔ ⚜</div>`;
+    inBand.forEach(r => { sec.appendChild(renderSagaCard(r)); rendered++; });
+    el.appendChild(sec);
+  });
+  if (!rendered) el.appendChild(Object.assign(document.createElement("div"), { className: "patrons-empty", textContent: "No raids in the data set yet." }));
 }
 
 function renderPatronsView() {
