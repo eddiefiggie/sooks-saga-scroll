@@ -4824,7 +4824,7 @@ html { overflow-y: scroll; }   /* always reserve the scrollbar gutter — a shor
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07292026.5</div>
+      <div class="build">Build 07292026.6</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -15941,11 +15941,21 @@ function renderSagaCard(saga) {
   const raidInstance = isRaid ? ((saga.raidQuests && saga.raidQuests[0]) || saga.quests[0]) : null;
   const raidFlagging = isRaid ? (saga.flagging || []) : [];
   const raidHasFlagging = raidFlagging.length > 0;
+  // Build 07292026.6 — raid completion state, read directly from sagaDone (NOT the
+  // container's auto-bank reward). Auto-bank is one-way — it flips reward to "banked"
+  // when the raid is completed but never resets it, and raids have no reward pill to
+  // toggle it off — so basing the completed hue on reward left an unchecked raid stuck
+  // washed. Driving the hue from sagaDone means unchecking reverts it.
+  const _raidSS = isRaid ? ((state.progress[char] && state.progress[char][saga.id]) || null) : null;
+  const raidDone = !!(_raidSS && _raidSS.sagaDone && _raidSS.sagaDone[raidInstance]);
+  const raidReaper = !!(_raidSS && _raidSS.quests && _raidSS.quests[raidInstance] === "reaper");
 
   const card = document.createElement("div");
   let cls = "saga";
-  if (isRaid) cls += " raid-card";
-  if (st.complete && st.reward === "banked") cls += " complete";
+  if (isRaid) {
+    cls += " raid-card";
+    if (raidDone) cls += " complete";   // completed hue from the raid's own completion, so unchecking reverts it
+  } else if (st.complete && st.reward === "banked") cls += " complete";
   else if (st.reward === "banked") cls += " banked";
   else if (st.ftrRemaining > 0) cls += " has-ftr";
   if (isExpanded) cls += " expanded";
@@ -16048,14 +16058,11 @@ function renderSagaCard(saga) {
   // data-reaper hooks, so completion + reaper behave exactly like a single quest.
   let raidHdrControls = "";
   if (isRaid) {
-    const _rss = (state.progress[char] && state.progress[char][saga.id]) || null;
-    const rDone = !!(_rss && _rss.sagaDone && _rss.sagaDone[raidInstance]);
-    const rReaper = !!(_rss && _rss.quests && _rss.quests[raidInstance] === "reaper");
-    let rReaperCls = "ftr-badge tiny" + (rReaper ? " sealed" : (rDone ? " standby" : ""));
-    if (rReaper && reaperPopQueue.has(raidInstance)) { rReaperCls += " reaper-pop"; reaperPopQueue.delete(raidInstance); }
+    let rReaperCls = "ftr-badge tiny" + (raidReaper ? " sealed" : (raidDone ? " standby" : ""));
+    if (raidReaper && reaperPopQueue.has(raidInstance)) { rReaperCls += " reaper-pop"; reaperPopQueue.delete(raidInstance); }
     raidHdrControls = `<div class="hdr-tier hdr-t2 raid-controls">
-        <label class="raid-complete${rDone ? " done" : ""}" title="RAID COMPLETED — the raid variant of the saga Quest Completed seal. Mark it when you've completed the raid (auto-fills when you mark Reaper). Click to toggle."><input type="checkbox" data-quest="${escapeHtml(raidInstance)}" ${rDone ? "checked" : ""}> Complete</label>
-        <button type="button" class="${rReaperCls}" data-reaper="${escapeHtml(raidInstance)}" title="${rReaper ? "Raid completed on Reaper — click to clear" : "Mark the raid completed on Reaper"}"><span class="ftr-tag">${rReaper ? "Completed" : "First Time"}</span><span class="ftr-main"><span class="skull">☠</span> REAPER <span class="skull">☠</span></span></button>
+        <label class="raid-complete${raidDone ? " done" : ""}" title="RAID COMPLETED — the raid variant of the saga Quest Completed seal. Mark it when you've completed the raid (auto-fills when you mark Reaper). Click to toggle."><input type="checkbox" data-quest="${escapeHtml(raidInstance)}" ${raidDone ? "checked" : ""}> Complete</label>
+        <button type="button" class="${rReaperCls}" data-reaper="${escapeHtml(raidInstance)}" title="${raidReaper ? "Raid completed on Reaper — click to clear" : "Mark the raid completed on Reaper"}"><span class="ftr-tag">${raidReaper ? "Completed" : "First Time"}</span><span class="ftr-main"><span class="skull">☠</span> REAPER <span class="skull">☠</span></span></button>
       </div>`;
   }
 

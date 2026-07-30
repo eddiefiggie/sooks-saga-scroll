@@ -2,11 +2,16 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07292026-5.html` — Build
-> `07292026.5` (2026-07-29). Retain set is **3 files**: the 2 most recent
-> overall (`-07292026-5` + `-07292026-4`, both 07-29) PLUS the most-recent
+> **Currently parked:** `sooks-saga-scroll-07292026-6.html` — Build
+> `07292026.6` (2026-07-29). Retain set is **3 files**: the 2 most recent
+> overall (`-07292026-6` + `-07292026-5`, both 07-29) PLUS the most-recent
 > previous-day build (`-07272026-7`, 07-27) as the cross-day rollback anchor.
-> Pruned this park (moved to `_to_delete/`): `-07292026-3`.
+> Pruned this park (moved to `_to_delete/`): `-07292026-4`.
+> **Build .6 fix — un-completing a raid reverts its hue.** The completed hue on a
+> raid card is now driven by the raid's own completion (`sagaDone[instance]`), not
+> the container's auto-bank `reward`. Auto-bank is one-way (it never resets to
+> "incomplete"), and raids have no reward pill to toggle it off, so a raid stayed
+> washed after unchecking; keying the class off `sagaDone` makes the hue revert.
 > **Build .5 — raid Complete uses the saga quest-completion seal.** The raid
 > Complete control now reuses the circular green "quest completed" seal (shared
 > `.quest`/`.raid-controls input[type=checkbox]` styling; `--q-check` fed to
