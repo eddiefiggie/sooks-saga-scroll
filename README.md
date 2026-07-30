@@ -2,19 +2,20 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07292026-3.html` — Build
-> `07292026.3` (2026-07-29). Retain set is **3 files**: the 2 most recent
-> overall (`-07292026-3` + `-07292026-2`, both 07-29) PLUS the most-recent
+> **Currently parked:** `sooks-saga-scroll-07292026-4.html` — Build
+> `07292026.4` (2026-07-29). Retain set is **3 files**: the 2 most recent
+> overall (`-07292026-4` + `-07292026-3`, both 07-29) PLUS the most-recent
 > previous-day build (`-07272026-7`, 07-27) as the cross-day rollback anchor.
-> Pruned this park (moved to `_to_delete/`): `-07292026-1`.
-> **Build .3 — raids reuse the proven quest/container card.** Removed the custom
-> keyed badge ("Not keyed · N left"); raid cards now render the standard reward
-> pill + **First-Time Reaper bar** (FTR tracker, per-quest reaper buttons) +
-> **Complete bar** + standard quest rows, exactly like quests. A **Flagging bar**
-> shows only when the raid actually has flagging (prereq) quests; no-flagging
-> raids show just the two standard bars. Completion is the standard sagaDone
-> mechanism. (.2 fix retained: a raid card's header LFM pill is scoped to the raid
-> instance, not its prereq quests.)
+> Pruned this park (moved to `_to_delete/`): `-07292026-2`.
+> **Build .4 — a raid is tracked as a single item, not a container of quests.**
+> Raid cards no longer duplicate their flagging quests as rows (those are tracked
+> in the Saga tab). Each raid now has two always-visible header booleans —
+> **Complete** (checkbox) and **☠ Reaper** (button, "completed the raid on
+> Reaper") — reusing the proven per-quest controls (`sagaDone` + `quests==="reaper"`),
+> no bars, no reward pill. **Flagging** is a read-only note listing the flagging
+> quests ("track these in the Saga tab"); the note reads "No flagging required" when
+> a raid has none. A load-time transform derives each raid's `flagging` list and
+> scopes its tracked `quests` to the raid instance alone.
 > Latest: **NEW Raids tab** (Saga | Raids | Patrons) — a per-character tracker
 > for all 40 permanent Heroic/Epic/Legendary raids, modeled like saga content,
 > with derived "keyed" status (from each raid's wiki-sourced flagging chain),
