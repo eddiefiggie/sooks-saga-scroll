@@ -4824,7 +4824,7 @@ html { overflow-y: scroll; }   /* always reserve the scrollbar gutter — a shor
     </div>
     <div class="build-row">
       <button class="reload-btn" id="reloadBtn" type="button" title="Force-reload the page to pick up any newer disk version of this file. Safe — keeps all saved data intact.">⟳ Reload</button>
-      <div class="build">Build 07292026.6</div>
+      <div class="build">Build 07292026.7</div>
     </div>
     <div class="last-export" id="lastExport"></div>
     <div class="selfcheck" id="selfCheck"></div>
@@ -13489,12 +13489,33 @@ SAGAS.push({ id:"raid-caught-in-the-web", isRaid:true, tier:"Epic", raidBand:"Ep
 // into a descriptive `flagging` field, and scope the container's quests to the raid
 // instance so all completion/reaper state is about the raid alone. Raid entries above
 // keep listing [..prereqs, raid] for readability; this derives the split once.
+// Build 07292026.7 — each raid's base (Elite) favor, wiki-sourced from the {{Quest}}
+// infobox `favor` field (ddowiki.com), keyed by raid instance name. Drives the raid's
+// patron-favor contribution: a completed raid is assumed run on Hard (2/3 of this base),
+// or on Reaper (== Elite, the full base) when the Reaper button was used. See
+// computeCharacterFavor. Keep in sync with the raid roster: every raid needs an entry.
+const RAID_FAVOR = {
+  "Plane of Night": 5, "Tempest's Spine": 6, "The Reaver's Fate": 6, "Zawabi's Revenge": 6,
+  "The Titan Awakes": 6, "Hound of Xoriat": 9, "A Vision of Destruction": 9, "Ascension Chamber": 7,
+  "Tower of Despair": 8, "The Chronoscope": 5, "The Lord of Blades": 7, "The Master Artificer": 7,
+  "The Twilight Forge": 10, "The Shroud": 11, "The Fall of Truth": 8, "Caught in the Web": 8,
+  "Legendary Tempest's Spine": 11, "Legendary Hound of Xoriat": 12, "Legendary Vision of Destruction": 12,
+  "Legendary Master Artificer": 10, "Legendary Lord of Blades": 10, "The Chronoscope (Legendary)": 10,
+  "Temple of the Deathwyrm": 9, "The Mark of Death": 9, "Defiler of the Just": 9,
+  "The Codex and the Shroud": 14, "The Curse of Strahd": 10, "Old Baba's Hut": 9,
+  "Project Nemesis": 10, "The Dryad and the Demigod": 10, "Den of Vipers": 11, "Relentless": 12,
+  "Threats Old and New": 9, "Fire Over Morgrave": 9, "Riding the Storm Out": 10,
+  "Fire on Thunder Peak": 9, "Killing Time": 11, "Too Hot to Handle": 10, "Hunt or Be Hunted": 10,
+  "Skeletons in the Closet": 10
+};
+
 SAGAS.forEach(r => {
   if (!r.isRaid) return;
   const inst = (r.raidQuests && r.raidQuests.length) ? r.raidQuests.slice() : [r.quests[r.quests.length - 1]];
   r.flagging = (r.quests || []).filter(q => !inst.includes(q));   // prereqs — sourced from the Saga tab, not tracked here
   r.quests = inst.slice();
   r.raidQuests = inst.slice();
+  r.favor = RAID_FAVOR[inst[0]];   // base/Elite favor for the raid's own patron reward
   (r.storyArcs || []).forEach(a => { a.quests = inst.slice(); });   // keep the descriptive name text; scope tracked quests to the raid
 });
 
@@ -13962,6 +13983,23 @@ function computeCharacterFavor(progress) {
   if (!progress) return perPatron;
   for (const sagaId in progress) {
     const ss = progress[sagaId];
+    const container = SAGA_BY_ID.get(sagaId);
+    if (container && container.isRaid) {
+      // Raid favor: granted to the raid's own patron when the raid is completed.
+      // The Raids tab tracks the raid alone (a single instance), so favor is a flat
+      // per-raid award, not a favor-group dedup. We can't know the difficulty the
+      // player actually ran, so we assume: Reaper (== Elite, full base favor) when the
+      // Reaper button was used, otherwise Hard (2/3 of the Elite base) for a plain
+      // Complete. Reaper grants no favor beyond Elite in DDO, so Reaper == base.
+      const inst = (container.raidQuests && container.raidQuests[0]) || (container.quests && container.quests[0]);
+      const base = container.favor, patron = container.patron;
+      if (!inst || !base || !patron) continue;
+      if (!ss || !ss.sagaDone || !ss.sagaDone[inst]) continue;
+      const ranReaper = ss.quests && ss.quests[inst] === "reaper";
+      const amt = ranReaper ? base : Math.round(base * 2 / 3);   // Elite/Reaper vs Hard
+      perPatron[patron] = (perPatron[patron] || 0) + amt;
+      continue;   // raids never participate in the quest favor-group loop below
+    }
     const sd = ss && ss.sagaDone;
     if (!sd) continue;
     for (const q in sd) {
@@ -18358,7 +18396,16 @@ function runDataSelfCheck() {
   // yet harvested) would otherwise silently contribute 0 favor with a green badge.
   const _favSeen = new Set();
   SAGAS.forEach(s => {
-    if (s.isRaid) return;   // Build 07292026.1 (U6) — raids are outside patron-favor tracking (v1); their prereqs are covered via their non-raid twin container.
+    if (s.isRaid) {
+      // Build 07292026.7 — raids grant patron favor via their own flat per-raid award
+      // (RAID_FAVOR base + Hard/Reaper assumption), NOT the QUEST_FAVOR group loop.
+      // So a raid is not required to be in QUEST_FAVOR, but it MUST carry a numeric
+      // favor and a real patron, or completing it would silently award 0 / no tier.
+      const inst = (s.raidQuests && s.raidQuests[0]) || (s.quests && s.quests[0]);
+      if (typeof s.favor !== "number" || !(s.favor > 0)) errors.push(`Raid "${s.id}" (${inst}) has no numeric base favor (RAID_FAVOR entry missing?)`);
+      if (!s.patron || !PATRON_TIERS[s.patron]) errors.push(`Raid "${s.id}" patron "${s.patron}" has no PATRON_TIERS entry`);
+      return;
+    }
     (s.quests || []).forEach(q => {
       if (_favSeen.has(q)) return; _favSeen.add(q);
       if (!FAVOR_INDEX.slotToGroup[q]) errors.push(`SAGAS quest "${q}" (${s.id}) has no QUEST_FAVOR entry`);

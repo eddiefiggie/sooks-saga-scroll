@@ -2,11 +2,19 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07292026-6.html` — Build
-> `07292026.6` (2026-07-29). Retain set is **3 files**: the 2 most recent
-> overall (`-07292026-6` + `-07292026-5`, both 07-29) PLUS the most-recent
+> **Currently parked:** `sooks-saga-scroll-07292026-7.html` — Build
+> `07292026.7` (2026-07-29). Retain set is **3 files**: the 2 most recent
+> overall (`-07292026-7` + `-07292026-6`, both 07-29) PLUS the most-recent
 > previous-day build (`-07272026-7`, 07-27) as the cross-day rollback anchor.
-> Pruned this park (moved to `_to_delete/`): `-07292026-4`.
+> Pruned this park (moved to `_to_delete/`): `-07292026-5`.
+> **Build .7 — raids now reward patron favor.** A completed raid awards favor to its
+> own patron on the Patrons tab, from a wiki-sourced base (`RAID_FAVOR`, the Elite
+> value). Because difficulty isn't tracked, a plain **Complete** is assumed run on
+> **Hard** (⅔ of base, rounded); using the **Reaper** button assumes **Reaper** (==
+> Elite, full base). It's a flat per-raid award (not a `shares favor` group), appears/
+> disappears live with the raid's `sagaDone`, and a self-check now asserts every raid
+> carries a numeric base favor + a valid patron. Base favor for all 40 raids was
+> harvested from the ddowiki `{{Quest}}` infobox `favor` field.
 > **Build .6 fix — un-completing a raid reverts its hue.** The completed hue on a
 > raid card is now driven by the raid's own completion (`sagaDone[instance]`), not
 > the container's auto-bank `reward`. Auto-bank is one-way (it never resets to

@@ -46,6 +46,16 @@ Reincarnation, with no permanent "ever-earned" underlay. This makes it a this-li
 a mirror of the game's permanent patron favor. Distinct from account-wide total favor, which is
 explicitly out of scope.
 
+**Raids contribute too, under a different difficulty assumption (Build 07292026.7).** A completed
+raid awards favor to its own patron from a wiki-sourced base value (`RAID_FAVOR`, the Elite base),
+but — because the app can't know which difficulty was actually run — a plain **Complete** is assumed
+run on **Hard** (⅔ of the Elite base, rounded), while using the **Reaper** button is assumed
+**Reaper**, which grants the same favor as Elite in DDO (the full base). Unlike quests, a raid's award
+is a flat per-raid amount, not a `shares favor` [favor-group](#favor-group) dedup — each raid is one
+instance with one patron. The award appears/disappears live with the raid's own `sagaDone`, so
+un-completing a raid removes its favor. This is why raids skip the `QUEST_FAVOR` group loop entirely
+in `computeCharacterFavor` yet still show up on the Patrons dashboard.
+
 ### Favor-group
 The unit favor is counted by: a quest together with any `shares favor` partners across its Heroic /
 Epic / Legendary versions. Verified on the DDO Wiki — the Heroic and Epic versions of a quest carry
