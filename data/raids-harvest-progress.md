@@ -77,8 +77,19 @@ raid instance is Plane of Night (already seeded). Do not add a second container.
 - Denoised flagging omits some entries (e.g. Reaver's Fate's "Prison of the Planes" was
   recovered only from the flagging prose) — always cross-check the prose, not just links.
 
-## Remaining work
+## Status: COMPLETE (Build 07292026.1)
 
-U4: add the ~31 permanent raids above (2 seeded). Then re-verify (`runDataSelfCheck`
-0 errors incl. raid asserts; browser render + cascade), park (3-build retention), sync
-`index.html`, update `README.md` resume prompt, and open the PR.
+All **40 permanent raids** harvested and shipped (13 Heroic, 3 Epic, 24 Legendary).
+`runDataSelfCheck` 0 errors; browser render shows all three band sections + 40 cards;
+keyed derivation + cross-tab cascade verified; 0 console errors.
+
+**Correction logged:** the 5 raids first assumed to be seasonal/event — Fire on Thunder
+Peak, Killing Time, Too Hot to Handle, Hunt or Be Hunted, Skeletons in the Closet — were
+verified against their wiki categories and are all **permanent**; they were included. No
+raid in Category:Raids is event-gated. "The Vault of Night" (pageid 7601) was skipped as
+a duplicate of the Plane of Night (VoN 6) raid instance.
+
+**One documented approximation:** `Caught in the Web` flags via the full Menace of the
+Underdark story arc; its exact pre-raid subset wasn't cleanly enumerable, so it is modeled
+with the arc entry quest (`The Battle for Eveningstar`) as a keyed proxy, with the full
+requirement noted in its storyArc. Refine to the precise MotU flagging subset if desired.

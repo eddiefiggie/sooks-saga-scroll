@@ -2,16 +2,20 @@
 
 **Category:** Personal
 
-> **Currently parked:** `sooks-saga-scroll-07272026-7.html` — Build
-> `07272026.7` (2026-07-27). Retain set is **3 files**: the 2 most recent
-> overall (`-07272026-7` + `-07272026-6`, both 07-27) PLUS the most-recent
-> previous-day build (`-07262026-8`, 07-26) as the cross-day rollback anchor.
-> Pruned this park: `-07272026-5`.
-> Latest: Patron header now aligns exactly with the Saga tier headers (same
-> width/center/vertical gap; the sweep-in is vertical so it no longer slides the
-> header sideways). Earlier: Patron header reuses the tier-header treatment; polished segmented tabs; patron-favor tracking (Patrons
-> tab) + code-review hardening — full
-> changelog in the Files and Resume-prompt sections below. (This is the line the
+> **Currently parked:** `sooks-saga-scroll-07292026-1.html` — Build
+> `07292026.1` (2026-07-29). Retain set is **2 files**: the 2 most recent
+> overall (`-07292026-1` (07-29) + `-07272026-7` (07-27)); `-07272026-7` also
+> serves as the most-recent-previous-day cross-day rollback anchor.
+> Pruned this park (moved to `_to_delete/`): `-07272026-6`, `-07262026-8`.
+> Latest: **NEW Raids tab** (Saga | Raids | Patrons) — a per-character tracker
+> for all 40 permanent Heroic/Epic/Legendary raids, modeled like saga content,
+> with derived "keyed" status (from each raid's wiki-sourced flagging chain),
+> cross-tab shared-quest cascade, live-LFM parity, and self-check integrity
+> asserts. Schema bumped v14 → **v15** (purely additive — raid completion reuses
+> the existing per-quest state; no new persisted field). `DDO_REF_EPOCH` 3 → 4.
+> Built via the CE pipeline (brainstorm → plan → work); plan at
+> `docs/plans/2026-07-29-001-feat-raids-tab-plan.md`, harvest provenance at
+> `data/raids-harvest-progress.md`. (This is the line the
 > Pages deploy workflow reads to pick which build to publish — keep its filename
 > current every park.) The older note that follows is retained for history.
 > **Slimmer saga-header
